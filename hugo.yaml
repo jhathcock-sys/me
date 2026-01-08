@@ -30,7 +30,7 @@ params:
     subtitle: "Senior Systems Engineer | IT Director | 30+ Years Exp"
     buttons:
       - name: View Full Resume
-        url: "/resume"
+        url: "/resume/"
       - name: Email Me
         url: "mailto:jhathcock@gmail.com"
       - name: LinkedIn
