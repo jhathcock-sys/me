@@ -1,4 +1,50 @@
-theme: "PaperMod"
 baseURL: "https://jhathcock-sys.github.io/me/"
 languageCode: "en-us"
-title: "My IT Portfolio"
+title: "James Hathcock"
+theme: "PaperMod"
+
+enableRobotsTXT: true
+buildDrafts: false
+buildFuture: false
+
+# This creates the navigation bar at the top right
+menu:
+  main:
+    - identifier: resume
+      name: Resume
+      url: /resume/
+      weight: 10
+    - identifier: projects
+      name: Projects
+      url: /projects/
+      weight: 20
+
+params:
+  defaultTheme: auto # Respects user's system preference (Dark/Light)
+  ShowShareButtons: false
+  
+  # --- The "Hero" Card on the Homepage ---
+  profileMode:
+    enabled: true
+    title: "James Hathcock"
+    subtitle: "Senior Systems Engineer | IT Director | 30+ Years Exp"
+    buttons:
+      - name: View Full Resume
+        url: "/resume"
+      - name: Email Me
+        url: "mailto:jhathcock@gmail.com"
+      - name: LinkedIn
+        url: "https://linkedin.com/in/jameshathcock"
+
+  # --- Social Icons (Appears at bottom of the Hero Card) ---
+  socialIcons:
+    - name: linkedin
+      url: "https://linkedin.com/in/jameshathcock"
+    - name: email
+      url: "mailto:jhathcock@gmail.com"
+    - name: github
+      url: "https://github.com/jhathcock-sys"
+
+  # --- Theme Settings ---
+  assets:
+    disableHLJS: true # Disables code highlighting if you don't need it (speeds up site)
