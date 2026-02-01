@@ -88,7 +88,7 @@ High-availability node for DNS redundancy and isolated services, managed remotel
 
 ## 🚀 Infrastructure as Code
 
-All Docker compose files are managed via GitOps. See my [GitOps Project](/projects/gitops/) for details on the repository structure and deployment workflow.
+All Docker compose files are managed via GitOps. See my [GitOps Project](../gitops/) for details on the repository structure and deployment workflow.
 
 **Repository:** [github.com/jhathcock-sys/Dockers](https://github.com/jhathcock-sys/Dockers)
 

@@ -7,7 +7,7 @@ showToc: true
 tocOpen: true
 ---
 
-> 📄 **[Download PDF Resume](/files/James_Hathcock_Resume.pdf)**
+> 📄 **[Download PDF Resume](/me/files/James_Hathcock_Resume.pdf)**
 
 ---
 

@@ -11,14 +11,14 @@ A collection of technical projects demonstrating hands-on experience with infras
 
 ## Featured Projects
 
-### [Home Lab](/projects/home-lab/)
+### [Home Lab](../home-lab/)
 Self-hosted infrastructure running on Proxmox and Raspberry Pi. Includes monitoring, DNS, dashboards, and containerized services managed via Dockhand.
 
 **Technologies:** Proxmox, Docker, Pi-hole, Grafana, Prometheus, Tailscale
 
 ---
 
-### [GitOps Infrastructure](/projects/gitops/)
+### [GitOps Infrastructure](../gitops/)
 Infrastructure as Code repository for managing all homelab Docker configurations. Version-controlled deployments with secrets management and remote stack control via Hawser.
 
 **Technologies:** Git, Docker Compose, Dockhand, GitHub

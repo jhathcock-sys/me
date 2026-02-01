@@ -39,9 +39,9 @@ params:
     subtitle: "Senior Systems Engineer | IT Director | 30+ Years Exp"
     buttons:
       - name: View Resume
-        url: "/resume/"
+        url: "/me/resume/"
       - name: Download PDF
-        url: "/files/James_Hathcock_Resume.pdf"
+        url: "/me/files/James_Hathcock_Resume.pdf"
       - name: LinkedIn
         url: "https://linkedin.com/in/jameshathcock"
 
