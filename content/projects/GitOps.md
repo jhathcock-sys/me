@@ -1,101 +1,148 @@
-# GitOps Configs for ProxMox Docker-SRV
+---
+title: "GitOps Infrastructure"
+date: 2026-01-26
+draft: false
+---
 
-**Author:** James Hathcock
-**Date:** January 26th, 2026
+# 🔄 GitOps Infrastructure
 
-## Project Description
+**Repository:** [github.com/jhathcock-sys/Dockers](https://github.com/jhathcock-sys/Dockers)
 
-I am moving all of my Yamls to GIT for management by Dockhand on my servers.  At some point I would like to move to **Kubernettes** but for now I am working my way to that.  Working with a learning curve but documentation to what I am striving for.
+## Project Overview
 
-### Uptime Kuma
+Infrastructure as Code for my homelab environment. All Docker Compose configurations are version-controlled in Git, enabling reproducible deployments, change tracking, and easy rollbacks.
 
-```YAML
-services:
-  uptime-kuma:
-    image: louislam/uptime-kuma:1
-    container_name: uptime-kuma
-    volumes:
-      - ./data:/app/data
-      - /var/run/docker.sock:/var/run/docker.sock # Optional: Allows it to monitor Docker containers directly
-    ports:
-      - "3001:3001"
-    restart: unless-stopped
+This is a stepping stone toward full Kubernetes orchestration, building GitOps practices while working with Docker Compose.
+
+---
+
+## 📁 Repository Structure
+
+```
+homelab-ops/
+├── proxmox/                    # ProxMoxBox (192.168.1.4) stacks
+│   ├── dockhand/               # Docker management UI
+│   ├── homepage/               # Dashboard + config files
+│   │   └── config/             # services.yaml, widgets.yaml, etc.
+│   ├── homelab-tools/          # Homebox asset inventory
+│   ├── minecraft/              # PaperMC + Geyser/Floodgate
+│   ├── monitoring/             # Prometheus, Grafana, Node Exporter, cAdvisor
+│   │   └── prometheus/         # prometheus.yml scrape configs
+│   ├── nginx-proxy-manager/    # Reverse proxy
+│   └── uptime-kuma/            # Service health monitoring
+│
+└── pi5/                        # Raspberry Pi 5 stacks (via Hawser)
+    ├── infra/                  # Pi-hole + Tailscale
+    ├── mealie/                 # Recipe management
+    └── nebula-sync/            # Pi-hole sync
 ```
 
-### Home Lab Tools Stack
+---
 
-```YAML
+## 🚀 Deployment Workflow
+
+### Local Stacks (ProxMoxBox)
+
+```bash
+# 1. Edit compose files locally
+vim proxmox/homepage/docker-compose.yaml
+
+# 2. Commit and push
+git add . && git commit -m "Update homepage config"
+git push
+
+# 3. On server: pull and deploy
+cd /opt/homepage
+git pull
+docker compose up -d
+```
+
+### Remote Stacks (Pi5 via Hawser)
+
+Pi5 stacks are managed remotely through Dockhand's **Hawser** agent:
+- Compose files live on ProxMoxBox at `/opt/pi5-stacks/`
+- Hawser executes commands on the Pi5 Docker daemon
+- No SSH required for routine deployments
+
+---
+
+## 🗺️ Path Mapping
+
+| Git Path | Deploy Path | Server |
+|----------|-------------|--------|
+| `proxmox/<stack>/` | `/opt/<stack>/` | ProxMoxBox |
+| `pi5/<stack>/` | `/opt/pi5-stacks/<stack>/` | ProxMoxBox (Hawser → Pi5) |
+
+---
+
+## 🔧 Stack Management with Dockhand
+
+[Dockhand](https://github.com/fnsys/dockhand) provides a web UI for Docker management:
+
+- **Stack Import:** Adopt existing containers by pointing to compose files
+- **Remote Management:** Hawser agent enables control of remote Docker hosts
+- **Compose Editing:** Edit and redeploy stacks from the UI
+
+### Key Configuration
+
+```yaml
 services:
-  # Homarr - Your Dashboard
-  homarr:
-    container_name: homarr
-    image: ghcr.io/ajnart/homarr:latest
-    restart: unless-stopped
-    volumes:
-      - ./homarr/configs:/app/data/configs
-      - ./homarr/icons:/app/public/icons
-      - /var/run/docker.sock:/var/run/docker.sock # Optional: Lets Homarr control local containers
-    ports:
-      - "7575:7575"
-
-  # HomeBox - Asset Inventory
-  homebox:
-    image: ghcr.io/sysadminsmedia/homebox:latest
-    container_name: homebox
-    restart: unless-stopped
+  dockhand:
+    image: fnsys/dockhand:latest
     environment:
-      - HBOX_LOG_LEVEL=info
-      - HBOX_LOG_FORMAT=text
-      - HBOX_WEB_PORT=3100
-      - HBOX_OPTIONS_ALLOW_REGISTRATION=true # Set to false after you create your account!
+      - HOST_DATA_DIR=/opt          # Path resolution for stacks
     volumes:
-      - ./homebox-data:/data
-    ports:
-      - "3100:3100"
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt:/opt                   # Access to all compose files
 ```
 
-### Minecraft Server for Daughter
+---
 
-```YAML
-services:
-  mc:
-    image: itzg/minecraft-server
-    container_name: mc-server
-    tty: true
-    stdin_open: true
-    ports:
-      - "25565:25565"       # Java Port
-      - "19132:19132/udp"   # Bedrock Port (Mapped directly to this container)
-    environment:
-      EULA: "TRUE"
-      TYPE: "PAPER"
-      VERSION: "LATEST"
-      MEMORY: "6G"
-      MOTD: "Hosted on Dell R430"
-      MAX_PLAYERS: 10
-      # This variable tells the container to auto-download these plugins on boot
-      PLUGINS: |
-        https://download.geysermc.org/v2/projects/geyser/versions/latest/builds/latest/downloads/spigot
-        https://download.geysermc.org/v2/projects/floodgate/versions/latest/builds/latest/downloads/spi>
-    volumes:
-      - ./data:/data
-    restart: unless-stopped
+## 🔐 Secrets Management
+
+Sensitive values are kept out of Git using `.env` files:
+
+```bash
+# Template provided in repo
+cp .env.example .env
+
+# Generate encryption keys
+openssl rand -hex 32
 ```
 
-### Homepage (Dashboard)
+**Pattern:**
+- `.env.example` → Committed (templates with placeholders)
+- `.env` → Gitignored (actual secrets)
 
-```YAML
-services:
-  homepage:
-    image: ghcr.io/gethomepage/homepage:latest
-    container_name: homepage
-    ports:
-      - 4000:4000
-    volumes:
-      - /opt/homepage/config:/app/config
-      - /var/run/docker.sock:/var/run/docker.sock:ro # Optional for Docker Integration
-    environment:
-      HOMEPAGE_ALLOWED_HOSTS: gethomepage.dev,192.168.1.4:4000,dashboard.home.lab #required adding port may be needed was for me
-```
+---
 
+## 📊 Current Stacks
 
+### ProxMoxBox Services
+
+| Stack | Ports | Purpose |
+|-------|-------|---------|
+| dockhand | 3000 | Docker management |
+| homepage | 4000 | Dashboard |
+| homelab-tools | 3100 | Homebox inventory |
+| minecraft | 25565, 19132/udp | Game server |
+| monitoring | 3030, 9090, 9100, 8081 | Grafana, Prometheus, exporters |
+| nginx-proxy-manager | 80, 443, 81 | Reverse proxy |
+| uptime-kuma | 3001 | Health monitoring |
+
+### Pi5 Services (via Hawser)
+
+| Stack | Services | Purpose |
+|-------|----------|---------|
+| infra | Pi-hole, Tailscale | DNS + VPN |
+| mealie | Mealie | Recipe management |
+| nebula-sync | Nebula-sync | Pi-hole replication |
+
+---
+
+## 📋 Future Plans
+
+- [ ] Implement CI/CD pipeline for automated deployments
+- [ ] Add pre-commit hooks for YAML linting
+- [ ] Migrate to Kubernetes with ArgoCD
+- [ ] Set up Renovate for automated image updates

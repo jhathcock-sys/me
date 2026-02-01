@@ -1,67 +1,103 @@
+---
+title: "Home Lab"
+date: 2026-01-08
+draft: false
+---
+
 # 🏠 My Homelab Setup
 
-Welcome to my homelab documentation. This repository tracks the infrastructure, services, and networking configuration of my self-hosted environment. The goal is to create a resilient, automated, and organized system for home automation, media, and development.
+Welcome to my homelab documentation. This project tracks the infrastructure, services, and networking configuration of my self-hosted environment. The goal is to create a resilient, automated, and organized system for home services, monitoring, and development.
 
 ## 🛠 Hardware Infrastructure
 
 | Device | Role | OS / Hypervisor | Specs/Notes |
 | :--- | :--- | :--- | :--- |
-| **Dell R430** | Primary Server | **Proxmox VE 9** | The heavy lifter. Runs LXC containers and manages core network services. |
-| **Raspberry Pi 5** | Secondary Node | **Debian (Docker)** | Dedicated low-power node for redundancy and specific lightweight services. |
+| **Dell R430** | Primary Server | **Proxmox VE** | The heavy lifter. Runs LXC containers and manages core network services. |
+| **Raspberry Pi 5** | Secondary Node | **Debian (Docker)** | Low-power node for DNS redundancy and lightweight services. |
+| **Synology NAS** | Network Storage | **DSM** | Centralized file storage and backups. |
 
 ---
 
 ## ☁️ Virtualization & Software Stack
 
-### 🖥️ Node 1: Dell R430 (Proxmox VE)
-The Proxmox host manages three distinct **LXC Containers** to separate concerns:
+### 🖥️ Node 1: Dell R430 (ProxMoxBox - 192.168.1.4)
 
-1.  **Nginx Proxy Manager (NPM)** 🛡️
-    * Dedicated LXC for reverse proxying.
-    * Handles SSL termination and routing for `*.home.lab`.
-2.  **Pi-hole (Primary)** 🛑
-    * Dedicated LXC for network-wide ad blocking and local DNS.
-3.  **Docker Host** 🐳
-    * A heavy-duty LXC container running the core application stack.
-    * **Managed by:** [Komodo](https://komodo.io)
-    * **Services Running:**
-        * **Homebox:** Asset inventory and tracking.
-        * **Homarr:** Main dashboard for the lab.
-        * **Homepage:** Secondary status page.
-        * **Minecraft Server:** Hosted game server.
-        * **Syncthing:** File synchronization across devices.
+The Proxmox host runs **LXC Containers** to separate concerns:
 
-### 🍓 Node 2: Raspberry Pi 5 (Docker)
-Functions as a high-availability node for DNS and isolated services.
+1. **Nginx Proxy Manager** 🛡️
+   * Reverse proxy with SSL termination
+   * Routes all `*.home.lab` traffic
 
-* **Mealie:** Recipe and meal planning manager.
-* **Pi-hole (Secondary):** Redundant DNS to ensure uptime if the R430 is rebooting.
-* **Nebula-Sync:** Automatically syncs DNS records, blocklists, and settings between the Primary (R430) and Secondary (Pi) Pi-hole instances.
+2. **Pi-hole (Primary)** 🛑
+   * Network-wide ad blocking and local DNS (ns1.home.lab)
+
+3. **Docker Host** 🐳
+   * Core application stack managed by **Dockhand**
+   * **Services Running:**
+     * **Homepage:** Primary dashboard for the lab
+     * **Homebox:** Asset inventory and tracking
+     * **Uptime Kuma:** Service health monitoring
+     * **Minecraft Server:** PaperMC with Geyser/Floodgate (Java + Bedrock)
+     * **Syncthing:** File synchronization across devices
+
+4. **Monitoring Stack** 📊
+   * **Grafana:** Dashboards and visualization
+   * **Prometheus:** Metrics collection and storage
+   * **Node Exporter:** System metrics
+   * **cAdvisor:** Container metrics
+
+### 🍓 Node 2: Raspberry Pi 5 (192.168.1.234)
+
+High-availability node for DNS redundancy and isolated services, managed remotely via **Hawser** agent.
+
+* **Pi-hole (Secondary):** Redundant DNS (ns2) for uptime during R430 reboots
+* **Tailscale:** Secure zero-config VPN access
+* **Mealie:** Recipe and meal planning manager
+* **Nebula-Sync:** Syncs DNS records and blocklists between Pi-hole instances
+* **Node Exporter:** System metrics fed to Prometheus
 
 ---
 
 ## 🌐 Networking & DNS
 
-* **Domain:** `home.lab` (Local only)
-* **Reverse Proxy:** Nginx Proxy Manager (LXC) routes all `*.home.lab` traffic to the correct container IPs.
-* **Remote Access:** **Tailscale** 🛡️ is installed on all nodes to provide secure, zero-config remote access without opening ports on the firewall.
+| IP | Device | Role |
+|----|--------|------|
+| 192.168.1.3 | Primary Pi-hole | Main DNS (ns1.home.lab) |
+| 192.168.1.4 | ProxMoxBox | Main Docker host |
+| 192.168.1.5 | Synology NAS | Network storage |
+| 192.168.1.6 | Nginx Proxy Manager | Reverse proxy |
+| 192.168.1.234 | Pi5 | Secondary DNS, Tailscale |
+| 192.168.1.253 | Proxmox | Hypervisor management |
 
 ### DNS Flow
-1.  Client requests `homarr.home.lab`.
-2.  **Pi-hole** resolves domain to the **NPM** IP address.
-3.  **NPM** routes the request to the specific **Docker Container** port.
+1. Client requests `dashboard.home.lab`
+2. **Pi-hole** resolves domain to the **NPM** IP address
+3. **NPM** routes the request to the correct **Docker container** port
 
 ---
 
 ## 📊 Dashboard & Management
 
-* **Infrastructure Management:** Proxmox Web UI & Komodo.
-* **Application Dashboard:** [Homarr](https://homarr.dev) serves as the "Start Page" for the network.
-* **Inventory:** Homebox tracks physical IT gear and 3D printing filaments.
+* **Docker Management:** [Dockhand](http://192.168.1.4:3000) - UI for managing all stacks locally and remotely via Hawser
+* **Application Dashboard:** [Homepage](http://192.168.1.4:4000) - Central hub for all services
+* **Monitoring:** [Grafana](http://192.168.1.4:3030) - System and container metrics
+* **Health Checks:** [Uptime Kuma](http://192.168.1.4:3001) - Service availability monitoring
+* **Inventory:** [Homebox](http://192.168.1.4:3100) - Physical IT gear tracking
 
 ---
 
-## 🚀 Future Plans
-- [ ] Migrate critical data backups to offsite storage.
-- [ ] Implement additional alerting via Komodo.
-- [ ] Explore automated OS patching with Ansible.
+## 🚀 Infrastructure as Code
+
+All Docker compose files are managed via GitOps. See my [GitOps Project](/projects/gitops/) for details on the repository structure and deployment workflow.
+
+**Repository:** [github.com/jhathcock-sys/Dockers](https://github.com/jhathcock-sys/Dockers)
+
+---
+
+## 📋 Future Plans
+
+- [ ] Add media stack (Jellyfin/Plex, Sonarr, Radarr)
+- [ ] Implement Home Assistant for home automation
+- [ ] Migrate to Kubernetes for orchestration
+- [ ] Set up offsite backups to cloud storage
+- [ ] Add alerting via Grafana/Prometheus
