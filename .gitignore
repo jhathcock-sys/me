@@ -1,0 +1,9 @@
+# Local Claude memory
+CLAUDE.local.md
+
+# Hugo
+.hugo_build.lock
+resources/_gen/
+
+# OS
+.DS_Store
