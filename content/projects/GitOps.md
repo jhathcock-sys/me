@@ -126,7 +126,7 @@ openssl rand -hex 32
 | homepage | 4000 | Dashboard |
 | homelab-tools | 3100 | Homebox inventory |
 | minecraft | 25565, 19132/udp | Game server |
-| monitoring | 3030, 9090, 9100, 8081 | Grafana, Prometheus, exporters |
+| monitoring | 3030, 9090, 9100, 8081, 3101 | Grafana, Prometheus, Loki, exporters |
 | nginx-proxy-manager | 80, 443, 81 | Reverse proxy |
 | uptime-kuma | 3001 | Health monitoring |
 
@@ -137,6 +137,7 @@ openssl rand -hex 32
 | infra | Pi-hole, Tailscale | DNS + VPN |
 | mealie | Mealie | Recipe management |
 | nebula-sync | Nebula-sync | Pi-hole replication |
+| promtail | Promtail | Log collection to Loki |
 
 ---
 

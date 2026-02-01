@@ -43,6 +43,8 @@ The Proxmox host runs **LXC Containers** to separate concerns:
 4. **Monitoring Stack** 📊
    * **Grafana:** Dashboards and visualization
    * **Prometheus:** Metrics collection and storage
+   * **Loki:** Centralized log aggregation
+   * **Promtail:** Log collector agent
    * **Node Exporter:** System metrics
    * **cAdvisor:** Container metrics
 
@@ -55,6 +57,7 @@ High-availability node for DNS redundancy and isolated services, managed remotel
 * **Mealie:** Recipe and meal planning manager
 * **Nebula-Sync:** Syncs DNS records and blocklists between Pi-hole instances
 * **Node Exporter:** System metrics fed to Prometheus
+* **Promtail:** Log collector sending to Loki
 
 ---
 
@@ -80,7 +83,8 @@ High-availability node for DNS redundancy and isolated services, managed remotel
 
 * **Docker Management:** [Dockhand](http://192.168.1.4:3000) - UI for managing all stacks locally and remotely via Hawser
 * **Application Dashboard:** [Homepage](http://192.168.1.4:4000) - Central hub for all services
-* **Monitoring:** [Grafana](http://192.168.1.4:3030) - System and container metrics
+* **Monitoring:** [Grafana](http://192.168.1.4:3030) - Metrics dashboards and log exploration
+* **Log Aggregation:** [Loki](http://192.168.1.4:3101) - Centralized logs from all hosts
 * **Health Checks:** [Uptime Kuma](http://192.168.1.4:3001) - Service availability monitoring
 * **Inventory:** [Homebox](http://192.168.1.4:3100) - Physical IT gear tracking
 
