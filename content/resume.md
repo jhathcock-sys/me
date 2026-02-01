@@ -7,6 +7,10 @@ showToc: true
 tocOpen: true
 ---
 
+> 📄 **[Download PDF Resume](/files/James_Hathcock_Resume.pdf)**
+
+---
+
 ## Professional Summary
 Senior Systems Engineer with **30 years of experience** architecting, securing, and optimizing enterprise IT infrastructure. Expert in cloud services (Azure/O365), virtualization, systems management, and network engineering. 
 

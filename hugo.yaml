@@ -7,7 +7,7 @@ enableRobotsTXT: true
 buildDrafts: false
 buildFuture: false
 
-# This creates the navigation bar at the top right
+# Navigation menu
 menu:
   main:
     - identifier: resume
@@ -20,23 +20,32 @@ menu:
       weight: 20
 
 params:
-  defaultTheme: auto # Respects user's system preference (Dark/Light)
+  # SEO and Open Graph
+  description: "Senior Systems Engineer with 30+ years experience in cloud infrastructure, Azure, and enterprise IT."
+  author: "James Hathcock"
+  keywords: ["Systems Engineer", "Azure", "DevOps", "Infrastructure", "IT Director"]
+
+  # Theme settings
+  defaultTheme: auto
   ShowShareButtons: false
-  
-  # --- The "Hero" Card on the Homepage ---
+  ShowReadingTime: true
+  ShowBreadCrumbs: true
+  ShowPostNavLinks: true
+
+  # Hero card on homepage
   profileMode:
     enabled: true
     title: "James Hathcock"
     subtitle: "Senior Systems Engineer | IT Director | 30+ Years Exp"
     buttons:
-      - name: View Full Resume
-        url: "/me/resume/"
-      - name: Email Me
-        url: "mailto:jhathcock@gmail.com"
+      - name: View Resume
+        url: "/resume/"
+      - name: Download PDF
+        url: "/files/James_Hathcock_Resume.pdf"
       - name: LinkedIn
         url: "https://linkedin.com/in/jameshathcock"
 
-  # --- Social Icons (Appears at bottom of the Hero Card) ---
+  # Social icons
   socialIcons:
     - name: linkedin
       url: "https://linkedin.com/in/jameshathcock"
@@ -45,6 +54,6 @@ params:
     - name: github
       url: "https://github.com/jhathcock-sys"
 
-  # --- Theme Settings ---
+  # Enable code highlighting for project pages
   assets:
-    disableHLJS: true # Disables code highlighting if you don't need it (speeds up site)
+    disableHLJS: false
