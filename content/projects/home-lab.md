@@ -87,12 +87,12 @@ High-availability node for DNS redundancy and isolated services, managed remotel
 
 ### Wazuh SIEM (192.168.1.7)
 
-Dedicated VM running the full Wazuh security stack for centralized security monitoring across all homelab hosts.
+Dedicated VM (Debian 12) running Wazuh v4.14.2 for centralized security monitoring across all homelab hosts.
 
 **Components:**
 * **Wazuh Manager:** Core SIEM engine - processes security events, file integrity monitoring, vulnerability detection
 * **Wazuh Indexer:** OpenSearch-based backend for storing and searching security data
-* **Wazuh Dashboard:** Web UI for security analysis, threat hunting, and compliance reporting
+* **Wazuh Dashboard:** Web UI for security analysis, threat hunting, and compliance reporting (https://192.168.1.7)
 * **Filebeat:** Ships alerts from manager to indexer
 
 **Agents Deployed:**
@@ -120,7 +120,7 @@ Dedicated VM running the full Wazuh security stack for centralized security moni
 * **Log Aggregation:** [Loki](http://192.168.1.4:3101) - Centralized logs from all hosts
 * **Health Checks:** [Uptime Kuma](http://192.168.1.4:3001) - Service availability monitoring
 * **Inventory:** [Homebox](http://192.168.1.4:3100) - Physical IT gear tracking
-* **SIEM:** [Wazuh Dashboard](http://192.168.1.7:443) - Security event analysis and threat detection
+* **SIEM:** [Wazuh Dashboard](https://192.168.1.7) - Security event analysis and threat detection
 
 ---
 
