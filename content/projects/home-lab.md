@@ -42,11 +42,11 @@ The Proxmox host runs **LXC Containers** to separate concerns:
 
 4. **Monitoring & Alerting Stack** 📊
    * **Grafana:** Dashboards and visualization (custom Homelab Overview + Docker Containers dashboards)
-   * **Prometheus:** Metrics collection and storage
+   * **Prometheus:** Metrics collection from 7 targets (ProxMoxBox, Pi5, Pi-hole LXC, NPM LXC, Wazuh VM, cAdvisor)
    * **Alertmanager:** Alert routing with Discord notifications
    * **Loki:** Centralized log aggregation
    * **Promtail:** Log collector agent
-   * **Node Exporter:** System metrics
+   * **Node Exporter:** Installed on all hosts for system metrics
    * **cAdvisor:** Container metrics
 
    **Alerts Configured:** Disk space >80%/90%, High CPU/Memory >90%, Host down, Container down, Target scrape failures
