@@ -72,6 +72,7 @@ High-availability node for DNS redundancy and isolated services, managed remotel
 | 192.168.1.4 | ProxMoxBox | Main Docker host |
 | 192.168.1.5 | Synology NAS | Network storage |
 | 192.168.1.6 | Nginx Proxy Manager | Reverse proxy |
+| 192.168.1.7 | Wazuh VM | SIEM (security monitoring) |
 | 192.168.1.234 | Pi5 | Secondary DNS, Tailscale |
 | 192.168.1.253 | Proxmox | Hypervisor management |
 
@@ -79,6 +80,34 @@ High-availability node for DNS redundancy and isolated services, managed remotel
 1. Client requests `dashboard.home.lab`
 2. **Pi-hole** resolves domain to the **NPM** IP address
 3. **NPM** routes the request to the correct **Docker container** port
+
+---
+
+## 🔐 Security & SIEM
+
+### Wazuh SIEM (192.168.1.7)
+
+Dedicated VM running the full Wazuh security stack for centralized security monitoring across all homelab hosts.
+
+**Components:**
+* **Wazuh Manager:** Core SIEM engine - processes security events, file integrity monitoring, vulnerability detection
+* **Wazuh Indexer:** OpenSearch-based backend for storing and searching security data
+* **Wazuh Dashboard:** Web UI for security analysis, threat hunting, and compliance reporting
+* **Filebeat:** Ships alerts from manager to indexer
+
+**Agents Deployed:**
+| Host | Agent Name | Monitors |
+|------|------------|----------|
+| ProxMoxBox (192.168.1.4) | SRV-DOCKER01 | Docker host, containers, system logs |
+| Pi5 (192.168.1.234) | pi-infra | DNS server, Tailscale, system logs |
+
+**Capabilities:**
+* Real-time log analysis and correlation
+* File integrity monitoring (FIM)
+* Vulnerability detection
+* Security Configuration Assessment (SCA)
+* Rootkit detection
+* Ready for Suricata IDS integration (planned with OPNsense)
 
 ---
 
@@ -91,6 +120,7 @@ High-availability node for DNS redundancy and isolated services, managed remotel
 * **Log Aggregation:** [Loki](http://192.168.1.4:3101) - Centralized logs from all hosts
 * **Health Checks:** [Uptime Kuma](http://192.168.1.4:3001) - Service availability monitoring
 * **Inventory:** [Homebox](http://192.168.1.4:3100) - Physical IT gear tracking
+* **SIEM:** [Wazuh Dashboard](http://192.168.1.7:443) - Security event analysis and threat detection
 
 ---
 
@@ -105,9 +135,9 @@ All Docker compose files are managed via GitOps. See my [GitOps Project](../gito
 ## 📋 Future Plans
 
 - [ ] **OPNsense + Managed Switch** - Enterprise networking with VLANs and IDS/IPS
-- [ ] **Wazuh SIEM** - Security monitoring and log correlation
 - [ ] Add media stack (Jellyfin/Plex, Sonarr, Radarr)
 - [ ] Implement Home Assistant for home automation
 - [ ] Migrate to Kubernetes for orchestration
 - [ ] Set up offsite backups to cloud storage
 - [x] ~~Add alerting via Grafana/Prometheus~~ (Completed - Discord notifications active)
+- [x] ~~Wazuh SIEM~~ (Completed - agents on ProxMoxBox and Pi5, ready for Suricata integration)
