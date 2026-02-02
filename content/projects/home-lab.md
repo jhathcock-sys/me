@@ -40,13 +40,16 @@ The Proxmox host runs **LXC Containers** to separate concerns:
      * **Minecraft Server:** PaperMC with Geyser/Floodgate (Java + Bedrock)
      * **Syncthing:** File synchronization across devices
 
-4. **Monitoring Stack** 📊
-   * **Grafana:** Dashboards and visualization
+4. **Monitoring & Alerting Stack** 📊
+   * **Grafana:** Dashboards and visualization (custom Homelab Overview + Docker Containers dashboards)
    * **Prometheus:** Metrics collection and storage
+   * **Alertmanager:** Alert routing with Discord notifications
    * **Loki:** Centralized log aggregation
    * **Promtail:** Log collector agent
    * **Node Exporter:** System metrics
    * **cAdvisor:** Container metrics
+
+   **Alerts Configured:** Disk space >80%/90%, High CPU/Memory >90%, Host down, Container down, Target scrape failures
 
 ### 🍓 Node 2: Raspberry Pi 5 (192.168.1.234)
 
@@ -83,7 +86,8 @@ High-availability node for DNS redundancy and isolated services, managed remotel
 
 * **Docker Management:** [Dockhand](http://192.168.1.4:3000) - UI for managing all stacks locally and remotely via Hawser
 * **Application Dashboard:** [Homepage](http://192.168.1.4:4000) - Central hub for all services
-* **Monitoring:** [Grafana](http://192.168.1.4:3030) - Metrics dashboards and log exploration
+* **Monitoring:** [Grafana](http://192.168.1.4:3030) - Custom dashboards for homelab overview and container metrics
+* **Alerting:** [Alertmanager](http://192.168.1.4:9093) - Alert routing with Discord notifications
 * **Log Aggregation:** [Loki](http://192.168.1.4:3101) - Centralized logs from all hosts
 * **Health Checks:** [Uptime Kuma](http://192.168.1.4:3001) - Service availability monitoring
 * **Inventory:** [Homebox](http://192.168.1.4:3100) - Physical IT gear tracking
@@ -100,8 +104,10 @@ All Docker compose files are managed via GitOps. See my [GitOps Project](../gito
 
 ## 📋 Future Plans
 
+- [ ] **OPNsense + Managed Switch** - Enterprise networking with VLANs and IDS/IPS
+- [ ] **Wazuh SIEM** - Security monitoring and log correlation
 - [ ] Add media stack (Jellyfin/Plex, Sonarr, Radarr)
 - [ ] Implement Home Assistant for home automation
 - [ ] Migrate to Kubernetes for orchestration
 - [ ] Set up offsite backups to cloud storage
-- [ ] Add alerting via Grafana/Prometheus
+- [x] ~~Add alerting via Grafana/Prometheus~~ (Completed - Discord notifications active)

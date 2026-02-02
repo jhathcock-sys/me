@@ -26,8 +26,12 @@ homelab-ops/
 │   │   └── config/             # services.yaml, widgets.yaml, etc.
 │   ├── homelab-tools/          # Homebox asset inventory
 │   ├── minecraft/              # PaperMC + Geyser/Floodgate
-│   ├── monitoring/             # Prometheus, Grafana, Node Exporter, cAdvisor
-│   │   └── prometheus/         # prometheus.yml scrape configs
+│   ├── monitoring/             # Full observability stack
+│   │   ├── alertmanager/       # Alert routing config (Discord)
+│   │   ├── prometheus/         # Scrape configs + alert rules
+│   │   ├── loki/               # Log aggregation config
+│   │   ├── promtail/           # Log collector config
+│   │   └── grafana/            # Dashboard provisioning
 │   ├── nginx-proxy-manager/    # Reverse proxy
 │   └── uptime-kuma/            # Service health monitoring
 │
@@ -126,7 +130,7 @@ openssl rand -hex 32
 | homepage | 4000 | Dashboard |
 | homelab-tools | 3100 | Homebox inventory |
 | minecraft | 25565, 19132/udp | Game server |
-| monitoring | 3030, 9090, 9100, 8081, 3101 | Grafana, Prometheus, Loki, exporters |
+| monitoring | 3030, 9090, 9093, 9100, 8081, 3101 | Grafana, Prometheus, Alertmanager, Loki, exporters |
 | nginx-proxy-manager | 80, 443, 81 | Reverse proxy |
 | uptime-kuma | 3001 | Health monitoring |
 
