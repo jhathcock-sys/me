@@ -99,7 +99,9 @@ Dedicated VM (Debian 12) running Wazuh v4.14.2 for centralized security monitori
 | Host | Agent Name | Monitors |
 |------|------------|----------|
 | ProxMoxBox (192.168.1.4) | SRV-DOCKER01 | Docker host, containers, system logs |
-| Pi5 (192.168.1.234) | pi-infra | DNS server, Tailscale, system logs |
+| Pi5 (192.168.1.234) | pi-infra | Secondary DNS, Tailscale, system logs |
+| Pi-hole LXC (192.168.1.3) | SRV-DNS01 | Primary DNS server, Pi-hole logs |
+| NPM LXC (192.168.1.6) | SRV-NPM01 | Reverse proxy, SSL certificates, access logs |
 
 **Capabilities:**
 * Real-time log analysis and correlation
