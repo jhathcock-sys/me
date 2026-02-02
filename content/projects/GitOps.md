@@ -145,6 +145,20 @@ openssl rand -hex 32
 
 ---
 
+---
+
+## 🖥️ Non-Docker Services
+
+Some infrastructure runs on dedicated VMs outside the GitOps workflow:
+
+| Service | IP | Notes |
+|---------|-----|-------|
+| **Wazuh SIEM** | 192.168.1.7 | Security monitoring - standalone Debian VM |
+
+These are managed separately but integrate with the Docker-based services (e.g., Wazuh agents on Docker hosts report to the SIEM).
+
+---
+
 ## 📋 Future Plans
 
 - [ ] Implement CI/CD pipeline for automated deployments
