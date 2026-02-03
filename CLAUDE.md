@@ -1,7 +1,5 @@
 # CLAUDE.md - Portfolio Site
 
-This file provides guidance to Claude Code when working in this repository.
-
 <project>
     <overview>
         Personal portfolio and resume site built with Hugo static site generator.
@@ -48,31 +46,15 @@ This file provides guidance to Claude Code when working in this repository.
         <feature>Dark/Light mode (follows system)</feature>
         <feature>SEO metadata configured</feature>
     </features>
+
+    <new_project_template>
+        <step>Create content/projects/new-project.md</step>
+        <frontmatter>
+            title: "Project Name"
+            date: 2026-02-02
+            draft: false
+        </frontmatter>
+        <step>Write content in markdown</step>
+        <step>Link from other projects using relative paths</step>
+    </new_project_template>
 </project>
-
-## Quick Reference
-
-```bash
-# Local development (includes drafts)
-hugo server -D
-
-# Build static site
-hugo
-
-# Deploy (auto on push)
-git add -A && git commit -m "message" && git push
-```
-
-## Adding a New Project
-
-1. Create `content/projects/new-project.md`
-2. Add frontmatter:
-   ```yaml
-   ---
-   title: "Project Name"
-   date: 2026-02-02
-   draft: false
-   ---
-   ```
-3. Write content in markdown
-4. Link from other projects using relative paths
