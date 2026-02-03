@@ -134,6 +134,18 @@ All Docker compose files are managed via GitOps. See my [GitOps Project](../gito
 
 ---
 
+## 🛡️ Security Hardening
+
+The Docker infrastructure has undergone a comprehensive security audit. Critical vulnerabilities were identified and fixed, including:
+
+- Removed privileged mode from cAdvisor (replaced with specific capabilities)
+- Added read-only flags to Docker socket mounts
+- Eliminated default password fallbacks
+
+See my [Docker Security Review](../security-review/) for the full audit report, methodology, and lessons learned.
+
+---
+
 ## 📋 Future Plans
 
 - [ ] **OPNsense + Managed Switch** - Enterprise networking with VLANs and IDS/IPS

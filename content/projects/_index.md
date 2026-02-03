@@ -25,4 +25,16 @@ Infrastructure as Code repository for managing all homelab Docker configurations
 
 ---
 
-*More projects coming soon...*
+### [Docker Security Review](../security-review/)
+Comprehensive security audit of homelab Docker infrastructure. Identified critical vulnerabilities including privileged containers and unprotected Docker socket mounts, then applied hardening fixes following CIS Docker Benchmark guidelines.
+
+**Technologies:** Docker, Security Auditing, Linux Capabilities, Container Hardening
+
+---
+
+### [Claude Code Memory System](../claude-memory/)
+Structured context system for AI-assisted infrastructure development. Converts markdown-based memory files to XML format for better hierarchy and queryability across development sessions.
+
+**Technologies:** Claude Code, XML, Bash, Git
+
+---
