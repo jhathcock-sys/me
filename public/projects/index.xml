@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>James Hathcock</title>
-    <link>http://localhost:43835/me/</link>
-    <description>Recent content on James Hathcock</description>
+    <title>Projects on James Hathcock</title>
+    <link>http://localhost:43835/me/projects/</link>
+    <description>Recent content in Projects on James Hathcock</description>
     <generator>Hugo -- 0.154.3</generator>
     <language>en-us</language>
     <lastBuildDate>Mon, 02 Feb 2026 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:43835/me/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:43835/me/projects/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Claude Code Memory System</title>
       <link>http://localhost:43835/me/projects/claude-memory/</link>
@@ -110,13 +110,6 @@
 &lt;h2 id=&#34;-virtualization--software-stack&#34;&gt;☁️ Virtualization &amp;amp; Software Stack&lt;/h2&gt;
 &lt;h3 id=&#34;-node-1-dell-r430-proxmoxbox---19216814&#34;&gt;🖥️ Node 1: Dell R430 (ProxMoxBox - 192.168.1.4)&lt;/h3&gt;
 &lt;p&gt;The Proxmox host runs &lt;strong&gt;LXC Containers&lt;/strong&gt; to separate concerns:&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>James Hathcock</title>
-      <link>http://localhost:43835/me/resume/</link>
-      <pubDate>Thu, 08 Jan 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:43835/me/resume/</guid>
-      <description>Senior Systems Engineer with 30 years of experience architecting, securing, and optimizing enterprise IT infrastructure.</description>
     </item>
   </channel>
 </rss>

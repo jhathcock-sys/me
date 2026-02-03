@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><script src="/me/livereload.js?mindelay=10&amp;v=2&amp;port=43835&amp;path=me/livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Claude Code Memory System | James Hathcock</title>
+<meta name="keywords" content="">
+<meta name="description" content="🧠 Claude Code Memory System
+Building a structured context system for AI-assisted infrastructure development.
+Project Overview
+Claude Code is Anthropic&rsquo;s CLI tool for AI-assisted development. While powerful out of the box, it lacks persistent memory between sessions. This project documents how I built a structured memory file (CLAUDE.md) to provide consistent context, enforce operational standards, and create a personalized AI engineering assistant.
+Key Insight: The quality of AI assistance is directly proportional to the quality of context you provide. A well-structured memory file transforms a general-purpose AI into a specialized team member who understands your infrastructure, preferences, and standards.">
+<meta name="author" content="James Hathcock">
+<link rel="canonical" href="http://localhost:43835/me/projects/claude-memory/">
+<link crossorigin="anonymous" href="/me/assets/css/stylesheet.343cc480b9ffc8f04ccbe5e968ad674880cab773ec19905e93033065c1e7a804.css" integrity="sha256-NDzEgLn/yPBMy&#43;XpaK1nSIDKt3PsGZBekwMwZcHnqAQ=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:43835/me/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:43835/me/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:43835/me/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:43835/me/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:43835/me/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:43835/me/projects/claude-memory/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:43835/me/" accesskey="h" title="James Hathcock (Alt + H)">James Hathcock</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:43835/me/resume/" title="Resume">
+                    <span>Resume</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:43835/me/projects/" title="Projects">
+                    <span>Projects</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:43835/me/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:43835/me/projects/">Projects</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Claude Code Memory System
+    </h1>
+    <div class="post-meta"><span title='2026-02-02 00:00:00 +0000 UTC'>February 2, 2026</span>&nbsp;·&nbsp;<span>14 min</span>&nbsp;·&nbsp;<span>James Hathcock</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="-claude-code-memory-system">🧠 Claude Code Memory System<a hidden class="anchor" aria-hidden="true" href="#-claude-code-memory-system">#</a></h1>
+<p>Building a structured context system for AI-assisted infrastructure development.</p>
+<h2 id="project-overview">Project Overview<a hidden class="anchor" aria-hidden="true" href="#project-overview">#</a></h2>
+<p>Claude Code is Anthropic&rsquo;s CLI tool for AI-assisted development. While powerful out of the box, it lacks persistent memory between sessions. This project documents how I built a structured memory file (<code>CLAUDE.md</code>) to provide consistent context, enforce operational standards, and create a personalized AI engineering assistant.</p>
+<p><strong>Key Insight:</strong> The quality of AI assistance is directly proportional to the quality of context you provide. A well-structured memory file transforms a general-purpose AI into a specialized team member who understands your infrastructure, preferences, and standards.</p>
+<hr>
+<h2 id="-problem-statement">🎯 Problem Statement<a hidden class="anchor" aria-hidden="true" href="#-problem-statement">#</a></h2>
+<p>Without persistent context, each Claude Code session starts fresh:</p>
+<ul>
+<li>No knowledge of my infrastructure or IP assignments</li>
+<li>No understanding of my preferred tools (Docker Compose vs docker run)</li>
+<li>No awareness of security requirements or coding standards</li>
+<li>Repeated explanations of the same architecture</li>
+<li>Generic suggestions that don&rsquo;t fit my environment</li>
+</ul>
+<p><strong>The Frustration Cycle:</strong></p>
+<pre tabindex="0"><code>Session 1: &#34;My Docker host is at 192.168.1.4, I use Dockhand for management...&#34;
+Session 2: &#34;Remember, my Docker host is at 192.168.1.4...&#34;
+Session 3: &#34;As I mentioned before, 192.168.1.4 is my Docker host...&#34;
+</code></pre><p><strong>Goal:</strong> Create a memory system that makes Claude Code act as a Senior Systems Architect who already knows my homelab inside and out—every session, from the first prompt.</p>
+<hr>
+<h2 id="-why-xml-over-markdown-tables">📐 Why XML Over Markdown Tables?<a hidden class="anchor" aria-hidden="true" href="#-why-xml-over-markdown-tables">#</a></h2>
+<p>My initial <code>CLAUDE.md</code> used markdown tables—the standard approach most people use. But I discovered significant limitations when dealing with complex infrastructure documentation:</p>
+<h3 id="the-limitations-of-flat-tables">The Limitations of Flat Tables<a hidden class="anchor" aria-hidden="true" href="#the-limitations-of-flat-tables">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Markdown Tables</th>
+          <th>XML Structure</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Flat, hard to nest</td>
+          <td>Hierarchical, supports relationships</td>
+      </tr>
+      <tr>
+          <td>Ambiguous parsing</td>
+          <td>Explicit element boundaries</td>
+      </tr>
+      <tr>
+          <td>Limited metadata</td>
+          <td>Attributes for properties</td>
+      </tr>
+      <tr>
+          <td>Repetitive headers</td>
+          <td>Semantic grouping</td>
+      </tr>
+      <tr>
+          <td>Context spread across multiple tables</td>
+          <td>Related data grouped together</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="example-1-service-definitions">Example 1: Service Definitions<a hidden class="anchor" aria-hidden="true" href="#example-1-service-definitions">#</a></h3>
+<p><em>Markdown approach (what most people use):</em></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span>| Server | Service | Port | Notes |
+</span></span><span style="display:flex;"><span>|--------|---------|------|-------|
+</span></span><span style="display:flex;"><span>| ProxMoxBox | Grafana | 3030 | Monitoring dashboards |
+</span></span><span style="display:flex;"><span>| ProxMoxBox | Prometheus | 9090 | Metrics collection |
+</span></span><span style="display:flex;"><span>| ProxMoxBox | Loki | 3101 | Log aggregation |
+</span></span><span style="display:flex;"><span>| Pi5 | Pi-hole | 53, 8080 | Secondary DNS |
+</span></span><span style="display:flex;"><span>| Pi5 | Mealie | 9925 | Recipe management |
+</span></span></code></pre></div><p><em>XML approach (what I implemented):</em></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;services&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;server</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;ProxMoxBox&#34;</span> <span style="color:#a6e22e">ip=</span><span style="color:#e6db74">&#34;192.168.1.4&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;service</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Grafana&#34;</span> <span style="color:#a6e22e">port=</span><span style="color:#e6db74">&#34;3030&#34;</span> <span style="color:#a6e22e">note=</span><span style="color:#e6db74">&#34;Monitoring dashboards&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;service</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Prometheus&#34;</span> <span style="color:#a6e22e">port=</span><span style="color:#e6db74">&#34;9090&#34;</span> <span style="color:#a6e22e">note=</span><span style="color:#e6db74">&#34;Metrics collection&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;service</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Loki&#34;</span> <span style="color:#a6e22e">port=</span><span style="color:#e6db74">&#34;3101&#34;</span> <span style="color:#a6e22e">note=</span><span style="color:#e6db74">&#34;Log aggregation&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/server&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;server</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Pi5&#34;</span> <span style="color:#a6e22e">ip=</span><span style="color:#e6db74">&#34;192.168.1.234&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;service</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Pi-hole&#34;</span> <span style="color:#a6e22e">ports=</span><span style="color:#e6db74">&#34;53, 8080&#34;</span> <span style="color:#a6e22e">note=</span><span style="color:#e6db74">&#34;Secondary DNS&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;service</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Mealie&#34;</span> <span style="color:#a6e22e">port=</span><span style="color:#e6db74">&#34;9925&#34;</span> <span style="color:#a6e22e">note=</span><span style="color:#e6db74">&#34;Recipe management&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/server&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/services&gt;</span>
+</span></span></code></pre></div><p><strong>Why XML wins here:</strong></p>
+<ul>
+<li>Services are grouped by server—no scanning through rows to find what&rsquo;s on ProxMoxBox</li>
+<li>The IP address is attached to the server, not repeated for every service</li>
+<li>Relationships are explicit: Grafana <em>belongs to</em> ProxMoxBox</li>
+<li>Easy to add server-level attributes (IP, role, OS) without new columns</li>
+</ul>
+<h3 id="example-2-access-credentials-and-endpoints">Example 2: Access Credentials and Endpoints<a hidden class="anchor" aria-hidden="true" href="#example-2-access-credentials-and-endpoints">#</a></h3>
+<p><em>Markdown approach:</em></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span><span style="color:#75715e">## SSH Access
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> ProxMoxBox: <span style="color:#e6db74">`ssh root@192.168.1.4`</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> Pi5: <span style="color:#e6db74">`ssh cib@192.168.1.234`</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Web Interfaces
+</span></span></span><span style="display:flex;"><span>| Service | URL | Credentials |
+</span></span><span style="display:flex;"><span>|---------|-----|-------------|
+</span></span><span style="display:flex;"><span>| Grafana | http://192.168.1.4:3030 | admin / <span style="font-style:italic">**</span>****** |
+</span></span><span style="display:flex;"><span>| Wazuh | https://192.168.1.7 | admin / <span style="font-style:italic">**</span>********** |
+</span></span></code></pre></div><p><em>XML approach:</em></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;access_points&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;ssh</span> <span style="color:#a6e22e">target=</span><span style="color:#e6db74">&#34;ProxMoxBox&#34;</span><span style="color:#f92672">&gt;</span>ssh root@192.168.1.4<span style="color:#f92672">&lt;/ssh&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;ssh</span> <span style="color:#a6e22e">target=</span><span style="color:#e6db74">&#34;Pi5&#34;</span><span style="color:#f92672">&gt;</span>ssh cib@192.168.1.234<span style="color:#f92672">&lt;/ssh&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;ssh</span> <span style="color:#a6e22e">target=</span><span style="color:#e6db74">&#34;Wazuh&#34;</span><span style="color:#f92672">&gt;</span>ssh root@192.168.1.7<span style="color:#f92672">&lt;/ssh&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;web_interface</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Grafana&#34;</span> <span style="color:#a6e22e">url=</span><span style="color:#e6db74">&#34;http://192.168.1.4:3030&#34;</span> <span style="color:#a6e22e">creds=</span><span style="color:#e6db74">&#34;admin / ********&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;web_interface</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Wazuh Dashboard&#34;</span> <span style="color:#a6e22e">url=</span><span style="color:#e6db74">&#34;https://192.168.1.7&#34;</span> <span style="color:#a6e22e">creds=</span><span style="color:#e6db74">&#34;admin / ************************&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;web_interface</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Prometheus&#34;</span> <span style="color:#a6e22e">url=</span><span style="color:#e6db74">&#34;http://192.168.1.4:9090&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;web_interface</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Alertmanager&#34;</span> <span style="color:#a6e22e">url=</span><span style="color:#e6db74">&#34;http://192.168.1.4:9093&#34;</span> <span style="color:#a6e22e">note=</span><span style="color:#e6db74">&#34;Discord notifications&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/access_points&gt;</span>
+</span></span></code></pre></div><p><strong>Why XML wins here:</strong></p>
+<ul>
+<li>All access information in one semantic block</li>
+<li>Optional attributes (creds, note) only appear when relevant</li>
+<li>Consistent structure for both SSH and web interfaces</li>
+<li>The AI can query &ldquo;how do I access Wazuh?&rdquo; and find both SSH and web access together</li>
+</ul>
+<h3 id="example-3-project-path-mapping">Example 3: Project Path Mapping<a hidden class="anchor" aria-hidden="true" href="#example-3-project-path-mapping">#</a></h3>
+<p><em>Markdown approach:</em></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span>| Server | Git Path | Deploy Path |
+</span></span><span style="display:flex;"><span>|--------|----------|-------------|
+</span></span><span style="display:flex;"><span>| ProxMoxBox | homelab-ops/proxmox/&lt;stack&gt;/ | /opt/&lt;stack&gt;/ |
+</span></span><span style="display:flex;"><span>| Pi5 | homelab-ops/pi5/&lt;stack&gt;/ | /opt/pi5-stacks/&lt;stack&gt;/ |
+</span></span></code></pre></div><p><em>XML approach:</em></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;stack_mapping&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;server</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;ProxMoxBox&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;git_path&gt;</span>homelab-ops/proxmox/&amp;lt;stack&amp;gt;/<span style="color:#f92672">&lt;/git_path&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;deploy_path&gt;</span>/opt/&amp;lt;stack&amp;gt;/<span style="color:#f92672">&lt;/deploy_path&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/server&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;server</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Pi5&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;git_path&gt;</span>homelab-ops/pi5/&amp;lt;stack&amp;gt;/<span style="color:#f92672">&lt;/git_path&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;deploy_path&gt;</span>/opt/pi5-stacks/&amp;lt;stack&amp;gt;/<span style="color:#f92672">&lt;/deploy_path&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;note&gt;</span>Managed via Hawser agent<span style="color:#f92672">&lt;/note&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/server&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/stack_mapping&gt;</span>
+</span></span></code></pre></div><p><strong>Why XML wins here:</strong></p>
+<ul>
+<li>The Pi5-specific note about Hawser management is attached to Pi5, not in a separate section</li>
+<li>When the AI helps deploy to Pi5, it immediately sees the Hawser context</li>
+</ul>
+<hr>
+<h2 id="-memory-architecture">🏗️ Memory Architecture<a hidden class="anchor" aria-hidden="true" href="#-memory-architecture">#</a></h2>
+<p>The memory file is organized into logical sections, each serving a specific purpose:</p>
+<h3 id="1-metadata-section">1. Metadata Section<a hidden class="anchor" aria-hidden="true" href="#1-metadata-section">#</a></h3>
+<p>Basic profile information that personalizes interactions:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;meta_data&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;user_name&gt;</span>James<span style="color:#f92672">&lt;/user_name&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;location&gt;</span>Delaware, EST (UTC-5)<span style="color:#f92672">&lt;/location&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;status&gt;</span>Job Hunting (Target: SysAdmin, IT Director, Network/Sec)<span style="color:#f92672">&lt;/status&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;years_experience&gt;</span>30+<span style="color:#f92672">&lt;/years_experience&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;key_strengths&gt;</span>Networking, Windows, Project Management<span style="color:#f92672">&lt;/key_strengths&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/meta_data&gt;</span>
+</span></span></code></pre></div><p><strong>Why it matters:</strong> The AI knows:</p>
+<ul>
+<li>My experience level → Don&rsquo;t over-explain networking basics, but do explain newer concepts like GitOps</li>
+<li>My career focus → Emphasize enterprise patterns and security best practices</li>
+<li>My timezone → Relevant for scheduling, cron jobs, log timestamps</li>
+<li>My strengths → Leverage my networking knowledge, help me grow in coding/automation</li>
+</ul>
+<p><strong>Real-world impact:</strong></p>
+<pre tabindex="0"><code>Without metadata: &#34;A subnet is a logical division of an IP network...&#34;
+With metadata: &#34;Since you&#39;re familiar with networking, I&#39;ll skip the subnet basics.
+               For your 192.168.1.0/24 network, here&#39;s the VLAN design...&#34;
+</code></pre><h3 id="2-persona-definition">2. Persona Definition<a hidden class="anchor" aria-hidden="true" href="#2-persona-definition">#</a></h3>
+<p>This is where the magic happens—defining <em>how</em> the AI should behave:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;persona&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;role&gt;</span>Senior Systems Architect and DevOps Engineer<span style="color:#f92672">&lt;/role&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;mission&gt;</span>Help build a secure, enterprise-grade homelab<span style="color:#f92672">&lt;/mission&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;core_directives&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;directive</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Idempotency&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>            Always prefer solutions that can be run multiple times without breaking things
+</span></span><span style="display:flex;"><span>            (e.g., check if a directory exists before creating it, use Ansible/Terraform
+</span></span><span style="display:flex;"><span>            logic where possible).
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;/directive&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;directive</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Security First&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>            Since James is studying for Security+, prioritize least-privilege access.
+</span></span><span style="display:flex;"><span>            Do not suggest chmod 777. Always suggest firewall rules (UFW) for new services.
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;/directive&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;directive</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Network Awareness&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>            Network is 192.168.1.0/24. Check infrastructure topology for used static IPs
+</span></span><span style="display:flex;"><span>            (.3, .4, .5, .6, .7, .234, .253) before suggesting a new static IP.
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;/directive&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;directive</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Documentation&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>            When writing scripts, include comments explaining why specific flags or
+</span></span><span style="display:flex;"><span>            settings are used (educational value for learning).
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;/directive&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;directive</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Docker Compose Only&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>            Never provide docker run commands. Always provide a docker-compose.yml file.
+</span></span><span style="display:flex;"><span>            For system config changes, provide a bash script or Ansible playbook snippet.
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;/directive&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/core_directives&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/persona&gt;</span>
+</span></span></code></pre></div><p><strong>Deep Dive: Why Each Directive Matters</strong></p>
+<h4 id="idempotency-directive">Idempotency Directive<a hidden class="anchor" aria-hidden="true" href="#idempotency-directive">#</a></h4>
+<p><strong>The Problem:</strong> Scripts that work once but fail on re-run:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># BAD: Fails if directory exists</span>
+</span></span><span style="display:flex;"><span>mkdir /opt/myapp
+</span></span></code></pre></div><p><strong>What the AI now provides:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Create directory if it doesn&#39;t exist (idempotent)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># -p flag: creates parent directories and doesn&#39;t error if dir exists</span>
+</span></span><span style="display:flex;"><span>mkdir -p /opt/myapp
+</span></span></code></pre></div><p><strong>Real example from our work:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"># Install node-exporter (idempotent installation script)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Check if already installed to avoid redundant work</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> systemctl is-active --quiet node_exporter; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>    echo <span style="color:#e6db74">&#34;node_exporter already running, skipping installation&#34;</span>
+</span></span><span style="display:flex;"><span>    exit <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Download only if binary doesn&#39;t exist</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> ! -f /usr/local/bin/node_exporter <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>    wget -q https://github.com/.../node_exporter-1.7.0.linux-amd64.tar.gz
+</span></span><span style="display:flex;"><span>    tar xzf node_exporter-*.tar.gz
+</span></span><span style="display:flex;"><span>    mv node_exporter-*/node_exporter /usr/local/bin/
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span></code></pre></div><h4 id="security-first-directive">Security First Directive<a hidden class="anchor" aria-hidden="true" href="#security-first-directive">#</a></h4>
+<p><strong>The Problem:</strong> Lazy permissions that create vulnerabilities:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># BAD: World-writable, massive security hole</span>
+</span></span><span style="display:flex;"><span>chmod <span style="color:#ae81ff">777</span> /opt/myapp
+</span></span><span style="display:flex;"><span>chmod <span style="color:#ae81ff">777</span> /var/log/myapp.log
+</span></span></code></pre></div><p><strong>What the AI now provides:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Set ownership to the service account (principle of least privilege)</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Only the app user needs write access, others get read-only</span>
+</span></span><span style="display:flex;"><span>chown -R myapp:myapp /opt/myapp
+</span></span><span style="display:flex;"><span>chmod <span style="color:#ae81ff">750</span> /opt/myapp           <span style="color:#75715e"># Owner: rwx, Group: r-x, Others: ---</span>
+</span></span><span style="display:flex;"><span>chmod <span style="color:#ae81ff">640</span> /opt/myapp/config    <span style="color:#75715e"># Owner: rw-, Group: r--, Others: ---</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Add UFW rule for the new service</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Only allow traffic on the specific port needed</span>
+</span></span><span style="display:flex;"><span>ufw allow 8080/tcp comment <span style="color:#e6db74">&#39;MyApp web interface&#39;</span>
+</span></span></code></pre></div><p><strong>Why this matters for Security+ studies:</strong></p>
+<ul>
+<li>Every suggestion reinforces least-privilege concepts</li>
+<li>Firewall rules are included by default, not as an afterthought</li>
+<li>I&rsquo;m learning security best practices through practical application</li>
+</ul>
+<h4 id="network-awareness-directive">Network Awareness Directive<a hidden class="anchor" aria-hidden="true" href="#network-awareness-directive">#</a></h4>
+<p><strong>The Problem:</strong> IP conflicts from blind suggestions:</p>
+<pre tabindex="0"><code>Me: &#34;I need a static IP for my new VM&#34;
+AI (without context): &#34;Use 192.168.1.10&#34;
+Me: &#34;That&#39;s already my NAS!&#34;
+</code></pre><p><strong>What the AI now provides:</strong></p>
+<pre tabindex="0"><code>Me: &#34;I need a static IP for my new VM&#34;
+AI (with context): &#34;Looking at your topology, these IPs are in use:
+    - .3 (Pi-hole), .4 (ProxMoxBox), .5 (NAS), .6 (NPM), .7 (Wazuh),
+    - .234 (Pi5), .253 (Proxmox)
+
+    I&#39;d suggest 192.168.1.8 for your new VM. It&#39;s:
+    - Sequential with your server range (.3-.7)
+    - Below .234 which you&#39;re using for IoT/secondary devices
+    - Easy to remember in your naming scheme&#34;
+</code></pre><h4 id="docker-compose-only-directive">Docker Compose Only Directive<a hidden class="anchor" aria-hidden="true" href="#docker-compose-only-directive">#</a></h4>
+<p><strong>The Problem:</strong> One-off docker run commands that aren&rsquo;t reproducible:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># BAD: How do I remember these flags next time? What if I need to modify it?</span>
+</span></span><span style="display:flex;"><span>docker run -d --name grafana -p 3030:3000 -v grafana-data:/var/lib/grafana <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -e GF_SECURITY_ADMIN_PASSWORD<span style="color:#f92672">=</span>secret grafana/grafana:latest
+</span></span></code></pre></div><p><strong>What the AI now provides:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># docker-compose.yml - Version controlled, reproducible, self-documenting</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">grafana</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">grafana/grafana:latest</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">container_name</span>: <span style="color:#ae81ff">grafana</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">restart</span>: <span style="color:#ae81ff">unless-stopped</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ports</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#e6db74">&#34;3030:3000&#34;</span>    <span style="color:#75715e"># External:Internal - access on port 3030</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">volumes</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">grafana-data:/var/lib/grafana   </span> <span style="color:#75715e"># Persist dashboards and settings</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">environment</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#ae81ff">GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD} </span> <span style="color:#75715e"># From .env file</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">volumes</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">grafana-data</span>:        <span style="color:#75715e"># Named volume for data persistence</span>
+</span></span></code></pre></div><p><strong>Benefits:</strong></p>
+<ul>
+<li>Checked into Git → version history, rollback capability</li>
+<li>Self-documenting with comments</li>
+<li>Secrets in <code>.env</code> file, not command history</li>
+<li>Consistent with my GitOps workflow</li>
+</ul>
+<h3 id="3-interaction-rules">3. Interaction Rules<a hidden class="anchor" aria-hidden="true" href="#3-interaction-rules">#</a></h3>
+<p>Beyond technical context, I defined <em>how</em> I want to work:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;interaction_rules&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;rule&gt;</span>Provide detailed explanations with thorough code comments.<span style="color:#f92672">&lt;/rule&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;rule&gt;</span>Always ASK before making changes to infrastructure.<span style="color:#f92672">&lt;/rule&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;rule&gt;</span>Preferred workflow: Focused bursts followed by breaks.<span style="color:#f92672">&lt;/rule&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;rule&gt;</span>Environment preference: CLI for Linux, GUI for Windows.<span style="color:#f92672">&lt;/rule&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/interaction_rules&gt;</span>
+</span></span></code></pre></div><p><strong>Real-world impact of &ldquo;Always ASK before making changes&rdquo;:</strong></p>
+<pre tabindex="0"><code>Without rule:
+AI: &#34;I&#39;ve updated your prometheus.yml and restarted the container.&#34;
+Me: &#34;Wait, I wasn&#39;t ready! That just broke my monitoring during an incident!&#34;
+
+With rule:
+AI: &#34;I&#39;ve prepared the prometheus.yml changes. Here&#39;s the diff:
+     [shows changes]
+
+     Should I apply these changes? Note: This will require restarting
+     Prometheus, which will cause a brief gap in metrics collection.&#34;
+Me: &#34;Let me wait until after hours to apply this.&#34;
+</code></pre><h3 id="4-infrastructure-topology">4. Infrastructure Topology<a hidden class="anchor" aria-hidden="true" href="#4-infrastructure-topology">#</a></h3>
+<p>Complete network documentation in a queryable format:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;infrastructure&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;topology&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;device</span> <span style="color:#a6e22e">ip=</span><span style="color:#e6db74">&#34;192.168.1.3&#34;</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Primary Pi-hole&#34;</span> <span style="color:#a6e22e">role=</span><span style="color:#e6db74">&#34;Main DNS (ns1.home.lab)&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;device</span> <span style="color:#a6e22e">ip=</span><span style="color:#e6db74">&#34;192.168.1.4&#34;</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;ProxMoxBox (Dell R430)&#34;</span> <span style="color:#a6e22e">role=</span><span style="color:#e6db74">&#34;Main Docker Host, Dockhand&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;device</span> <span style="color:#a6e22e">ip=</span><span style="color:#e6db74">&#34;192.168.1.5&#34;</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Synology NAS (DS220j)&#34;</span> <span style="color:#a6e22e">role=</span><span style="color:#e6db74">&#34;Network Storage (DSM)&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;device</span> <span style="color:#a6e22e">ip=</span><span style="color:#e6db74">&#34;192.168.1.6&#34;</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Nginx Proxy Manager&#34;</span> <span style="color:#a6e22e">role=</span><span style="color:#e6db74">&#34;Reverse Proxy&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;device</span> <span style="color:#a6e22e">ip=</span><span style="color:#e6db74">&#34;192.168.1.7&#34;</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Wazuh VM (Debian 12)&#34;</span> <span style="color:#a6e22e">role=</span><span style="color:#e6db74">&#34;SIEM v4.14.2&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;device</span> <span style="color:#a6e22e">ip=</span><span style="color:#e6db74">&#34;192.168.1.234&#34;</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Pi5 (Raspberry Pi 5)&#34;</span> <span style="color:#a6e22e">role=</span><span style="color:#e6db74">&#34;Secondary DNS, Tailscale, Mealie&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;device</span> <span style="color:#a6e22e">ip=</span><span style="color:#e6db74">&#34;192.168.1.253&#34;</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Proxmox&#34;</span> <span style="color:#a6e22e">role=</span><span style="color:#e6db74">&#34;Hypervisor&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/topology&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;access_points&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;ssh</span> <span style="color:#a6e22e">target=</span><span style="color:#e6db74">&#34;ProxMoxBox&#34;</span><span style="color:#f92672">&gt;</span>ssh root@192.168.1.4<span style="color:#f92672">&lt;/ssh&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;ssh</span> <span style="color:#a6e22e">target=</span><span style="color:#e6db74">&#34;Pi5&#34;</span><span style="color:#f92672">&gt;</span>ssh cib@192.168.1.234<span style="color:#f92672">&lt;/ssh&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;ssh</span> <span style="color:#a6e22e">target=</span><span style="color:#e6db74">&#34;Wazuh&#34;</span><span style="color:#f92672">&gt;</span>ssh root@192.168.1.7<span style="color:#f92672">&lt;/ssh&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;web_interface</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Dockhand&#34;</span> <span style="color:#a6e22e">url=</span><span style="color:#e6db74">&#34;http://192.168.1.4:3000&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;web_interface</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Grafana&#34;</span> <span style="color:#a6e22e">url=</span><span style="color:#e6db74">&#34;http://192.168.1.4:3030&#34;</span> <span style="color:#a6e22e">creds=</span><span style="color:#e6db74">&#34;admin / ********&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;web_interface</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Wazuh Dashboard&#34;</span> <span style="color:#a6e22e">url=</span><span style="color:#e6db74">&#34;https://192.168.1.7&#34;</span> <span style="color:#a6e22e">creds=</span><span style="color:#e6db74">&#34;admin / ************&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/access_points&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;services&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;server</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;ProxMoxBox&#34;</span> <span style="color:#a6e22e">ip=</span><span style="color:#e6db74">&#34;192.168.1.4&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;service</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Dockhand&#34;</span> <span style="color:#a6e22e">port=</span><span style="color:#e6db74">&#34;3000&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;service</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Homepage&#34;</span> <span style="color:#a6e22e">port=</span><span style="color:#e6db74">&#34;4000&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;service</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Homebox&#34;</span> <span style="color:#a6e22e">port=</span><span style="color:#e6db74">&#34;3100&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;service</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Grafana&#34;</span> <span style="color:#a6e22e">port=</span><span style="color:#e6db74">&#34;3030&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;service</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Prometheus&#34;</span> <span style="color:#a6e22e">port=</span><span style="color:#e6db74">&#34;9090&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;service</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Alertmanager&#34;</span> <span style="color:#a6e22e">port=</span><span style="color:#e6db74">&#34;9093&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;service</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Loki&#34;</span> <span style="color:#a6e22e">port=</span><span style="color:#e6db74">&#34;3101&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;service</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Node Exporter&#34;</span> <span style="color:#a6e22e">port=</span><span style="color:#e6db74">&#34;9100&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;service</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;cAdvisor&#34;</span> <span style="color:#a6e22e">port=</span><span style="color:#e6db74">&#34;8081&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;/server&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;server</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Pi5&#34;</span> <span style="color:#a6e22e">ip=</span><span style="color:#e6db74">&#34;192.168.1.234&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;service</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Pi-hole&#34;</span> <span style="color:#a6e22e">ports=</span><span style="color:#e6db74">&#34;53, 8080&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;service</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Mealie&#34;</span> <span style="color:#a6e22e">port=</span><span style="color:#e6db74">&#34;9925&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;service</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Node Exporter&#34;</span> <span style="color:#a6e22e">port=</span><span style="color:#e6db74">&#34;9100&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;service</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Promtail&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;/server&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/services&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/infrastructure&gt;</span>
+</span></span></code></pre></div><p><strong>Why this level of detail matters:</strong></p>
+<p>When I say &ldquo;add node-exporter to the Pi-hole LXC,&rdquo; the AI knows:</p>
+<ol>
+<li>Pi-hole is at 192.168.1.3</li>
+<li>It&rsquo;s an LXC container (not a full VM or Docker)</li>
+<li>Node Exporter should use port 9100 (consistent with other hosts)</li>
+<li>Prometheus at 192.168.1.4:9090 needs a new scrape target</li>
+<li>The Grafana dashboards are at 192.168.1.4:3030</li>
+</ol>
+<p>One sentence from me triggers a complete, context-aware response.</p>
+<h3 id="5-monitoring-configuration">5. Monitoring Configuration<a hidden class="anchor" aria-hidden="true" href="#5-monitoring-configuration">#</a></h3>
+<p>Alert thresholds and agent inventory ensure consistency:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;monitoring_config&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;dashboards&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;dashboard</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Homelab Overview&#34;</span> <span style="color:#a6e22e">path=</span><span style="color:#e6db74">&#34;/d/homelab-overview&#34;</span> <span style="color:#a6e22e">note=</span><span style="color:#e6db74">&#34;Single pane of glass&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;dashboard</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Docker Containers&#34;</span> <span style="color:#a6e22e">path=</span><span style="color:#e6db74">&#34;/d/docker-containers&#34;</span> <span style="color:#a6e22e">note=</span><span style="color:#e6db74">&#34;Container metrics&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;dashboard</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Loki Logs&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;dashboard</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Node Exporter Full&#34;</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;1860&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;dashboard</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;cAdvisor&#34;</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;14282&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/dashboards&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;alerts&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;threshold</span> <span style="color:#a6e22e">metric=</span><span style="color:#e6db74">&#34;Disk Warning&#34;</span> <span style="color:#a6e22e">value=</span><span style="color:#e6db74">&#34;&gt;80%&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;threshold</span> <span style="color:#a6e22e">metric=</span><span style="color:#e6db74">&#34;Disk Critical&#34;</span> <span style="color:#a6e22e">value=</span><span style="color:#e6db74">&#34;&gt;90%&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;threshold</span> <span style="color:#a6e22e">metric=</span><span style="color:#e6db74">&#34;Memory&#34;</span> <span style="color:#a6e22e">value=</span><span style="color:#e6db74">&#34;&gt;90% for 5m&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;threshold</span> <span style="color:#a6e22e">metric=</span><span style="color:#e6db74">&#34;CPU&#34;</span> <span style="color:#a6e22e">value=</span><span style="color:#e6db74">&#34;&gt;90% for 5m&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;threshold</span> <span style="color:#a6e22e">metric=</span><span style="color:#e6db74">&#34;Host Down&#34;</span> <span style="color:#a6e22e">value=</span><span style="color:#e6db74">&#34;unreachable 2m&#34;</span> <span style="color:#a6e22e">severity=</span><span style="color:#e6db74">&#34;critical&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;threshold</span> <span style="color:#a6e22e">metric=</span><span style="color:#e6db74">&#34;Container Down&#34;</span> <span style="color:#a6e22e">value=</span><span style="color:#e6db74">&#34;missing 2m&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;threshold</span> <span style="color:#a6e22e">metric=</span><span style="color:#e6db74">&#34;Target Down&#34;</span> <span style="color:#a6e22e">value=</span><span style="color:#e6db74">&#34;scrape fail 2m&#34;</span> <span style="color:#a6e22e">severity=</span><span style="color:#e6db74">&#34;critical&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/alerts&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;wazuh_agents&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;agent</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;001&#34;</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;SRV-DOCKER01&#34;</span> <span style="color:#a6e22e">host=</span><span style="color:#e6db74">&#34;ProxMoxBox (192.168.1.4)&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;agent</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;002&#34;</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;pi-infra&#34;</span> <span style="color:#a6e22e">host=</span><span style="color:#e6db74">&#34;Pi5 (192.168.1.234)&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;agent</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;003&#34;</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;SRV-DNS01&#34;</span> <span style="color:#a6e22e">host=</span><span style="color:#e6db74">&#34;Pi-hole LXC (192.168.1.3)&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;agent</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;004&#34;</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;SRV-NPM01&#34;</span> <span style="color:#a6e22e">host=</span><span style="color:#e6db74">&#34;NPM LXC (192.168.1.6)&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/wazuh_agents&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/monitoring_config&gt;</span>
+</span></span></code></pre></div><p><strong>Why this matters:</strong></p>
+<p>When adding a new host, the AI automatically suggests:</p>
+<ul>
+<li>Prometheus alert rules matching my existing thresholds (not arbitrary values)</li>
+<li>Wazuh agent registration with consistent naming conventions (SRV-*, descriptive names)</li>
+<li>Dashboard updates to include the new host</li>
+</ul>
+<h3 id="6-project-definitions">6. Project Definitions<a hidden class="anchor" aria-hidden="true" href="#6-project-definitions">#</a></h3>
+<p>Links repositories to their purposes and deployment paths:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;projects&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;project</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Homelab Ops&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;path_local&gt;</span>/home/cib/homelab-ops<span style="color:#f92672">&lt;/path_local&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;repo&gt;</span>github.com:jhathcock-sys/Dockers.git<span style="color:#f92672">&lt;/repo&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;stack_mapping&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;server</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;ProxMoxBox&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">&lt;git_path&gt;</span>homelab-ops/proxmox/&amp;lt;stack&amp;gt;/<span style="color:#f92672">&lt;/git_path&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">&lt;deploy_path&gt;</span>/opt/&amp;lt;stack&amp;gt;/<span style="color:#f92672">&lt;/deploy_path&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;/server&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;server</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Pi5&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">&lt;git_path&gt;</span>homelab-ops/pi5/&amp;lt;stack&amp;gt;/<span style="color:#f92672">&lt;/git_path&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">&lt;deploy_path&gt;</span>/opt/pi5-stacks/&amp;lt;stack&amp;gt;/<span style="color:#f92672">&lt;/deploy_path&gt;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">&lt;note&gt;</span>Managed via Hawser agent<span style="color:#f92672">&lt;/note&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;/server&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;/stack_mapping&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/project&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;project</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Portfolio Site&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;path_local&gt;</span>/home/cib/my-portfolio<span style="color:#f92672">&lt;/path_local&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;repo&gt;</span>github.com:jhathcock-sys/me.git<span style="color:#f92672">&lt;/repo&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;live_url&gt;</span>https://jhathcock-sys.github.io/me/<span style="color:#f92672">&lt;/live_url&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;tech_stack&gt;</span>Hugo, PaperMod Theme<span style="color:#f92672">&lt;/tech_stack&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;commands&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;cmd</span> <span style="color:#a6e22e">description=</span><span style="color:#e6db74">&#34;Local Dev&#34;</span><span style="color:#f92672">&gt;</span>hugo server -D<span style="color:#f92672">&lt;/cmd&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;cmd</span> <span style="color:#a6e22e">description=</span><span style="color:#e6db74">&#34;Build&#34;</span><span style="color:#f92672">&gt;</span>hugo<span style="color:#f92672">&lt;/cmd&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;cmd</span> <span style="color:#a6e22e">description=</span><span style="color:#e6db74">&#34;Deploy&#34;</span><span style="color:#f92672">&gt;</span>git push (auto GitHub Pages)<span style="color:#f92672">&lt;/cmd&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&lt;/commands&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/project&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/projects&gt;</span>
+</span></span></code></pre></div><hr>
+<h2 id="-before-and-after-real-examples">📊 Before and After: Real Examples<a hidden class="anchor" aria-hidden="true" href="#-before-and-after-real-examples">#</a></h2>
+<h3 id="example-1-deploying-a-new-service">Example 1: Deploying a New Service<a hidden class="anchor" aria-hidden="true" href="#example-1-deploying-a-new-service">#</a></h3>
+<p><strong>Before (no memory):</strong></p>
+<pre tabindex="0"><code>Me: &#34;I want to deploy Uptime Kuma&#34;
+
+AI: &#34;Here&#39;s how to run Uptime Kuma:
+     docker run -d --name uptime-kuma -p 3001:3001 \
+       -v uptime-kuma:/app/data louislam/uptime-kuma:1
+
+     Access it at http://localhost:3001&#34;
+</code></pre><p><strong>After (with memory):</strong></p>
+<pre tabindex="0"><code>Me: &#34;I want to deploy Uptime Kuma&#34;
+
+AI: &#34;I&#39;ll create a docker-compose.yml for Uptime Kuma on ProxMoxBox.
+
+     Based on your infrastructure:
+     - Port 3001 is available on 192.168.1.4
+     - I&#39;ll place it at /opt/uptime-kuma/ following your stack structure
+     - I&#39;ll add comments explaining each configuration option
+
+     Here&#39;s the compose file:
+
+     # /opt/uptime-kuma/docker-compose.yml
+     services:
+       uptime-kuma:
+         image: louislam/uptime-kuma:1
+         container_name: uptime-kuma
+         restart: unless-stopped    # Auto-restart on failure or reboot
+         ports:
+           - &#34;3001:3001&#34;            # Web UI - internal and external same
+         volumes:
+           - ./data:/app/data       # Persist monitors, settings, history
+
+     Should I also:
+     1. Add a UFW rule: ufw allow 3001/tcp comment &#39;Uptime Kuma&#39;
+     2. Add it to your Homepage dashboard?
+     3. Create a Prometheus scrape target for /metrics?&#34;
+</code></pre><h3 id="example-2-troubleshooting">Example 2: Troubleshooting<a hidden class="anchor" aria-hidden="true" href="#example-2-troubleshooting">#</a></h3>
+<p><strong>Before (no memory):</strong></p>
+<pre tabindex="0"><code>Me: &#34;Grafana can&#39;t reach Prometheus&#34;
+
+AI: &#34;Check if Prometheus is running with &#39;docker ps&#39;.
+     Verify the datasource URL in Grafana settings.
+     Check firewall rules between the containers.&#34;
+</code></pre><p><strong>After (with memory):</strong></p>
+<pre tabindex="0"><code>Me: &#34;Grafana can&#39;t reach Prometheus&#34;
+
+AI: &#34;Let me help troubleshoot. In your setup:
+     - Grafana: 192.168.1.4:3030
+     - Prometheus: 192.168.1.4:9090
+     - Both are in the monitoring stack at /opt/monitoring/
+
+     Since they&#39;re on the same host and Docker network, let&#39;s check:
+
+     1. Verify Prometheus is healthy:
+        curl http://192.168.1.4:9090/-/healthy
+
+     2. Check if they&#39;re on the same Docker network:
+        docker network inspect monitoring_default
+
+     3. In Grafana, the datasource URL should be:
+        http://prometheus:9090 (using container name, not IP)
+
+     4. Check your docker-compose.yml - both services should be
+        in the same compose file or explicitly share a network.
+
+     Want me to SSH to ProxMoxBox and run these diagnostics?&#34;
+</code></pre><h3 id="example-3-adding-monitoring-to-a-new-host">Example 3: Adding Monitoring to a New Host<a hidden class="anchor" aria-hidden="true" href="#example-3-adding-monitoring-to-a-new-host">#</a></h3>
+<p><strong>Before (no memory):</strong></p>
+<pre tabindex="0"><code>Me: &#34;Add monitoring to my Wazuh VM&#34;
+
+AI: &#34;Install node_exporter on the VM and add it to your Prometheus config.&#34;
+</code></pre><p><strong>After (with memory):</strong></p>
+<pre tabindex="0"><code>Me: &#34;Add monitoring to my Wazuh VM&#34;
+
+AI: &#34;I&#39;ll add full monitoring to your Wazuh VM (192.168.1.7, Debian 12).
+     Here&#39;s the plan:
+
+     1. **Node Exporter** (system metrics):
+        # Idempotent installation script with educational comments
+        [provides full bash script]
+
+        UFW rule: ufw allow from 192.168.1.4 to any port 9100 proto tcp \
+                  comment &#39;Prometheus scraping&#39;
+
+     2. **Prometheus scrape target**:
+        # Add to /opt/monitoring/prometheus/prometheus.yml
+        - job_name: &#39;wazuh&#39;
+          static_configs:
+            - targets: [&#39;192.168.1.7:9100&#39;]
+              labels:
+                instance: &#39;wazuh-vm&#39;
+                environment: &#39;production&#39;
+
+     3. **Promtail** (logs to Loki):
+        [provides docker-compose.yml for Promtail]
+
+     4. **Wazuh agent** - Already installed (ID: not yet assigned)
+        Should I register the VM as a Wazuh agent monitoring itself?
+
+     5. **Grafana dashboard** - The Node Exporter Full dashboard (ID: 1860)
+        will automatically show the new host.
+
+     Should I proceed with step 1 (Node Exporter installation)?&#34;
+</code></pre><hr>
+<h2 id="-lessons-learned">🎓 Lessons Learned<a hidden class="anchor" aria-hidden="true" href="#-lessons-learned">#</a></h2>
+<h3 id="1-structure-matters-more-than-content-volume">1. Structure Matters More Than Content Volume<a hidden class="anchor" aria-hidden="true" href="#1-structure-matters-more-than-content-volume">#</a></h3>
+<p>A small, well-organized memory file outperforms a large, unstructured one. The AI can find and use <code>&lt;device ip=&quot;192.168.1.4&quot;&gt;</code> faster than parsing paragraphs of prose.</p>
+<h3 id="2-directives-prevent-mistakes-before-they-happen">2. Directives Prevent Mistakes Before They Happen<a hidden class="anchor" aria-hidden="true" href="#2-directives-prevent-mistakes-before-they-happen">#</a></h3>
+<p>Instead of fixing bad suggestions, the directives prevent them entirely:</p>
+<ul>
+<li>&ldquo;No chmod 777&rdquo; → Never have to reject insecure permissions</li>
+<li>&ldquo;Docker Compose only&rdquo; → Never have to ask for a compose file</li>
+<li>&ldquo;Always ask before changes&rdquo; → Never have accidental modifications</li>
+</ul>
+<h3 id="3-context-compounds-over-time">3. Context Compounds Over Time<a hidden class="anchor" aria-hidden="true" href="#3-context-compounds-over-time">#</a></h3>
+<p>Each piece of information builds on others:</p>
+<ul>
+<li>Knowing the IP → Knowing the services → Knowing the ports → Knowing the access method</li>
+</ul>
+<p>The AI can make increasingly sophisticated suggestions as the context grows.</p>
+<h3 id="4-personas-shape-behavior-dramatically">4. Personas Shape Behavior Dramatically<a hidden class="anchor" aria-hidden="true" href="#4-personas-shape-behavior-dramatically">#</a></h3>
+<p>Defining a role (&ldquo;Senior Systems Architect&rdquo;) changes:</p>
+<ul>
+<li><strong>Vocabulary:</strong> Uses proper terminology, not oversimplified explanations</li>
+<li><strong>Assumptions:</strong> Expects familiarity with enterprise concepts</li>
+<li><strong>Suggestions:</strong> Recommends production-grade solutions, not quick hacks</li>
+<li><strong>Depth:</strong> Explains the &ldquo;why&rdquo; behind recommendations</li>
+</ul>
+<h3 id="5-educational-value-is-built-in">5. Educational Value is Built-In<a hidden class="anchor" aria-hidden="true" href="#5-educational-value-is-built-in">#</a></h3>
+<p>The &ldquo;Documentation&rdquo; directive means every script teaches something:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># -p flag: creates parent directories AND doesn&#39;t error if directory exists</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># This makes the script idempotent (safe to run multiple times)</span>
+</span></span><span style="display:flex;"><span>mkdir -p /opt/monitoring/prometheus
+</span></span></code></pre></div><p>I&rsquo;m learning Linux administration, security practices, and DevOps patterns through practical application, not just documentation reading.</p>
+<hr>
+<h2 id="-file-locations">📁 File Locations<a hidden class="anchor" aria-hidden="true" href="#-file-locations">#</a></h2>
+<p>Claude Code supports multiple memory files with different scopes:</p>
+<table>
+  <thead>
+      <tr>
+          <th>File</th>
+          <th>Scope</th>
+          <th>Purpose</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>~/.claude/CLAUDE.md</code></td>
+          <td>Global</td>
+          <td>Loaded for ALL projects - personal preferences, infrastructure</td>
+      </tr>
+      <tr>
+          <td><code>&lt;project&gt;/CLAUDE.md</code></td>
+          <td>Project</td>
+          <td>Checked into git - shared with team, project-specific context</td>
+      </tr>
+      <tr>
+          <td><code>&lt;project&gt;/CLAUDE.local.md</code></td>
+          <td>Session</td>
+          <td>Gitignored - private notes, temporary context, session history</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>My Setup:</strong></p>
+<ul>
+<li><strong>Global (<code>~/.claude/CLAUDE.md</code>):</strong> Infrastructure topology, personas, directives—everything in this article</li>
+<li><strong>Project (<code>homelab-ops/CLAUDE.md</code>):</strong> Repository structure, deployment conventions, service ports</li>
+<li><strong>Local (<code>homelab-ops/CLAUDE.local.md</code>):</strong> Session notes, work-in-progress, troubleshooting history</li>
+</ul>
+<hr>
+<h2 id="-implementation-tips">🔧 Implementation Tips<a hidden class="anchor" aria-hidden="true" href="#-implementation-tips">#</a></h2>
+<h3 id="start-small-iterate-often">Start Small, Iterate Often<a hidden class="anchor" aria-hidden="true" href="#start-small-iterate-often">#</a></h3>
+<p>Don&rsquo;t try to document everything at once. Start with:</p>
+<ol>
+<li>Basic infrastructure (IPs, hostnames)</li>
+<li>One or two critical directives</li>
+<li>Expand based on what you find yourself repeating</li>
+</ol>
+<h3 id="use-real-examples">Use Real Examples<a hidden class="anchor" aria-hidden="true" href="#use-real-examples">#</a></h3>
+<p>When adding directives, include examples of what you want and don&rsquo;t want:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;directive</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;Security First&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    Do not suggest: chmod 777, running as root unnecessarily
+</span></span><span style="display:flex;"><span>    Do suggest: Specific user permissions, UFW rules, least privilege
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/directive&gt;</span>
+</span></span></code></pre></div><h3 id="keep-it-current">Keep It Current<a hidden class="anchor" aria-hidden="true" href="#keep-it-current">#</a></h3>
+<p>Update the memory file when infrastructure changes. An outdated memory file is worse than none—it causes confident but wrong suggestions.</p>
+<h3 id="test-your-directives">Test Your Directives<a hidden class="anchor" aria-hidden="true" href="#test-your-directives">#</a></h3>
+<p>After adding a directive, test it:</p>
+<ul>
+<li>Add &ldquo;Docker Compose Only&rdquo; → Ask for a way to run nginx → Should get compose file, not docker run</li>
+</ul>
+<hr>
+<h2 id="-related-projects">🔗 Related Projects<a hidden class="anchor" aria-hidden="true" href="#-related-projects">#</a></h2>
+<ul>
+<li><a href="../home-lab/">HomeLab Infrastructure</a> - The infrastructure this memory system documents</li>
+<li><a href="../gitops/">GitOps Workflow</a> - Docker Compose management with version control</li>
+</ul>
+<hr>
+<h2 id="-future-enhancements">📋 Future Enhancements<a hidden class="anchor" aria-hidden="true" href="#-future-enhancements">#</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"> Add <code>&lt;runbooks&gt;</code> section for common procedures (backup restore, certificate renewal)</li>
+<li><input disabled="" type="checkbox"> Include <code>&lt;troubleshooting&gt;</code> patterns for known issues</li>
+<li><input disabled="" type="checkbox"> Create project-specific CLAUDE.md files for each stack</li>
+<li><input disabled="" type="checkbox"> Document MCP (Model Context Protocol) server integrations for tool access</li>
+<li><input disabled="" type="checkbox"> Add <code>&lt;maintenance_windows&gt;</code> to inform AI about acceptable change times</li>
+<li><input disabled="" type="checkbox"> Include <code>&lt;dependencies&gt;</code> mapping between services for impact analysis</li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+<nav class="paginav">
+  <a class="next" href="http://localhost:43835/me/projects/gitops/">
+    <span class="title">Next »</span>
+    <br>
+    <span>GitOps Infrastructure</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:43835/me/">James Hathcock</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>
