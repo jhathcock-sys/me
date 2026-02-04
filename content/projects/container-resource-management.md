@@ -53,7 +53,7 @@ Collected baseline memory usage from running containers:
 docker stats --no-stream --format 'table {{.Name}}\t{{.MemUsage}}\t{{.MemPerc}}'
 ```
 
-**Results (ProxMoxBox - 6GB RAM):**
+**Results (ProxMoxBox - 8GB RAM):**
 
 | Container | Current Usage | Pattern |
 |-----------|---------------|---------|
@@ -174,8 +174,9 @@ Status: Actionable - approaching 256MB limit, may need resize
 | uptime-kuma | 256 MB | 179 MB | 70% | ⚠️ Working well |
 | homepage | 256 MB | 104 MB | 40% | ✅ Plenty of room |
 
-**Total allocated:** 9.5 GB limits on 6 GB host = 1.58x overcommit
-- Safe because not all containers peak simultaneously
+**Total allocated:** 9.5 GB limits on 8 GB host = 1.19x overcommit
+- Very safe - only 19% overcommit with monitoring
+- Not all containers peak simultaneously
 - Monitoring will alert if any container approaches its limit
 
 ### Raspberry Pi 5 Notes
@@ -220,7 +221,7 @@ volumes:
 
 ### Challenge 1: Minecraft Memory Tuning
 
-Minecraft server had JVM heap set to 6GB on a 6GB host:
+Minecraft server had JVM heap set to 6GB on an 8GB host:
 
 ```yaml
 environment:
@@ -228,9 +229,9 @@ environment:
 ```
 
 **Problem:**
-- No room for JVM overhead (non-heap memory)
-- No room for other containers
-- Host would OOM under load
+- Leaves only 2GB for JVM overhead + all other containers
+- Too aggressive for a multi-service host
+- Risk of OOM under load
 
 **Solution:**
 ```yaml
