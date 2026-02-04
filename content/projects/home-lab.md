@@ -70,7 +70,7 @@ High-availability node for DNS redundancy and isolated services, managed remotel
 |----|--------|------|
 | 192.168.1.3 | Primary Pi-hole | Main DNS (ns1.home.lab) |
 | 192.168.1.4 | ProxMoxBox | Main Docker host |
-| 192.168.1.5 | Synology NAS | Network storage |
+| 192.168.1.5 | Synology NAS (DS220j) | Network storage (7.2TB, SNMP monitored) |
 | 192.168.1.6 | Nginx Proxy Manager | Reverse proxy |
 | 192.168.1.7 | Wazuh VM | SIEM (security monitoring) |
 | 192.168.1.234 | Pi5 | Secondary DNS, Tailscale |
@@ -166,14 +166,44 @@ Self-hosted video podcast recording platform with 4K multi-track support. Built 
 
 ---
 
+## 🗄️ NAS Integration (2026-02-04)
+
+Integrated Synology DS220j (7.2TB) with homelab infrastructure for centralized storage and monitoring.
+
+**SNMP Monitoring:**
+- Prometheus scrapes NAS metrics via snmp-exporter
+- Monitors: network interfaces, traffic counters, interface status
+- Grafana dashboards available for visualization
+
+**SMB Storage Shares:**
+- Mounted on ProxMoxBox (via Proxmox host bind mount)
+- Mounted on Pi5 with full read/write access
+- Directories: `/mnt/nas/homelab/docker-backups/` and `/mnt/nas/homelab/media/`
+- Docker containers have full read/write access for backups and media
+- Persistent mounts configured in /etc/fstab on both systems
+
+**Syslog Forwarding (Partial):**
+- Synology forwards logs to Promtail on ProxMoxBox:1514
+- Messages arriving but needs RFC 3164 → RFC 5424 format conversion
+- Future enhancement: add syslog relay for proper parsing
+
+**Storage Capacity:**
+- Total: 7.2TB
+- Used: 4.9TB
+- Available: 2.4TB (ready for media library and backups)
+
+---
+
 ## 📋 Future Plans
 
 - [ ] **Podcast Studio Deployment** - Deploy and test on 192.168.1.8
 - [ ] **OPNsense + Managed Switch** - Enterprise networking with VLANs and IDS/IPS
-- [ ] Add media stack (Jellyfin/Plex, Sonarr, Radarr)
+- [ ] Add media stack (Jellyfin/Plex, Sonarr, Radarr) - **NAS storage ready**
 - [ ] Implement Home Assistant for home automation
 - [ ] Migrate to Kubernetes for orchestration
 - [ ] Set up offsite backups to cloud storage
+- [ ] Fix syslog format conversion for NAS logs
+- [x] ~~NAS integration~~ (Completed - SNMP monitoring + SMB shares)
 - [x] ~~Container resource management~~ (Completed - memory limits on all 20 containers)
 - [x] ~~Add alerting via Grafana/Prometheus~~ (Completed - Discord notifications active)
 - [x] ~~Wazuh SIEM~~ (Completed - agents on ProxMoxBox and Pi5, ready for Suricata integration)
