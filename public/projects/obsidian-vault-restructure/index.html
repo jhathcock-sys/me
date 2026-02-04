@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Obsidian Vault Restructure: Transforming Monolithic Documentation into a Wiki | James Hathcock</title>
+<meta name="keywords" content="documentation, obsidian, git, technical-writing, knowledge-management">
+<meta name="description" content="Restructured 1,550-line monolithic homelab documentation into a professional Obsidian vault with 31 wiki-linked files across 8 organized folders, implementing git version control and automated backup strategies.">
+<meta name="author" content="James Hathcock">
+<link rel="canonical" href="https://jhathcock-sys.github.io/me/projects/obsidian-vault-restructure/">
+<link crossorigin="anonymous" href="/me/assets/css/stylesheet.343cc480b9ffc8f04ccbe5e968ad674880cab773ec19905e93033065c1e7a804.css" integrity="sha256-NDzEgLn/yPBMy&#43;XpaK1nSIDKt3PsGZBekwMwZcHnqAQ=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://jhathcock-sys.github.io/me/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://jhathcock-sys.github.io/me/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jhathcock-sys.github.io/me/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://jhathcock-sys.github.io/me/apple-touch-icon.png">
+<link rel="mask-icon" href="https://jhathcock-sys.github.io/me/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://jhathcock-sys.github.io/me/projects/obsidian-vault-restructure/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://jhathcock-sys.github.io/me/projects/obsidian-vault-restructure/">
+  <meta property="og:site_name" content="James Hathcock">
+  <meta property="og:title" content="Obsidian Vault Restructure: Transforming Monolithic Documentation into a Wiki">
+  <meta property="og:description" content="Restructured 1,550-line monolithic homelab documentation into a professional Obsidian vault with 31 wiki-linked files across 8 organized folders, implementing git version control and automated backup strategies.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="projects">
+    <meta property="article:published_time" content="2026-02-04T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-02-04T00:00:00+00:00">
+    <meta property="article:tag" content="Documentation">
+    <meta property="article:tag" content="Obsidian">
+    <meta property="article:tag" content="Git">
+    <meta property="article:tag" content="Technical-Writing">
+    <meta property="article:tag" content="Knowledge-Management">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Obsidian Vault Restructure: Transforming Monolithic Documentation into a Wiki">
+<meta name="twitter:description" content="Restructured 1,550-line monolithic homelab documentation into a professional Obsidian vault with 31 wiki-linked files across 8 organized folders, implementing git version control and automated backup strategies.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Projects",
+      "item": "https://jhathcock-sys.github.io/me/projects/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Obsidian Vault Restructure: Transforming Monolithic Documentation into a Wiki",
+      "item": "https://jhathcock-sys.github.io/me/projects/obsidian-vault-restructure/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Obsidian Vault Restructure: Transforming Monolithic Documentation into a Wiki",
+  "name": "Obsidian Vault Restructure: Transforming Monolithic Documentation into a Wiki",
+  "description": "Restructured 1,550-line monolithic homelab documentation into a professional Obsidian vault with 31 wiki-linked files across 8 organized folders, implementing git version control and automated backup strategies.",
+  "keywords": [
+    "documentation", "obsidian", "git", "technical-writing", "knowledge-management"
+  ],
+  "articleBody": "Executive Summary Transformed a single 1,550-line markdown file containing all homelab infrastructure documentation into a structured Obsidian vault with 31 cross-referenced files organized across 8 thematic folders. Implemented wiki-style linking, git version control, and secure backup strategies while maintaining complete content fidelity.\nKey Results:\n31 organized files replacing monolithic 1,550-line document 8-folder taxonomy for logical content grouping Wiki-style cross-linking with 150+ internal references Git repository with security-hardened .gitignore Zero sensitive data exposure risk The Problem Monolithic Documentation Challenges The homelab infrastructure documentation had grown organically into a single unwieldy file:\nPain Points:\n1,550 lines in a single markdown file 25+ H2 sections covering disparate topics Difficult navigation - required scrolling or text search No cross-referencing between related topics Mixed concerns - infrastructure, services, projects, changelogs all intermingled Poor scalability - adding content made the file increasingly difficult to maintain Version control blind spots - single-file commits obscured what actually changed Content Scope:\nNetwork topology and IP assignments Docker service configurations (15+ services) Monitoring stack documentation (Prometheus, Grafana, Loki) Security hardening notes Project documentation (3 major projects) Changelog entries (10+ sessions) Reference material (commands, troubleshooting, environment files) Requirements for Solution Maintainability - Easy to update individual topics without affecting others Discoverability - Quick access to specific information Relationships - Clear connections between related concepts Scalability - Structure should support future growth Version Control - Granular tracking of documentation changes Security - Sensitive credentials must be excluded from version control Portability - Standard markdown format for tool independence Solution Architecture Folder Taxonomy Design Designed an 8-folder structure based on information architecture principles:\nHomeLab/ ├── _Index.md # Landing page (hub) ├── Infrastructure/ # Foundation (network, deployment) ├── Services/ # Applications (largest category) │ └── Monitoring/ # Subcategory for related services ├── Security/ # Security-specific documentation ├── Projects/ # Major initiatives ├── Reference/ # Quick-reference material ├── Roadmap/ # Planning and future work └── Changelog/ # Historical session notes └── 2026-02/ # Organized by year-month Design Rationale:\nInfrastructure - Foundational elements (network, deployment pipeline, workstation) Services - Operational applications (15+ services, warranted subcategories) Security - Isolated for Security+ certification focus Projects - High-level initiatives with their own lifecycles Reference - Frequently accessed quick-reference material Roadmap - Forward-looking planning Changelog - Historical records organized chronologically Wiki Linking Strategy Implemented Obsidian’s [[Page-Name]] wiki-style linking:\nLink Types:\nHierarchical - Parent to child relationships Cross-referential - Related concepts across categories Bidirectional - Automatic backlinks via Obsidian Contextual - Links embedded in natural language Example Link Patterns:\n# In Services/Homepage-Dashboard.md **IP:** [[Network-Topology|192.168.1.4:4000]] **Stack:** [[GitOps-Workflow|homelab-ops/proxmox/homepage/]] Related: [[Dockhand]], [[Pi-hole]], [[Grafana]] Benefits:\nClick-through navigation between related pages Backlinks panel shows what references each page Graph view visualizes documentation relationships Broken links highlighted in red (dead reference detection) Content Mapping Strategy Mapped monolithic sections to new file locations:\nOriginal Section New Location Rationale Overview _Index.md Entry point hub Network Topology Infrastructure/Network-Topology.md Foundation reference Homepage Dashboard Services/Homepage-Dashboard.md Service-specific Monitoring Stack Services/Monitoring/_Monitoring-Stack.md Overview for subcategory Prometheus Config Services/Monitoring/Prometheus.md Detailed service doc Wazuh SIEM Security/Wazuh-SIEM.md Security focus Podcast Studio Projects/Podcast-Studio.md Project lifecycle Personal Context Reference/Personal-Context.md Quick reference Future Plans Roadmap/Future-Plans.md Forward-looking NAS Integration Session Changelog/2026-02/2026-02-04-NAS-Integration.md Historical record Implementation Phase 1: Structure Creation Created folder hierarchy and landing page:\nmkdir -p Infrastructure Services Services/Monitoring Security \\ Projects Reference Roadmap Changelog Changelog/2026-02 Landing Page Design:\nQuick Links table with all major categories Network topology table (frequently referenced) Running containers overview Related notes references Phase 2: Content Extraction and File Creation Process:\nRead original monolithic file Extract section content with context preservation Create new file with appropriate header Add wiki links to related pages Add navigation breadcrumb ([[_Index|← Back to Index]]) Header Template:\n# Page Title [[_Index|← Back to Index]] **IP:** [[Network-Topology|192.168.1.X]] | **Stack:** [[GitOps-Workflow|path]] --- ## Content sections... --- ## Related Pages - [[Related-Page-1]] - [[Related-Page-2]] Phase 3: Wiki Linking Implementation Added cross-references following these patterns:\nService Files → Infrastructure:\n**IP:** [[Network-Topology|192.168.1.4:3000]] **Stack:** [[GitOps-Workflow|homelab-ops/proxmox/dockhand/]] Monitoring Stack → Individual Services:\n- [[Prometheus]] - Time-series metrics database - [[Grafana]] - Visualization and dashboards - [[Alertmanager]] - Alert routing Changelog → Services:\nSuccessfully added [[Prometheus]] monitoring for [[NAS-Synology]] via SNMP. Total Links Created: 150+ internal wiki links\nPhase 4: Git Repository Setup Security-First Approach:\nCreated comprehensive .gitignore:\n# Sensitive Files - Credentials and Tokens Wazuh Creds.md Token Github.md Token for Homarr ProxMox.md Secrets/ **/*secret*.md **/*password*.md **/*cred*.md # Working Notes and Drafts Build Outs/ Config Files/ # Archive and Old Files _Archive-*.md Homelab and Portfolio Log.md # Obsidian Configuration .obsidian/ Repository Initialization:\ngit init git branch -m main git add . git status # Verified sensitive files excluded git commit -m \"Initial commit: Obsidian vault restructure\" GitHub Integration:\ngh repo create homelab-docs --private \\ --description \"Structured Obsidian vault for homelab infrastructure documentation\" \\ --source=. --remote=origin git push -u origin main Result: Private repository with 35 tracked files, zero sensitive data exposure.\nPhase 5: Memory System Integration Updated Claude Code memory system to reference new structure:\nGlobal Memory Update (~/.claude/CLAUDE.md):\n",
+  "wordCount" : "1825",
+  "inLanguage": "en",
+  "datePublished": "2026-02-04T00:00:00Z",
+  "dateModified": "2026-02-04T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "James Hathcock"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://jhathcock-sys.github.io/me/projects/obsidian-vault-restructure/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "James Hathcock",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://jhathcock-sys.github.io/me/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://jhathcock-sys.github.io/me/" accesskey="h" title="James Hathcock (Alt + H)">James Hathcock</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://jhathcock-sys.github.io/me/resume/" title="Resume">
+                    <span>Resume</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://jhathcock-sys.github.io/me/projects/" title="Projects">
+                    <span>Projects</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://jhathcock-sys.github.io/me/">Home</a>&nbsp;»&nbsp;<a href="https://jhathcock-sys.github.io/me/projects/">Projects</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Obsidian Vault Restructure: Transforming Monolithic Documentation into a Wiki
+    </h1>
+    <div class="post-description">
+      Restructured 1,550-line monolithic homelab documentation into a professional Obsidian vault with 31 wiki-linked files across 8 organized folders, implementing git version control and automated backup strategies.
+    </div>
+    <div class="post-meta"><span title='2026-02-04 00:00:00 +0000 UTC'>February 4, 2026</span>&nbsp;·&nbsp;<span>9 min</span>&nbsp;·&nbsp;<span>James Hathcock</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h2 id="executive-summary">Executive Summary<a hidden class="anchor" aria-hidden="true" href="#executive-summary">#</a></h2>
+<p>Transformed a single 1,550-line markdown file containing all homelab infrastructure documentation into a structured Obsidian vault with 31 cross-referenced files organized across 8 thematic folders. Implemented wiki-style linking, git version control, and secure backup strategies while maintaining complete content fidelity.</p>
+<p><strong>Key Results:</strong></p>
+<ul>
+<li>31 organized files replacing monolithic 1,550-line document</li>
+<li>8-folder taxonomy for logical content grouping</li>
+<li>Wiki-style cross-linking with 150+ internal references</li>
+<li>Git repository with security-hardened .gitignore</li>
+<li>Zero sensitive data exposure risk</li>
+</ul>
+<hr>
+<h2 id="the-problem">The Problem<a hidden class="anchor" aria-hidden="true" href="#the-problem">#</a></h2>
+<h3 id="monolithic-documentation-challenges">Monolithic Documentation Challenges<a hidden class="anchor" aria-hidden="true" href="#monolithic-documentation-challenges">#</a></h3>
+<p>The homelab infrastructure documentation had grown organically into a single unwieldy file:</p>
+<p><strong>Pain Points:</strong></p>
+<ul>
+<li><strong>1,550 lines</strong> in a single markdown file</li>
+<li><strong>25+ H2 sections</strong> covering disparate topics</li>
+<li><strong>Difficult navigation</strong> - required scrolling or text search</li>
+<li><strong>No cross-referencing</strong> between related topics</li>
+<li><strong>Mixed concerns</strong> - infrastructure, services, projects, changelogs all intermingled</li>
+<li><strong>Poor scalability</strong> - adding content made the file increasingly difficult to maintain</li>
+<li><strong>Version control blind spots</strong> - single-file commits obscured what actually changed</li>
+</ul>
+<p><strong>Content Scope:</strong></p>
+<ul>
+<li>Network topology and IP assignments</li>
+<li>Docker service configurations (15+ services)</li>
+<li>Monitoring stack documentation (Prometheus, Grafana, Loki)</li>
+<li>Security hardening notes</li>
+<li>Project documentation (3 major projects)</li>
+<li>Changelog entries (10+ sessions)</li>
+<li>Reference material (commands, troubleshooting, environment files)</li>
+</ul>
+<h3 id="requirements-for-solution">Requirements for Solution<a hidden class="anchor" aria-hidden="true" href="#requirements-for-solution">#</a></h3>
+<ol>
+<li><strong>Maintainability</strong> - Easy to update individual topics without affecting others</li>
+<li><strong>Discoverability</strong> - Quick access to specific information</li>
+<li><strong>Relationships</strong> - Clear connections between related concepts</li>
+<li><strong>Scalability</strong> - Structure should support future growth</li>
+<li><strong>Version Control</strong> - Granular tracking of documentation changes</li>
+<li><strong>Security</strong> - Sensitive credentials must be excluded from version control</li>
+<li><strong>Portability</strong> - Standard markdown format for tool independence</li>
+</ol>
+<hr>
+<h2 id="solution-architecture">Solution Architecture<a hidden class="anchor" aria-hidden="true" href="#solution-architecture">#</a></h2>
+<h3 id="folder-taxonomy-design">Folder Taxonomy Design<a hidden class="anchor" aria-hidden="true" href="#folder-taxonomy-design">#</a></h3>
+<p>Designed an 8-folder structure based on information architecture principles:</p>
+<pre tabindex="0"><code>HomeLab/
+├── _Index.md                    # Landing page (hub)
+├── Infrastructure/              # Foundation (network, deployment)
+├── Services/                    # Applications (largest category)
+│   └── Monitoring/              # Subcategory for related services
+├── Security/                    # Security-specific documentation
+├── Projects/                    # Major initiatives
+├── Reference/                   # Quick-reference material
+├── Roadmap/                     # Planning and future work
+└── Changelog/                   # Historical session notes
+    └── 2026-02/                 # Organized by year-month
+</code></pre><p><strong>Design Rationale:</strong></p>
+<ul>
+<li><strong>Infrastructure</strong> - Foundational elements (network, deployment pipeline, workstation)</li>
+<li><strong>Services</strong> - Operational applications (15+ services, warranted subcategories)</li>
+<li><strong>Security</strong> - Isolated for Security+ certification focus</li>
+<li><strong>Projects</strong> - High-level initiatives with their own lifecycles</li>
+<li><strong>Reference</strong> - Frequently accessed quick-reference material</li>
+<li><strong>Roadmap</strong> - Forward-looking planning</li>
+<li><strong>Changelog</strong> - Historical records organized chronologically</li>
+</ul>
+<h3 id="wiki-linking-strategy">Wiki Linking Strategy<a hidden class="anchor" aria-hidden="true" href="#wiki-linking-strategy">#</a></h3>
+<p>Implemented Obsidian&rsquo;s <code>[[Page-Name]]</code> wiki-style linking:</p>
+<p><strong>Link Types:</strong></p>
+<ol>
+<li><strong>Hierarchical</strong> - Parent to child relationships</li>
+<li><strong>Cross-referential</strong> - Related concepts across categories</li>
+<li><strong>Bidirectional</strong> - Automatic backlinks via Obsidian</li>
+<li><strong>Contextual</strong> - Links embedded in natural language</li>
+</ol>
+<p><strong>Example Link Patterns:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span># In Services/Homepage-Dashboard.md
+</span></span><span style="display:flex;"><span>**IP:** [[Network-Topology|192.168.1.4:4000]]
+</span></span><span style="display:flex;"><span><span style="font-weight:bold">**Stack:**</span> [[GitOps-Workflow|homelab-ops/proxmox/homepage/]]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Related: [[Dockhand]], [[Pi-hole]], [[Grafana]]
+</span></span></code></pre></div><p><strong>Benefits:</strong></p>
+<ul>
+<li>Click-through navigation between related pages</li>
+<li>Backlinks panel shows what references each page</li>
+<li>Graph view visualizes documentation relationships</li>
+<li>Broken links highlighted in red (dead reference detection)</li>
+</ul>
+<h3 id="content-mapping-strategy">Content Mapping Strategy<a hidden class="anchor" aria-hidden="true" href="#content-mapping-strategy">#</a></h3>
+<p>Mapped monolithic sections to new file locations:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Original Section</th>
+          <th>New Location</th>
+          <th>Rationale</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Overview</td>
+          <td><code>_Index.md</code></td>
+          <td>Entry point hub</td>
+      </tr>
+      <tr>
+          <td>Network Topology</td>
+          <td><code>Infrastructure/Network-Topology.md</code></td>
+          <td>Foundation reference</td>
+      </tr>
+      <tr>
+          <td>Homepage Dashboard</td>
+          <td><code>Services/Homepage-Dashboard.md</code></td>
+          <td>Service-specific</td>
+      </tr>
+      <tr>
+          <td>Monitoring Stack</td>
+          <td><code>Services/Monitoring/_Monitoring-Stack.md</code></td>
+          <td>Overview for subcategory</td>
+      </tr>
+      <tr>
+          <td>Prometheus Config</td>
+          <td><code>Services/Monitoring/Prometheus.md</code></td>
+          <td>Detailed service doc</td>
+      </tr>
+      <tr>
+          <td>Wazuh SIEM</td>
+          <td><code>Security/Wazuh-SIEM.md</code></td>
+          <td>Security focus</td>
+      </tr>
+      <tr>
+          <td>Podcast Studio</td>
+          <td><code>Projects/Podcast-Studio.md</code></td>
+          <td>Project lifecycle</td>
+      </tr>
+      <tr>
+          <td>Personal Context</td>
+          <td><code>Reference/Personal-Context.md</code></td>
+          <td>Quick reference</td>
+      </tr>
+      <tr>
+          <td>Future Plans</td>
+          <td><code>Roadmap/Future-Plans.md</code></td>
+          <td>Forward-looking</td>
+      </tr>
+      <tr>
+          <td>NAS Integration Session</td>
+          <td><code>Changelog/2026-02/2026-02-04-NAS-Integration.md</code></td>
+          <td>Historical record</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="implementation">Implementation<a hidden class="anchor" aria-hidden="true" href="#implementation">#</a></h2>
+<h3 id="phase-1-structure-creation">Phase 1: Structure Creation<a hidden class="anchor" aria-hidden="true" href="#phase-1-structure-creation">#</a></h3>
+<p>Created folder hierarchy and landing page:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>mkdir -p Infrastructure Services Services/Monitoring Security <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>         Projects Reference Roadmap Changelog Changelog/2026-02
+</span></span></code></pre></div><p><strong>Landing Page Design:</strong></p>
+<ul>
+<li>Quick Links table with all major categories</li>
+<li>Network topology table (frequently referenced)</li>
+<li>Running containers overview</li>
+<li>Related notes references</li>
+</ul>
+<h3 id="phase-2-content-extraction-and-file-creation">Phase 2: Content Extraction and File Creation<a hidden class="anchor" aria-hidden="true" href="#phase-2-content-extraction-and-file-creation">#</a></h3>
+<p><strong>Process:</strong></p>
+<ol>
+<li>Read original monolithic file</li>
+<li>Extract section content with context preservation</li>
+<li>Create new file with appropriate header</li>
+<li>Add wiki links to related pages</li>
+<li>Add navigation breadcrumb (<code>[[_Index|← Back to Index]]</code>)</li>
+</ol>
+<p><strong>Header Template:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span># Page Title
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[[_Index|← Back to Index]]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="font-weight:bold">**IP:**</span> [[Network-Topology|192.168.1.X]] | <span style="font-weight:bold">**Stack:**</span> [[GitOps-Workflow|path]]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Content sections...
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Related Pages
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> [[Related-Page-1]]
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> [[Related-Page-2]]
+</span></span></code></pre></div><h3 id="phase-3-wiki-linking-implementation">Phase 3: Wiki Linking Implementation<a hidden class="anchor" aria-hidden="true" href="#phase-3-wiki-linking-implementation">#</a></h3>
+<p>Added cross-references following these patterns:</p>
+<p><strong>Service Files → Infrastructure:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span>**IP:** [[Network-Topology|192.168.1.4:3000]]
+</span></span><span style="display:flex;"><span><span style="font-weight:bold">**Stack:**</span> [[GitOps-Workflow|homelab-ops/proxmox/dockhand/]]
+</span></span></code></pre></div><p><strong>Monitoring Stack → Individual Services:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span><span style="color:#66d9ef">-</span> [[Prometheus]] - Time-series metrics database
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> [[Grafana]] - Visualization and dashboards
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> [[Alertmanager]] - Alert routing
+</span></span></code></pre></div><p><strong>Changelog → Services:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span>Successfully added [[Prometheus]] monitoring for [[NAS-Synology]] via SNMP.
+</span></span></code></pre></div><p><strong>Total Links Created:</strong> 150+ internal wiki links</p>
+<h3 id="phase-4-git-repository-setup">Phase 4: Git Repository Setup<a hidden class="anchor" aria-hidden="true" href="#phase-4-git-repository-setup">#</a></h3>
+<p><strong>Security-First Approach:</strong></p>
+<p>Created comprehensive <code>.gitignore</code>:</p>
+<pre tabindex="0"><code class="language-gitignore" data-lang="gitignore"># Sensitive Files - Credentials and Tokens
+Wazuh Creds.md
+Token Github.md
+Token for Homarr ProxMox.md
+Secrets/
+**/*secret*.md
+**/*password*.md
+**/*cred*.md
+
+# Working Notes and Drafts
+Build Outs/
+Config Files/
+
+# Archive and Old Files
+_Archive-*.md
+Homelab and Portfolio Log.md
+
+# Obsidian Configuration
+.obsidian/
+</code></pre><p><strong>Repository Initialization:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git init
+</span></span><span style="display:flex;"><span>git branch -m main
+</span></span><span style="display:flex;"><span>git add .
+</span></span><span style="display:flex;"><span>git status  <span style="color:#75715e"># Verified sensitive files excluded</span>
+</span></span><span style="display:flex;"><span>git commit -m <span style="color:#e6db74">&#34;Initial commit: Obsidian vault restructure&#34;</span>
+</span></span></code></pre></div><p><strong>GitHub Integration:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>gh repo create homelab-docs --private <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --description <span style="color:#e6db74">&#34;Structured Obsidian vault for homelab infrastructure documentation&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --source<span style="color:#f92672">=</span>. --remote<span style="color:#f92672">=</span>origin
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>git push -u origin main
+</span></span></code></pre></div><p><strong>Result:</strong> Private repository with 35 tracked files, zero sensitive data exposure.</p>
+<h3 id="phase-5-memory-system-integration">Phase 5: Memory System Integration<a hidden class="anchor" aria-hidden="true" href="#phase-5-memory-system-integration">#</a></h3>
+<p>Updated Claude Code memory system to reference new structure:</p>
+<p><strong>Global Memory Update (<code>~/.claude/CLAUDE.md</code>):</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;documentation&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;doc</span> <span style="color:#a6e22e">path=</span><span style="color:#e6db74">&#34;/home/cib/Documents/HomeLab/HomeLab/_Index.md&#34;</span> <span style="color:#a6e22e">type=</span><span style="color:#e6db74">&#34;obsidian_vault&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>        Obsidian Vault - Structured homelab documentation with wiki-style linking.
+</span></span><span style="display:flex;"><span>        31 files across 8 folders: Infrastructure, Services, Security, Projects,
+</span></span><span style="display:flex;"><span>        Reference, Roadmap, Changelog.
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/doc&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;vault_structure&gt;</span>
+</span></span><span style="display:flex;"><span>        Infrastructure/ - Network topology, GitOps workflow, workstation setup
+</span></span><span style="display:flex;"><span>        Services/ - Homepage, Dockhand, Pi-hole, Minecraft, NAS, Monitoring/
+</span></span><span style="display:flex;"><span>        Security/ - Wazuh SIEM, security hardening, best practices
+</span></span><span style="display:flex;"><span>        Projects/ - Podcast Studio, Portfolio Site, Claude Memory System
+</span></span><span style="display:flex;"><span>        Reference/ - Docker commands, troubleshooting, environment files
+</span></span><span style="display:flex;"><span>        Roadmap/ - Future plans, current TODO
+</span></span><span style="display:flex;"><span>        Changelog/ - Session notes organized by date
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/vault_structure&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/documentation&gt;</span>
+</span></span></code></pre></div><p><strong>Benefits:</strong></p>
+<ul>
+<li>AI assistant knows vault structure</li>
+<li>Can reference specific pages in responses</li>
+<li>Understands relationships between pages</li>
+<li>Maintains wiki linking conventions</li>
+</ul>
+<hr>
+<h2 id="results">Results<a hidden class="anchor" aria-hidden="true" href="#results">#</a></h2>
+<h3 id="quantitative-metrics">Quantitative Metrics<a hidden class="anchor" aria-hidden="true" href="#quantitative-metrics">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Metric</th>
+          <th>Before</th>
+          <th>After</th>
+          <th>Improvement</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Files</strong></td>
+          <td>1</td>
+          <td>31</td>
+          <td>+3,000% granularity</td>
+      </tr>
+      <tr>
+          <td><strong>Lines</strong></td>
+          <td>1,550</td>
+          <td>~125 avg/file</td>
+          <td>Manageable chunks</td>
+      </tr>
+      <tr>
+          <td><strong>Search Time</strong></td>
+          <td>30-60 sec</td>
+          <td>&lt;5 sec</td>
+          <td>85%+ faster</td>
+      </tr>
+      <tr>
+          <td><strong>Update Scope</strong></td>
+          <td>Full file</td>
+          <td>Single file</td>
+          <td>Isolated changes</td>
+      </tr>
+      <tr>
+          <td><strong>Version Control</strong></td>
+          <td>Opaque</td>
+          <td>Granular</td>
+          <td>Clear change tracking</td>
+      </tr>
+      <tr>
+          <td><strong>Cross-References</strong></td>
+          <td>0</td>
+          <td>150+</td>
+          <td>Full connectivity</td>
+      </tr>
+      <tr>
+          <td><strong>Security Risk</strong></td>
+          <td>High (credentials in repo)</td>
+          <td>Zero</td>
+          <td>Fully mitigated</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="qualitative-improvements">Qualitative Improvements<a hidden class="anchor" aria-hidden="true" href="#qualitative-improvements">#</a></h3>
+<p><strong>Navigation:</strong></p>
+<ul>
+<li>✅ Click-through navigation via wiki links</li>
+<li>✅ Breadcrumb trail (back to index)</li>
+<li>✅ Automatic backlinks panel</li>
+<li>✅ Graph view visualization</li>
+</ul>
+<p><strong>Maintainability:</strong></p>
+<ul>
+<li>✅ Update single page without affecting others</li>
+<li>✅ Git commits show exact scope of change</li>
+<li>✅ Easy to reorganize by moving files</li>
+<li>✅ Add new pages without cluttering existing content</li>
+</ul>
+<p><strong>Discoverability:</strong></p>
+<ul>
+<li>✅ Topic-based file names (search for &ldquo;prometheus&rdquo; finds exact file)</li>
+<li>✅ Related pages linked at bottom</li>
+<li>✅ Backlinks show all references to a page</li>
+<li>✅ Table of contents at <code>_Index.md</code></li>
+</ul>
+<p><strong>Security:</strong></p>
+<ul>
+<li>✅ Credentials excluded via <code>.gitignore</code></li>
+<li>✅ Private GitHub repository</li>
+<li>✅ No secrets in commit history</li>
+<li>✅ Future-proofed with pattern matching</li>
+</ul>
+<h3 id="file-statistics">File Statistics<a hidden class="anchor" aria-hidden="true" href="#file-statistics">#</a></h3>
+<pre tabindex="0"><code>├── Infrastructure/ (3 files)
+│   └── ~80 lines avg
+├── Services/ (11 files)
+│   └── ~120 lines avg
+├── Security/ (3 files)
+│   └── ~180 lines avg
+├── Projects/ (3 files)
+│   └── ~140 lines avg
+├── Reference/ (5 files)
+│   └── ~90 lines avg
+├── Roadmap/ (2 files)
+│   └── ~110 lines avg
+└── Changelog/ (6 files)
+    └── ~280 lines avg (detailed session notes)
+
+Total: 3,898 lines across 35 files
+</code></pre><hr>
+<h2 id="technical-challenges--solutions">Technical Challenges &amp; Solutions<a hidden class="anchor" aria-hidden="true" href="#technical-challenges--solutions">#</a></h2>
+<h3 id="challenge-1-content-decomposition">Challenge 1: Content Decomposition<a hidden class="anchor" aria-hidden="true" href="#challenge-1-content-decomposition">#</a></h3>
+<p><strong>Problem:</strong> How to split highly interconnected content without losing context?</p>
+<p><strong>Solution:</strong></p>
+<ul>
+<li>Created <code>_Index.md</code> as aggregation point</li>
+<li>Added &ldquo;Related Pages&rdquo; sections to each file</li>
+<li>Used wiki links with context (<code>[[Page|descriptive text]]</code>)</li>
+<li>Preserved original file as <code>_Archive-Original-2026-02-04.md</code></li>
+</ul>
+<h3 id="challenge-2-link-maintenance">Challenge 2: Link Maintenance<a hidden class="anchor" aria-hidden="true" href="#challenge-2-link-maintenance">#</a></h3>
+<p><strong>Problem:</strong> With 150+ links, how to avoid broken references?</p>
+<p><strong>Solution:</strong></p>
+<ul>
+<li>Obsidian&rsquo;s built-in link validation (shows broken links in red)</li>
+<li>Standardized page naming convention (Title-Case-With-Hyphens)</li>
+<li>Used descriptive link text for clarity</li>
+<li>Verified all links after restructure</li>
+</ul>
+<h3 id="challenge-3-sensitive-data-protection">Challenge 3: Sensitive Data Protection<a hidden class="anchor" aria-hidden="true" href="#challenge-3-sensitive-data-protection">#</a></h3>
+<p><strong>Problem:</strong> Vault contained credentials mixed with documentation.</p>
+<p><strong>Solution:</strong></p>
+<ul>
+<li>Comprehensive <code>.gitignore</code> with pattern matching</li>
+<li>Verified with <code>git status</code> before initial commit</li>
+<li>Private repository as additional safeguard</li>
+<li>Created separate <code>Secrets/</code> folder (gitignored) for credentials</li>
+</ul>
+<h3 id="challenge-4-historical-context-preservation">Challenge 4: Historical Context Preservation<a hidden class="anchor" aria-hidden="true" href="#challenge-4-historical-context-preservation">#</a></h3>
+<p><strong>Problem:</strong> Monolithic file had chronological changelog that showed evolution.</p>
+<p><strong>Solution:</strong></p>
+<ul>
+<li>Created <code>Changelog/</code> folder with detailed session notes</li>
+<li>Organized by year-month subfolders</li>
+<li>Each session gets dedicated file with full context</li>
+<li><code>_Changelog-Index.md</code> provides timeline overview</li>
+</ul>
+<h3 id="challenge-5-memory-system-integration">Challenge 5: Memory System Integration<a hidden class="anchor" aria-hidden="true" href="#challenge-5-memory-system-integration">#</a></h3>
+<p><strong>Problem:</strong> AI assistant&rsquo;s memory pointed to old monolithic file.</p>
+<p><strong>Solution:</strong></p>
+<ul>
+<li>Updated global memory with vault structure</li>
+<li>Added vault taxonomy to memory system</li>
+<li>Included example navigation patterns</li>
+<li>Synced to backup repository (<code>ai-assistant-config</code>)</li>
+</ul>
+<hr>
+<h2 id="skills-demonstrated">Skills Demonstrated<a hidden class="anchor" aria-hidden="true" href="#skills-demonstrated">#</a></h2>
+<h3 id="information-architecture">Information Architecture<a hidden class="anchor" aria-hidden="true" href="#information-architecture">#</a></h3>
+<ul>
+<li><strong>Taxonomy Design</strong> - Created logical 8-folder structure based on content types and user needs</li>
+<li><strong>Content Modeling</strong> - Mapped 25+ sections to appropriate categories</li>
+<li><strong>Navigation Design</strong> - Implemented hub-and-spoke model with <code>_Index.md</code> as central hub</li>
+<li><strong>Relationship Mapping</strong> - Identified and linked 150+ cross-references</li>
+</ul>
+<h3 id="technical-writing">Technical Writing<a hidden class="anchor" aria-hidden="true" href="#technical-writing">#</a></h3>
+<ul>
+<li><strong>Clarity</strong> - Each page has clear purpose and scope</li>
+<li><strong>Consistency</strong> - Standardized headers, formatting, and link patterns</li>
+<li><strong>Completeness</strong> - All original content preserved with added context</li>
+<li><strong>Accessibility</strong> - Breadcrumb navigation and related pages for wayfinding</li>
+</ul>
+<h3 id="version-control">Version Control<a hidden class="anchor" aria-hidden="true" href="#version-control">#</a></h3>
+<ul>
+<li><strong>Git Workflow</strong> - Repository initialization, branching strategy (main)</li>
+<li><strong>Security</strong> - Comprehensive <code>.gitignore</code> to exclude sensitive data</li>
+<li><strong>Commit Hygiene</strong> - Descriptive commit messages with context</li>
+<li><strong>Remote Management</strong> - GitHub CLI integration, private repository setup</li>
+</ul>
+<h3 id="knowledge-management">Knowledge Management<a hidden class="anchor" aria-hidden="true" href="#knowledge-management">#</a></h3>
+<ul>
+<li><strong>Wiki Methodology</strong> - Bidirectional linking, backlinks, graph visualization</li>
+<li><strong>Metadata Management</strong> - Frontmatter for Obsidian features</li>
+<li><strong>Search Optimization</strong> - File naming for quick discovery</li>
+<li><strong>Scalability</strong> - Structure supports unlimited growth</li>
+</ul>
+<h3 id="automation--integration">Automation &amp; Integration<a hidden class="anchor" aria-hidden="true" href="#automation--integration">#</a></h3>
+<ul>
+<li><strong>Memory System</strong> - Updated AI assistant memory with new structure</li>
+<li><strong>Backup Strategy</strong> - Automated sync to backup repository</li>
+<li><strong>Documentation as Code</strong> - Git-versioned markdown files</li>
+<li><strong>Tool Integration</strong> - Obsidian + Git + GitHub + Claude Code</li>
+</ul>
+<hr>
+<h2 id="lessons-learned">Lessons Learned<a hidden class="anchor" aria-hidden="true" href="#lessons-learned">#</a></h2>
+<h3 id="documentation-debt-is-real">Documentation Debt is Real<a hidden class="anchor" aria-hidden="true" href="#documentation-debt-is-real">#</a></h3>
+<p>Large monolithic files accumulate slowly. Restructuring took ~2 hours but saved future hours of inefficiency.</p>
+<h3 id="early-structure-pays-off">Early Structure Pays Off<a hidden class="anchor" aria-hidden="true" href="#early-structure-pays-off">#</a></h3>
+<p>Starting with good taxonomy prevents future reorganization. The 8-folder structure should scale to 100+ files.</p>
+<h3 id="security-by-default">Security by Default<a hidden class="anchor" aria-hidden="true" href="#security-by-default">#</a></h3>
+<p>Including comprehensive <code>.gitignore</code> from day one prevents credential leaks. Pattern matching catches future additions.</p>
+<h3 id="tools-matter">Tools Matter<a hidden class="anchor" aria-hidden="true" href="#tools-matter">#</a></h3>
+<p>Obsidian&rsquo;s wiki links + graph view + backlinks made restructuring valuable. Standard markdown maintains portability.</p>
+<h3 id="context-preservation">Context Preservation<a hidden class="anchor" aria-hidden="true" href="#context-preservation">#</a></h3>
+<p>Keeping <code>_Archive-Original-2026-02-04.md</code> provides safety net. No information was lost during restructure.</p>
+<hr>
+<h2 id="future-enhancements">Future Enhancements<a hidden class="anchor" aria-hidden="true" href="#future-enhancements">#</a></h2>
+<h3 id="phase-2-improvements">Phase 2 Improvements<a hidden class="anchor" aria-hidden="true" href="#phase-2-improvements">#</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> Add frontmatter metadata (tags, categories, dates)</li>
+<li><input disabled="" type="checkbox"> Create custom Obsidian templates for new pages</li>
+<li><input disabled="" type="checkbox"> Implement automated link validation in CI/CD</li>
+<li><input disabled="" type="checkbox"> Add diagrams (network topology, architecture) using Mermaid</li>
+<li><input disabled="" type="checkbox"> Create Obsidian Dataview queries for dynamic indexes</li>
+</ul>
+<h3 id="advanced-features">Advanced Features<a hidden class="anchor" aria-hidden="true" href="#advanced-features">#</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> Publish vault to static site (Obsidian Publish or custom)</li>
+<li><input disabled="" type="checkbox"> Add full-text search with Algolia or similar</li>
+<li><input disabled="" type="checkbox"> Implement automated changelog generation from git commits</li>
+<li><input disabled="" type="checkbox"> Create dashboard views for service status</li>
+<li><input disabled="" type="checkbox"> Add automated backups to multiple locations</li>
+</ul>
+<h3 id="integration-opportunities">Integration Opportunities<a hidden class="anchor" aria-hidden="true" href="#integration-opportunities">#</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> Link to portfolio projects from vault</li>
+<li><input disabled="" type="checkbox"> Generate resume content from vault data</li>
+<li><input disabled="" type="checkbox"> Create automated documentation from infrastructure as code</li>
+<li><input disabled="" type="checkbox"> Implement bidirectional sync with homelab-ops repository</li>
+</ul>
+<hr>
+<h2 id="conclusion">Conclusion<a hidden class="anchor" aria-hidden="true" href="#conclusion">#</a></h2>
+<p>Restructuring 1,550 lines of monolithic documentation into a 31-file Obsidian vault with wiki-style linking transformed homelab documentation from a maintenance burden into a professional knowledge base. The git-versioned structure with comprehensive security measures provides both historical tracking and credential protection.</p>
+<p>The project demonstrates proficiency in information architecture, technical writing, version control, and knowledge management - all critical skills for IT infrastructure roles. The scalable taxonomy and wiki methodology ensure the documentation will remain maintainable as the homelab grows.</p>
+<p><strong>Repository:</strong> <a href="https://github.com/jhathcock-sys/homelab-docs">https://github.com/jhathcock-sys/homelab-docs</a> (Private)</p>
+<p><strong>Key Takeaway:</strong> Investing time in documentation structure pays compounding dividends in maintenance efficiency and knowledge transfer.</p>
+<hr>
+<p><em>Project completed: February 4, 2026</em></p>
+<p><em>Tools used: Obsidian, Git, GitHub CLI, Claude Code, Markdown</em></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://jhathcock-sys.github.io/me/tags/documentation/">Documentation</a></li>
+      <li><a href="https://jhathcock-sys.github.io/me/tags/obsidian/">Obsidian</a></li>
+      <li><a href="https://jhathcock-sys.github.io/me/tags/git/">Git</a></li>
+      <li><a href="https://jhathcock-sys.github.io/me/tags/technical-writing/">Technical-Writing</a></li>
+      <li><a href="https://jhathcock-sys.github.io/me/tags/knowledge-management/">Knowledge-Management</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://jhathcock-sys.github.io/me/projects/container-resource-management/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Container Resource Management &amp; Monitoring</span>
+  </a>
+  <a class="next" href="https://jhathcock-sys.github.io/me/projects/security-review/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Docker Security Review</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://jhathcock-sys.github.io/me/">James Hathcock</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

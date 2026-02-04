@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Documentation on James Hathcock</title>
+    <link>https://jhathcock-sys.github.io/me/categories/documentation/</link>
+    <description>Recent content in Documentation on James Hathcock</description>
+    <generator>Hugo -- 0.154.3</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 04 Feb 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://jhathcock-sys.github.io/me/categories/documentation/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Obsidian Vault Restructure: Transforming Monolithic Documentation into a Wiki</title>
+      <link>https://jhathcock-sys.github.io/me/projects/obsidian-vault-restructure/</link>
+      <pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate>
+      <guid>https://jhathcock-sys.github.io/me/projects/obsidian-vault-restructure/</guid>
+      <description>Restructured 1,550-line monolithic homelab documentation into a professional Obsidian vault with 31 wiki-linked files across 8 organized folders, implementing git version control and automated backup strategies.</description>
+    </item>
+  </channel>
+</rss>

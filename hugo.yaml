@@ -40,6 +40,8 @@ params:
     buttons:
       - name: View Resume
         url: "/me/resume/"
+      - name: Homelab Wiki
+        url: "https://jhathcock-sys.github.io/homelab-wiki/"
       - name: Download PDF
         url: "/me/files/James_Hathcock_Resume.pdf"
       - name: LinkedIn

@@ -9,11 +9,25 @@
     <lastBuildDate>Wed, 04 Feb 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://jhathcock-sys.github.io/me/projects/index.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>Claude Code Custom Agent System</title>
+      <link>https://jhathcock-sys.github.io/me/projects/claude-code-agents/</link>
+      <pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate>
+      <guid>https://jhathcock-sys.github.io/me/projects/claude-code-agents/</guid>
+      <description>Built a specialized sub-agent system for automated homelab infrastructure validation, security auditing, and documentation synchronization using Claude Code&amp;rsquo;s Task API.</description>
+    </item>
+    <item>
       <title>Container Resource Management &amp; Monitoring</title>
       <link>https://jhathcock-sys.github.io/me/projects/container-resource-management/</link>
       <pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate>
       <guid>https://jhathcock-sys.github.io/me/projects/container-resource-management/</guid>
       <description>Implemented comprehensive memory limits and fixed Prometheus alerting across 20 Docker containers in a production homelab environment.</description>
+    </item>
+    <item>
+      <title>Obsidian Vault Restructure: Transforming Monolithic Documentation into a Wiki</title>
+      <link>https://jhathcock-sys.github.io/me/projects/obsidian-vault-restructure/</link>
+      <pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate>
+      <guid>https://jhathcock-sys.github.io/me/projects/obsidian-vault-restructure/</guid>
+      <description>Restructured 1,550-line monolithic homelab documentation into a professional Obsidian vault with 31 wiki-linked files across 8 organized folders, implementing git version control and automated backup strategies.</description>
     </item>
     <item>
       <title>Docker Security Review</title>
@@ -94,41 +108,18 @@
       <guid>https://jhathcock-sys.github.io/me/projects/home-lab/</guid>
       <description>&lt;h1 id=&#34;-my-homelab-setup&#34;&gt;🏠 My Homelab Setup&lt;/h1&gt;
 &lt;p&gt;Welcome to my homelab documentation. This project tracks the infrastructure, services, and networking configuration of my self-hosted environment. The goal is to create a resilient, automated, and organized system for home services, monitoring, and development.&lt;/p&gt;
-&lt;h2 id=&#34;-hardware-infrastructure&#34;&gt;🛠 Hardware Infrastructure&lt;/h2&gt;
-&lt;table&gt;
-  &lt;thead&gt;
-      &lt;tr&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;Device&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;Role&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;OS / Hypervisor&lt;/th&gt;
-          &lt;th style=&#34;text-align: left&#34;&gt;Specs/Notes&lt;/th&gt;
-      &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;&lt;strong&gt;Dell R430&lt;/strong&gt;&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;Primary Server&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;&lt;strong&gt;Proxmox VE&lt;/strong&gt;&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;The heavy lifter. Runs LXC containers and manages core network services.&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;&lt;strong&gt;Raspberry Pi 5&lt;/strong&gt;&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;Secondary Node&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;&lt;strong&gt;Debian (Docker)&lt;/strong&gt;&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;Low-power node for DNS redundancy and lightweight services.&lt;/td&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;&lt;strong&gt;Synology NAS&lt;/strong&gt;&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;Network Storage&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;&lt;strong&gt;DSM&lt;/strong&gt;&lt;/td&gt;
-          &lt;td style=&#34;text-align: left&#34;&gt;Centralized file storage and backups.&lt;/td&gt;
-      &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
 &lt;hr&gt;
-&lt;h2 id=&#34;-virtualization--software-stack&#34;&gt;☁️ Virtualization &amp;amp; Software Stack&lt;/h2&gt;
-&lt;h3 id=&#34;-node-1-dell-r430-proxmoxbox---19216814&#34;&gt;🖥️ Node 1: Dell R430 (ProxMoxBox - 192.168.1.4)&lt;/h3&gt;
-&lt;p&gt;The Proxmox host runs &lt;strong&gt;LXC Containers&lt;/strong&gt; to separate concerns:&lt;/p&gt;</description>
+&lt;h2 id=&#34;-documentation-wiki&#34;&gt;📚 Documentation Wiki&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;https://jhathcock-sys.github.io/homelab-wiki/&#34;&gt;View Full Homelab Documentation →&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Complete technical documentation is available on my public wiki, including:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Detailed service configurations and architecture diagrams&lt;/li&gt;
+&lt;li&gt;Step-by-step setup guides and troubleshooting&lt;/li&gt;
+&lt;li&gt;GitOps workflow and deployment procedures&lt;/li&gt;
+&lt;li&gt;Security best practices and monitoring setup&lt;/li&gt;
+&lt;li&gt;Project changelogs and infrastructure evolution&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The wiki is built with Quartz v4 and features full-text search, graph view, and WikiLinks for easy navigation.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

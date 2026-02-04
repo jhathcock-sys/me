@@ -8,6 +8,23 @@ draft: false
 
 Welcome to my homelab documentation. This project tracks the infrastructure, services, and networking configuration of my self-hosted environment. The goal is to create a resilient, automated, and organized system for home services, monitoring, and development.
 
+---
+
+## 📚 Documentation Wiki
+
+**[View Full Homelab Documentation →](https://jhathcock-sys.github.io/homelab-wiki/)**
+
+Complete technical documentation is available on my public wiki, including:
+- Detailed service configurations and architecture diagrams
+- Step-by-step setup guides and troubleshooting
+- GitOps workflow and deployment procedures
+- Security best practices and monitoring setup
+- Project changelogs and infrastructure evolution
+
+The wiki is built with Quartz v4 and features full-text search, graph view, and WikiLinks for easy navigation.
+
+---
+
 ## 🛠 Hardware Infrastructure
 
 | Device | Role | OS / Hypervisor | Specs/Notes |

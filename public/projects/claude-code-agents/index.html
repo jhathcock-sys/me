@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Claude Code Custom Agent System | James Hathcock</title>
+<meta name="keywords" content="AI, Automation, DevOps, Security, Infrastructure">
+<meta name="description" content="Built a specialized sub-agent system for automated homelab infrastructure validation, security auditing, and documentation synchronization using Claude Code&rsquo;s Task API.">
+<meta name="author" content="James Hathcock">
+<link rel="canonical" href="https://jhathcock-sys.github.io/me/projects/claude-code-agents/">
+<link crossorigin="anonymous" href="/me/assets/css/stylesheet.343cc480b9ffc8f04ccbe5e968ad674880cab773ec19905e93033065c1e7a804.css" integrity="sha256-NDzEgLn/yPBMy&#43;XpaK1nSIDKt3PsGZBekwMwZcHnqAQ=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://jhathcock-sys.github.io/me/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://jhathcock-sys.github.io/me/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jhathcock-sys.github.io/me/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://jhathcock-sys.github.io/me/apple-touch-icon.png">
+<link rel="mask-icon" href="https://jhathcock-sys.github.io/me/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://jhathcock-sys.github.io/me/projects/claude-code-agents/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://jhathcock-sys.github.io/me/projects/claude-code-agents/">
+  <meta property="og:site_name" content="James Hathcock">
+  <meta property="og:title" content="Claude Code Custom Agent System">
+  <meta property="og:description" content="Built a specialized sub-agent system for automated homelab infrastructure validation, security auditing, and documentation synchronization using Claude Code’s Task API.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="projects">
+    <meta property="article:published_time" content="2026-02-04T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-02-04T00:00:00+00:00">
+    <meta property="article:tag" content="AI">
+    <meta property="article:tag" content="Automation">
+    <meta property="article:tag" content="DevOps">
+    <meta property="article:tag" content="Security">
+    <meta property="article:tag" content="Infrastructure">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Claude Code Custom Agent System">
+<meta name="twitter:description" content="Built a specialized sub-agent system for automated homelab infrastructure validation, security auditing, and documentation synchronization using Claude Code&rsquo;s Task API.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Projects",
+      "item": "https://jhathcock-sys.github.io/me/projects/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Claude Code Custom Agent System",
+      "item": "https://jhathcock-sys.github.io/me/projects/claude-code-agents/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Claude Code Custom Agent System",
+  "name": "Claude Code Custom Agent System",
+  "description": "Built a specialized sub-agent system for automated homelab infrastructure validation, security auditing, and documentation synchronization using Claude Code\u0026rsquo;s Task API.",
+  "keywords": [
+    "AI", "Automation", "DevOps", "Security", "Infrastructure"
+  ],
+  "articleBody": "Overview Created a custom agent framework leveraging Claude Code’s sub-agent capabilities to automate security auditing, infrastructure validation, and documentation maintenance for a Docker-based homelab environment.\nTech Stack: Claude Code CLI, Markdown (agent definitions), Bash, Docker Compose, Obsidian\nRepository: ai-assistant-config\nThe Problem Managing a homelab with 20+ Docker containers across multiple hosts requires constant vigilance:\nSecurity drift - Configurations degrade over time (privileged containers, weak passwords, exposed ports) Port conflicts - New services collide with existing allocations Documentation rot - Obsidian vault falls behind infrastructure changes Convention violations - Docker Compose files don’t follow established patterns Manual audits are time-consuming and error-prone. Each security review took 30+ minutes and missed edge cases.\nThe Solution Built four specialized AI agents that work in parallel to automate validation:\n1. Security Reviewer Agent Purpose: Audit Docker Compose stacks for vulnerabilities\nChecks:\nPrivileged mode abuse (privileged: true) Docker socket permissions (must be :ro) Hardcoded secrets / default passwords Image tag pinning (no :latest in production) Security options (no-new-privileges:true) Resource limits (DoS prevention) Network exposure + UFW firewall rules First Audit Results: Found 3 critical issues in monitoring stack (9 containers):\nMissing .env file (deployment blocker) 7 services missing security_opt: no-new-privileges:true 8 exposed ports without firewall rules Output: Generated ready-to-use UFW script restricting all monitoring ports to LAN-only access.\n2. Infrastructure Validator Agent Purpose: Pre-deployment conflict detection\nChecks:\nPort conflicts (vs 15+ known allocations across 3 hosts) IP address conflicts (192.168.1.0/24 topology) Volume path existence Docker Compose syntax validation Resource allocation (prevents OOM on 8GB hosts) Network configuration issues Example: Prevents deploying Jellyfin on port 3000 (already used by Dockhand).\n3. Documentation Sync Agent Purpose: Keep Obsidian vault synchronized with infrastructure\nChecks:\nMissing service documentation pages Outdated port/IP references Broken WikiLinks ([[Internal Links]]) Missing README files in stacks Stale change dates (docs vs code) Example: Detects when monitoring stack changes on 2026-02-04 but documentation last updated 2026-01-15.\n4. Deployment Helper Agent Purpose: Enforce Docker Compose conventions\nChecks:\nRestart policies (unless-stopped required) Security options (privilege escalation prevention) Memory limits (all services must define) Environment variables (no default password fallbacks) Volume mount patterns (prefer local paths) Health checks (for dependency orchestration) Example: Validates that all 20 containers follow the established pattern before git commit.\nTechnical Implementation Agent Architecture Each agent is a markdown file with YAML frontmatter:\n--- name: security-reviewer description: Security audit for Docker Compose stacks model: sonnet subagent_type: general-purpose --- [Detailed agent prompt with checks, context, and output format] Location: ~/.claude/agents/ Backup: Git-versioned in ai-assistant-config repository\nParallel Execution Agents can run simultaneously for fast validation:\n# Single message launches 3 agents in parallel \"Review proxmox/jellyfin/ with security-reviewer, infra-validator, and deploy-helper in parallel\" # Results combined into single report Context Integration Agents access homelab state from structured files:\nFile Contains ~/.claude/CLAUDE.md Global preferences, core directives ~/homelab-ops/CLAUDE.md Port allocations, IP topology, resource limits ~/Documents/HomeLab/HomeLab/_Index.md Documentation structure Example: Infrastructure validator knows that ProxMoxBox has 8GB RAM and 9.5GB already allocated (1.19x overcommit), so it warns when new services push allocation above safe thresholds.\nKey Features 1. Educational Security+ Integration Security reviewer provides exam-relevant context:\nAttack Frameworks - Privilege escalation vectors Configuration Management - Image pinning, secrets management Defense in Depth - Multiple security layers CIA Triad - Resource limits ensure availability Supply Chain Security - Container image provenance Example output:\n“This prevents a common privilege escalation vector where a compromised process tries to exploit setuid binaries (like sudo, passwd) to gain root. It’s like removing the ladder that attackers use to climb out of the container.”\n2. Actionable Remediation Agents don’t just report problems - they provide copy-paste fixes:\nSecurity Issue:\n❌ Missing security_opt on 7 services Agent-Provided Fix:\nprometheus: image: prom/prometheus:v2.49.1 security_opt: - no-new-privileges:true # ... rest of config UFW Firewall Script (generated):\n#!/bin/bash sudo ufw allow from 192.168.1.0/24 to any port 9090 proto tcp comment 'Prometheus - LAN only' sudo ufw deny 9090/tcp comment 'Block Prometheus from internet' # ... (16 rules total) 3. Risk Scoring Each service gets a security score:\nService Image Pin Security Opt Resources Network Overall Prometheus ⚠️ :latest ⚠️ Missing ✅ 768M ⚠️ 9090 Medium cAdvisor ⚠️ :latest ✅ Done ✅ 512M ⚠️ 8081 Low Prioritization: Fix criticals first, defer low-risk issues.\n4. Fail-Secure Design Agents validate that security controls are required, not optional:\nBad (default fallback):\nenvironment: - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin} # Fails open Good (required explicit value):\nenvironment: - ADMIN_PASSWORD=${ADMIN_PASSWORD} # Fails closed Security reviewer validates absence of fallback operators in password fields.\nResults \u0026 Impact Security Improvements Before Agents:\nManual audits every 2-3 weeks Inconsistent security configurations Port conflicts discovered at runtime Documentation lagged behind changes After Agents:\n✅ Automated pre-commit validation ✅ Consistent security patterns enforced ✅ Zero port conflicts (caught before deployment) ✅ Documentation audit in \u003c30 seconds First Security Audit Findings Stack: proxmox/monitoring/ (9 containers) Duration: ~2 minutes (vs 30+ minutes manual)\nFindings:\n1 critical issue (missing .env file) 3 high-priority issues (image pinning, security options, firewall rules) 3 low-priority informational items (all acceptable by design) Generated Outputs:\n153KB comprehensive security report UFW firewall script (16 rules) Specific version recommendations for 9 images Security+ exam context for all findings Workflows New Service Deployment # 1. Create docker-compose.yaml # 2. Validate in parallel (single command) \"Review proxmox/jellyfin/ with security-reviewer, infra-validator, and deploy-helper in parallel\" # 3. Fix issues # 4. Deploy cd ~/homelab-ops/proxmox/jellyfin \u0026\u0026 docker-compose up -d # 5. Update docs \"Use doc-sync to find what documentation needs creating\" Pre-Commit Validation # Run before every commit \"Run deploy-helper and security-reviewer on modified compose files in parallel\" Monthly Security Audit # Audit all stacks simultaneously \"Use security-reviewer to audit proxmox/dockhand, proxmox/monitoring, proxmox/homepage, and proxmox/minecraft in parallel\" Technical Challenges 1. Agent Context Limits Problem: Agents need access to infrastructure state (ports, IPs, resources) but context windows are limited.\nSolution: Structured CLAUDE.md files in each repository with:\nNetwork topology (IP allocations) Port allocations by service Resource limits by host Known exceptions Agents read these files first, then cross-reference during validation.\n2. Parallel Agent Coordination Problem: Running 3+ agents simultaneously could produce redundant or conflicting reports.\nSolution: Each agent has a distinct scope:\nSecurity reviewer → Vulnerabilities only Infrastructure validator → Conflicts only Deployment helper → Convention compliance only No overlap = clean combined reports.\n3. Actionable vs Informational Findings Problem: Early agent versions generated 50+ findings per stack, causing alert fatigue.\nSolution: Severity-based prioritization:\nCRITICAL (red) → Deployment blockers HIGH (orange) → Before production MEDIUM (yellow) → Next maintenance LOW (blue) → Informational only Only CRITICAL/HIGH require immediate action.\nFuture Enhancements Planned Agents Backup Validator - Verify backup jobs, test restore procedures Certificate Manager - Track SSL certificate expiration Log Analyzer - Parse Loki logs for patterns, anomalies Performance Profiler - Identify resource bottlenecks Feature Ideas Agent chaining - Output of one agent feeds into another Scheduled runs - Cron-based daily security audits Dashboard integration - Display agent results in Homepage Notification system - Slack/Discord alerts for critical findings Lessons Learned 1. Structured Context is Critical Agents need machine-readable state files to make decisions. Unstructured documentation doesn’t work.\nGood: CLAUDE.md with clear port allocation table Bad: “Prometheus runs somewhere around port 9000-ish”\n2. Agents Should Provide Fixes, Not Just Problems “Port 3000 is in use” → Frustrating “Port 3000 used by Dockhand. Next available: 3002” → Actionable\nInclude copy-paste solutions in every finding.\n3. Educational Context Adds Value Since I’m studying for Security+, agents that explain why a vulnerability matters are more valuable than simple checklists.\nExample: “This blocks setuid exploitation” → Generic “This prevents container escape by blocking exploitation of setuid binaries like sudo” → Educational\n4. Fail-Secure is Better Than Fail-Open When agents can’t determine if something is secure, they should flag it for review rather than assume it’s fine.\nUnknown configuration → ⚠️ Warn for manual review Don’t silently pass uncertain states.\nCode Samples Agent Definition Structure --- name: security-reviewer description: Security audit for Docker Compose stacks model: sonnet subagent_type: general-purpose --- # Security Reviewer Agent You are a security-focused agent specialized in auditing Docker Compose stacks. ## Context **Network**: 192.168.1.0/24 **Target User**: System Administrator studying Security+ ## Your Mission Scan Docker Compose files for vulnerabilities. Provide actionable recommendations with educational context. ## Critical Security Checks ### 1. Privileged Mode (CRITICAL) [Detailed check logic, examples, remediation] ### 2. Docker Socket Mounts (HIGH) [Detailed check logic, examples, remediation] [... 6 more checks ...] ## Output Format [Structured report template with severity levels] UFW Firewall Script (Generated) #!/bin/bash # Generated by security-reviewer agent # Purpose: Restrict monitoring services to LAN-only set -euo pipefail # Allow from LAN only sudo ufw allow from 192.168.1.0/24 to any port 9090 proto tcp comment 'Prometheus - LAN only' sudo ufw allow from 192.168.1.0/24 to any port 3030 proto tcp comment 'Grafana - LAN only' # Explicit deny from internet sudo ufw deny 9090/tcp comment 'Block Prometheus from internet' sudo ufw deny 3030/tcp comment 'Block Grafana from internet' echo \"✓ UFW rules applied\" Metrics Metric Before Agents After Agents Security audit time 30+ minutes ~2 minutes Port conflicts detected At runtime (fail) Pre-deployment (prevent) Documentation freshness Manual checks Automated sync Convention compliance Inconsistent Enforced Security+ study value Separate research Integrated into output Related Projects Container Resource Management - Memory limit implementation Security Review - Manual hardening process Obsidian Vault Restructure - Documentation system Conclusion Building custom AI agents transformed homelab infrastructure management from reactive (fix issues after they occur) to proactive (prevent issues before deployment).\nKey Takeaway: AI agents are most valuable when they:\nHave structured context (not just documentation) Provide actionable fixes (not just reports) Run in parallel (fast feedback loops) Integrate with existing workflows (pre-commit, pre-deploy) The agent system has become part of my standard deployment workflow - every new service is validated by 3+ agents before going live.\nSource Code: GitHub - ai-assistant-config/agents\nDocumentation: Obsidian Vault - Claude Code Agents\n",
+  "wordCount" : "1617",
+  "inLanguage": "en",
+  "datePublished": "2026-02-04T00:00:00Z",
+  "dateModified": "2026-02-04T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "James Hathcock"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://jhathcock-sys.github.io/me/projects/claude-code-agents/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "James Hathcock",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://jhathcock-sys.github.io/me/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://jhathcock-sys.github.io/me/" accesskey="h" title="James Hathcock (Alt + H)">James Hathcock</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://jhathcock-sys.github.io/me/resume/" title="Resume">
+                    <span>Resume</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://jhathcock-sys.github.io/me/projects/" title="Projects">
+                    <span>Projects</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://jhathcock-sys.github.io/me/">Home</a>&nbsp;»&nbsp;<a href="https://jhathcock-sys.github.io/me/projects/">Projects</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Claude Code Custom Agent System
+    </h1>
+    <div class="post-meta"><span title='2026-02-04 00:00:00 +0000 UTC'>February 4, 2026</span>&nbsp;·&nbsp;<span>8 min</span>&nbsp;·&nbsp;<span>James Hathcock</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h2 id="overview">Overview<a hidden class="anchor" aria-hidden="true" href="#overview">#</a></h2>
+<p>Created a custom agent framework leveraging Claude Code&rsquo;s sub-agent capabilities to automate security auditing, infrastructure validation, and documentation maintenance for a Docker-based homelab environment.</p>
+<p><strong>Tech Stack</strong>: Claude Code CLI, Markdown (agent definitions), Bash, Docker Compose, Obsidian</p>
+<p><strong>Repository</strong>: <a href="https://github.com/jhathcock-sys/ai-assistant-config">ai-assistant-config</a></p>
+<hr>
+<h2 id="the-problem">The Problem<a hidden class="anchor" aria-hidden="true" href="#the-problem">#</a></h2>
+<p>Managing a homelab with 20+ Docker containers across multiple hosts requires constant vigilance:</p>
+<ul>
+<li><strong>Security drift</strong> - Configurations degrade over time (privileged containers, weak passwords, exposed ports)</li>
+<li><strong>Port conflicts</strong> - New services collide with existing allocations</li>
+<li><strong>Documentation rot</strong> - Obsidian vault falls behind infrastructure changes</li>
+<li><strong>Convention violations</strong> - Docker Compose files don&rsquo;t follow established patterns</li>
+</ul>
+<p><strong>Manual audits are time-consuming and error-prone.</strong> Each security review took 30+ minutes and missed edge cases.</p>
+<hr>
+<h2 id="the-solution">The Solution<a hidden class="anchor" aria-hidden="true" href="#the-solution">#</a></h2>
+<p>Built four specialized AI agents that work in parallel to automate validation:</p>
+<h3 id="1-security-reviewer-agent">1. Security Reviewer Agent<a hidden class="anchor" aria-hidden="true" href="#1-security-reviewer-agent">#</a></h3>
+<p><strong>Purpose</strong>: Audit Docker Compose stacks for vulnerabilities</p>
+<p><strong>Checks</strong>:</p>
+<ul>
+<li>Privileged mode abuse (<code>privileged: true</code>)</li>
+<li>Docker socket permissions (must be <code>:ro</code>)</li>
+<li>Hardcoded secrets / default passwords</li>
+<li>Image tag pinning (no <code>:latest</code> in production)</li>
+<li>Security options (<code>no-new-privileges:true</code>)</li>
+<li>Resource limits (DoS prevention)</li>
+<li>Network exposure + UFW firewall rules</li>
+</ul>
+<p><strong>First Audit Results</strong>: Found 3 critical issues in monitoring stack (9 containers):</p>
+<ul>
+<li>Missing <code>.env</code> file (deployment blocker)</li>
+<li>7 services missing <code>security_opt: no-new-privileges:true</code></li>
+<li>8 exposed ports without firewall rules</li>
+</ul>
+<p><strong>Output</strong>: Generated ready-to-use UFW script restricting all monitoring ports to LAN-only access.</p>
+<hr>
+<h3 id="2-infrastructure-validator-agent">2. Infrastructure Validator Agent<a hidden class="anchor" aria-hidden="true" href="#2-infrastructure-validator-agent">#</a></h3>
+<p><strong>Purpose</strong>: Pre-deployment conflict detection</p>
+<p><strong>Checks</strong>:</p>
+<ul>
+<li>Port conflicts (vs 15+ known allocations across 3 hosts)</li>
+<li>IP address conflicts (192.168.1.0/24 topology)</li>
+<li>Volume path existence</li>
+<li>Docker Compose syntax validation</li>
+<li>Resource allocation (prevents OOM on 8GB hosts)</li>
+<li>Network configuration issues</li>
+</ul>
+<p><strong>Example</strong>: Prevents deploying Jellyfin on port 3000 (already used by Dockhand).</p>
+<hr>
+<h3 id="3-documentation-sync-agent">3. Documentation Sync Agent<a hidden class="anchor" aria-hidden="true" href="#3-documentation-sync-agent">#</a></h3>
+<p><strong>Purpose</strong>: Keep Obsidian vault synchronized with infrastructure</p>
+<p><strong>Checks</strong>:</p>
+<ul>
+<li>Missing service documentation pages</li>
+<li>Outdated port/IP references</li>
+<li>Broken WikiLinks (<code>[[Internal Links]]</code>)</li>
+<li>Missing README files in stacks</li>
+<li>Stale change dates (docs vs code)</li>
+</ul>
+<p><strong>Example</strong>: Detects when monitoring stack changes on 2026-02-04 but documentation last updated 2026-01-15.</p>
+<hr>
+<h3 id="4-deployment-helper-agent">4. Deployment Helper Agent<a hidden class="anchor" aria-hidden="true" href="#4-deployment-helper-agent">#</a></h3>
+<p><strong>Purpose</strong>: Enforce Docker Compose conventions</p>
+<p><strong>Checks</strong>:</p>
+<ul>
+<li>Restart policies (<code>unless-stopped</code> required)</li>
+<li>Security options (privilege escalation prevention)</li>
+<li>Memory limits (all services must define)</li>
+<li>Environment variables (no default password fallbacks)</li>
+<li>Volume mount patterns (prefer local paths)</li>
+<li>Health checks (for dependency orchestration)</li>
+</ul>
+<p><strong>Example</strong>: Validates that all 20 containers follow the established pattern before git commit.</p>
+<hr>
+<h2 id="technical-implementation">Technical Implementation<a hidden class="anchor" aria-hidden="true" href="#technical-implementation">#</a></h2>
+<h3 id="agent-architecture">Agent Architecture<a hidden class="anchor" aria-hidden="true" href="#agent-architecture">#</a></h3>
+<p>Each agent is a markdown file with YAML frontmatter:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span><span style="color:#f92672">name</span>: <span style="color:#ae81ff">security-reviewer</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">description</span>: <span style="color:#ae81ff">Security audit for Docker Compose stacks</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">model</span>: <span style="color:#ae81ff">sonnet</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">subagent_type</span>: <span style="color:#ae81ff">general-purpose</span>
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[<span style="color:#ae81ff">Detailed agent prompt with checks, context, and output format]</span>
+</span></span></code></pre></div><p><strong>Location</strong>: <code>~/.claude/agents/</code>
+<strong>Backup</strong>: Git-versioned in <code>ai-assistant-config</code> repository</p>
+<h3 id="parallel-execution">Parallel Execution<a hidden class="anchor" aria-hidden="true" href="#parallel-execution">#</a></h3>
+<p>Agents can run simultaneously for fast validation:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Single message launches 3 agents in parallel</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;Review proxmox/jellyfin/ with security-reviewer, infra-validator, and deploy-helper in parallel&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Results combined into single report</span>
+</span></span></code></pre></div><h3 id="context-integration">Context Integration<a hidden class="anchor" aria-hidden="true" href="#context-integration">#</a></h3>
+<p>Agents access homelab state from structured files:</p>
+<table>
+  <thead>
+      <tr>
+          <th>File</th>
+          <th>Contains</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>~/.claude/CLAUDE.md</code></td>
+          <td>Global preferences, core directives</td>
+      </tr>
+      <tr>
+          <td><code>~/homelab-ops/CLAUDE.md</code></td>
+          <td>Port allocations, IP topology, resource limits</td>
+      </tr>
+      <tr>
+          <td><code>~/Documents/HomeLab/HomeLab/_Index.md</code></td>
+          <td>Documentation structure</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Example</strong>: Infrastructure validator knows that ProxMoxBox has 8GB RAM and 9.5GB already allocated (1.19x overcommit), so it warns when new services push allocation above safe thresholds.</p>
+<hr>
+<h2 id="key-features">Key Features<a hidden class="anchor" aria-hidden="true" href="#key-features">#</a></h2>
+<h3 id="1-educational-security-integration">1. Educational Security+ Integration<a hidden class="anchor" aria-hidden="true" href="#1-educational-security-integration">#</a></h3>
+<p>Security reviewer provides exam-relevant context:</p>
+<ul>
+<li><strong>Attack Frameworks</strong> - Privilege escalation vectors</li>
+<li><strong>Configuration Management</strong> - Image pinning, secrets management</li>
+<li><strong>Defense in Depth</strong> - Multiple security layers</li>
+<li><strong>CIA Triad</strong> - Resource limits ensure availability</li>
+<li><strong>Supply Chain Security</strong> - Container image provenance</li>
+</ul>
+<p><strong>Example output</strong>:</p>
+<blockquote>
+<p>&ldquo;This prevents a common privilege escalation vector where a compromised process tries to exploit setuid binaries (like <code>sudo</code>, <code>passwd</code>) to gain root. It&rsquo;s like removing the ladder that attackers use to climb out of the container.&rdquo;</p>
+</blockquote>
+<hr>
+<h3 id="2-actionable-remediation">2. Actionable Remediation<a hidden class="anchor" aria-hidden="true" href="#2-actionable-remediation">#</a></h3>
+<p>Agents don&rsquo;t just report problems - they provide <strong>copy-paste fixes</strong>:</p>
+<p><strong>Security Issue</strong>:</p>
+<pre tabindex="0"><code>❌ Missing security_opt on 7 services
+</code></pre><p><strong>Agent-Provided Fix</strong>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">prometheus</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">image</span>: <span style="color:#ae81ff">prom/prometheus:v2.49.1</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">security_opt</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#66d9ef">no</span>-<span style="color:#ae81ff">new-privileges:true</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># ... rest of config</span>
+</span></span></code></pre></div><p><strong>UFW Firewall Script</strong> (generated):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span>sudo ufw allow from 192.168.1.0/24 to any port <span style="color:#ae81ff">9090</span> proto tcp comment <span style="color:#e6db74">&#39;Prometheus - LAN only&#39;</span>
+</span></span><span style="display:flex;"><span>sudo ufw deny 9090/tcp comment <span style="color:#e6db74">&#39;Block Prometheus from internet&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ... (16 rules total)</span>
+</span></span></code></pre></div><hr>
+<h3 id="3-risk-scoring">3. Risk Scoring<a hidden class="anchor" aria-hidden="true" href="#3-risk-scoring">#</a></h3>
+<p>Each service gets a security score:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Service</th>
+          <th>Image Pin</th>
+          <th>Security Opt</th>
+          <th>Resources</th>
+          <th>Network</th>
+          <th>Overall</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Prometheus</td>
+          <td>⚠️ :latest</td>
+          <td>⚠️ Missing</td>
+          <td>✅ 768M</td>
+          <td>⚠️ 9090</td>
+          <td><strong>Medium</strong></td>
+      </tr>
+      <tr>
+          <td>cAdvisor</td>
+          <td>⚠️ :latest</td>
+          <td>✅ <strong>Done</strong></td>
+          <td>✅ 512M</td>
+          <td>⚠️ 8081</td>
+          <td><strong>Low</strong></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Prioritization</strong>: Fix criticals first, defer low-risk issues.</p>
+<hr>
+<h3 id="4-fail-secure-design">4. Fail-Secure Design<a hidden class="anchor" aria-hidden="true" href="#4-fail-secure-design">#</a></h3>
+<p>Agents validate that security controls are <strong>required</strong>, not optional:</p>
+<p><strong>Bad (default fallback)</strong>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">environment</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin} </span> <span style="color:#75715e"># Fails open</span>
+</span></span></code></pre></div><p><strong>Good (required explicit value)</strong>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">environment</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">ADMIN_PASSWORD=${ADMIN_PASSWORD} </span> <span style="color:#75715e"># Fails closed</span>
+</span></span></code></pre></div><p>Security reviewer <strong>validates absence of fallback operators</strong> in password fields.</p>
+<hr>
+<h2 id="results--impact">Results &amp; Impact<a hidden class="anchor" aria-hidden="true" href="#results--impact">#</a></h2>
+<h3 id="security-improvements">Security Improvements<a hidden class="anchor" aria-hidden="true" href="#security-improvements">#</a></h3>
+<p><strong>Before Agents</strong>:</p>
+<ul>
+<li>Manual audits every 2-3 weeks</li>
+<li>Inconsistent security configurations</li>
+<li>Port conflicts discovered at runtime</li>
+<li>Documentation lagged behind changes</li>
+</ul>
+<p><strong>After Agents</strong>:</p>
+<ul>
+<li>✅ Automated pre-commit validation</li>
+<li>✅ Consistent security patterns enforced</li>
+<li>✅ Zero port conflicts (caught before deployment)</li>
+<li>✅ Documentation audit in &lt;30 seconds</li>
+</ul>
+<h3 id="first-security-audit-findings">First Security Audit Findings<a hidden class="anchor" aria-hidden="true" href="#first-security-audit-findings">#</a></h3>
+<p><strong>Stack</strong>: proxmox/monitoring/ (9 containers)
+<strong>Duration</strong>: ~2 minutes (vs 30+ minutes manual)</p>
+<p><strong>Findings</strong>:</p>
+<ul>
+<li>1 critical issue (missing <code>.env</code> file)</li>
+<li>3 high-priority issues (image pinning, security options, firewall rules)</li>
+<li>3 low-priority informational items (all acceptable by design)</li>
+</ul>
+<p><strong>Generated Outputs</strong>:</p>
+<ul>
+<li>153KB comprehensive security report</li>
+<li>UFW firewall script (16 rules)</li>
+<li>Specific version recommendations for 9 images</li>
+<li>Security+ exam context for all findings</li>
+</ul>
+<hr>
+<h2 id="workflows">Workflows<a hidden class="anchor" aria-hidden="true" href="#workflows">#</a></h2>
+<h3 id="new-service-deployment">New Service Deployment<a hidden class="anchor" aria-hidden="true" href="#new-service-deployment">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 1. Create docker-compose.yaml</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. Validate in parallel (single command)</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;Review proxmox/jellyfin/ with security-reviewer, infra-validator, and deploy-helper in parallel&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. Fix issues</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 4. Deploy</span>
+</span></span><span style="display:flex;"><span>cd ~/homelab-ops/proxmox/jellyfin <span style="color:#f92672">&amp;&amp;</span> docker-compose up -d
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 5. Update docs</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;Use doc-sync to find what documentation needs creating&#34;</span>
+</span></span></code></pre></div><h3 id="pre-commit-validation">Pre-Commit Validation<a hidden class="anchor" aria-hidden="true" href="#pre-commit-validation">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Run before every commit</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;Run deploy-helper and security-reviewer on modified compose files in parallel&#34;</span>
+</span></span></code></pre></div><h3 id="monthly-security-audit">Monthly Security Audit<a hidden class="anchor" aria-hidden="true" href="#monthly-security-audit">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Audit all stacks simultaneously</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;Use security-reviewer to audit proxmox/dockhand, proxmox/monitoring, proxmox/homepage, and proxmox/minecraft in parallel&#34;</span>
+</span></span></code></pre></div><hr>
+<h2 id="technical-challenges">Technical Challenges<a hidden class="anchor" aria-hidden="true" href="#technical-challenges">#</a></h2>
+<h3 id="1-agent-context-limits">1. Agent Context Limits<a hidden class="anchor" aria-hidden="true" href="#1-agent-context-limits">#</a></h3>
+<p><strong>Problem</strong>: Agents need access to infrastructure state (ports, IPs, resources) but context windows are limited.</p>
+<p><strong>Solution</strong>: Structured CLAUDE.md files in each repository with:</p>
+<ul>
+<li>Network topology (IP allocations)</li>
+<li>Port allocations by service</li>
+<li>Resource limits by host</li>
+<li>Known exceptions</li>
+</ul>
+<p>Agents read these files first, then cross-reference during validation.</p>
+<hr>
+<h3 id="2-parallel-agent-coordination">2. Parallel Agent Coordination<a hidden class="anchor" aria-hidden="true" href="#2-parallel-agent-coordination">#</a></h3>
+<p><strong>Problem</strong>: Running 3+ agents simultaneously could produce redundant or conflicting reports.</p>
+<p><strong>Solution</strong>: Each agent has a <strong>distinct scope</strong>:</p>
+<ul>
+<li>Security reviewer → Vulnerabilities only</li>
+<li>Infrastructure validator → Conflicts only</li>
+<li>Deployment helper → Convention compliance only</li>
+</ul>
+<p>No overlap = clean combined reports.</p>
+<hr>
+<h3 id="3-actionable-vs-informational-findings">3. Actionable vs Informational Findings<a hidden class="anchor" aria-hidden="true" href="#3-actionable-vs-informational-findings">#</a></h3>
+<p><strong>Problem</strong>: Early agent versions generated 50+ findings per stack, causing alert fatigue.</p>
+<p><strong>Solution</strong>: Severity-based prioritization:</p>
+<ul>
+<li><strong>CRITICAL</strong> (red) → Deployment blockers</li>
+<li><strong>HIGH</strong> (orange) → Before production</li>
+<li><strong>MEDIUM</strong> (yellow) → Next maintenance</li>
+<li><strong>LOW</strong> (blue) → Informational only</li>
+</ul>
+<p>Only CRITICAL/HIGH require immediate action.</p>
+<hr>
+<h2 id="future-enhancements">Future Enhancements<a hidden class="anchor" aria-hidden="true" href="#future-enhancements">#</a></h2>
+<h3 id="planned-agents">Planned Agents<a hidden class="anchor" aria-hidden="true" href="#planned-agents">#</a></h3>
+<ul>
+<li><strong>Backup Validator</strong> - Verify backup jobs, test restore procedures</li>
+<li><strong>Certificate Manager</strong> - Track SSL certificate expiration</li>
+<li><strong>Log Analyzer</strong> - Parse Loki logs for patterns, anomalies</li>
+<li><strong>Performance Profiler</strong> - Identify resource bottlenecks</li>
+</ul>
+<h3 id="feature-ideas">Feature Ideas<a hidden class="anchor" aria-hidden="true" href="#feature-ideas">#</a></h3>
+<ul>
+<li><strong>Agent chaining</strong> - Output of one agent feeds into another</li>
+<li><strong>Scheduled runs</strong> - Cron-based daily security audits</li>
+<li><strong>Dashboard integration</strong> - Display agent results in Homepage</li>
+<li><strong>Notification system</strong> - Slack/Discord alerts for critical findings</li>
+</ul>
+<hr>
+<h2 id="lessons-learned">Lessons Learned<a hidden class="anchor" aria-hidden="true" href="#lessons-learned">#</a></h2>
+<h3 id="1-structured-context-is-critical">1. Structured Context is Critical<a hidden class="anchor" aria-hidden="true" href="#1-structured-context-is-critical">#</a></h3>
+<p>Agents need <strong>machine-readable state files</strong> to make decisions. Unstructured documentation doesn&rsquo;t work.</p>
+<p><strong>Good</strong>: CLAUDE.md with clear port allocation table
+<strong>Bad</strong>: &ldquo;Prometheus runs somewhere around port 9000-ish&rdquo;</p>
+<hr>
+<h3 id="2-agents-should-provide-fixes-not-just-problems">2. Agents Should Provide Fixes, Not Just Problems<a hidden class="anchor" aria-hidden="true" href="#2-agents-should-provide-fixes-not-just-problems">#</a></h3>
+<p>&ldquo;Port 3000 is in use&rdquo; → Frustrating
+&ldquo;Port 3000 used by Dockhand. Next available: 3002&rdquo; → Actionable</p>
+<p>Include <strong>copy-paste solutions</strong> in every finding.</p>
+<hr>
+<h3 id="3-educational-context-adds-value">3. Educational Context Adds Value<a hidden class="anchor" aria-hidden="true" href="#3-educational-context-adds-value">#</a></h3>
+<p>Since I&rsquo;m studying for Security+, agents that explain <strong>why</strong> a vulnerability matters are more valuable than simple checklists.</p>
+<p>Example: &ldquo;This blocks setuid exploitation&rdquo; → Generic
+&ldquo;This prevents container escape by blocking exploitation of setuid binaries like sudo&rdquo; → Educational</p>
+<hr>
+<h3 id="4-fail-secure-is-better-than-fail-open">4. Fail-Secure is Better Than Fail-Open<a hidden class="anchor" aria-hidden="true" href="#4-fail-secure-is-better-than-fail-open">#</a></h3>
+<p>When agents can&rsquo;t determine if something is secure, they should <strong>flag it for review</strong> rather than assume it&rsquo;s fine.</p>
+<p>Unknown configuration → ⚠️ Warn for manual review
+Don&rsquo;t silently pass uncertain states.</p>
+<hr>
+<h2 id="code-samples">Code Samples<a hidden class="anchor" aria-hidden="true" href="#code-samples">#</a></h2>
+<h3 id="agent-definition-structure">Agent Definition Structure<a hidden class="anchor" aria-hidden="true" href="#agent-definition-structure">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>name: security-reviewer
+</span></span><span style="display:flex;"><span>description: Security audit for Docker Compose stacks
+</span></span><span style="display:flex;"><span>model: sonnet
+</span></span><span style="display:flex;"><span>subagent_type: general-purpose
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># Security Reviewer Agent
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>You are a security-focused agent specialized in auditing Docker Compose stacks.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Context
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="font-weight:bold">**Network**</span>: 192.168.1.0/24
+</span></span><span style="display:flex;"><span><span style="font-weight:bold">**Target User**</span>: System Administrator studying Security+
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Your Mission
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Scan Docker Compose files for vulnerabilities. Provide actionable recommendations with educational context.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Critical Security Checks
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">### 1. Privileged Mode (CRITICAL)
+</span></span></span><span style="display:flex;"><span>[Detailed check logic, examples, remediation]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">### 2. Docker Socket Mounts (HIGH)
+</span></span></span><span style="display:flex;"><span>[Detailed check logic, examples, remediation]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[... 6 more checks ...]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## Output Format
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>[Structured report template with severity levels]
+</span></span></code></pre></div><hr>
+<h3 id="ufw-firewall-script-generated">UFW Firewall Script (Generated)<a hidden class="anchor" aria-hidden="true" href="#ufw-firewall-script-generated">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"># Generated by security-reviewer agent</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Purpose: Restrict monitoring services to LAN-only</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>set -euo pipefail
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Allow from LAN only</span>
+</span></span><span style="display:flex;"><span>sudo ufw allow from 192.168.1.0/24 to any port <span style="color:#ae81ff">9090</span> proto tcp comment <span style="color:#e6db74">&#39;Prometheus - LAN only&#39;</span>
+</span></span><span style="display:flex;"><span>sudo ufw allow from 192.168.1.0/24 to any port <span style="color:#ae81ff">3030</span> proto tcp comment <span style="color:#e6db74">&#39;Grafana - LAN only&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Explicit deny from internet</span>
+</span></span><span style="display:flex;"><span>sudo ufw deny 9090/tcp comment <span style="color:#e6db74">&#39;Block Prometheus from internet&#39;</span>
+</span></span><span style="display:flex;"><span>sudo ufw deny 3030/tcp comment <span style="color:#e6db74">&#39;Block Grafana from internet&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;✓ UFW rules applied&#34;</span>
+</span></span></code></pre></div><hr>
+<h2 id="metrics">Metrics<a hidden class="anchor" aria-hidden="true" href="#metrics">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>Metric</th>
+          <th>Before Agents</th>
+          <th>After Agents</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Security audit time</td>
+          <td>30+ minutes</td>
+          <td>~2 minutes</td>
+      </tr>
+      <tr>
+          <td>Port conflicts detected</td>
+          <td>At runtime (fail)</td>
+          <td>Pre-deployment (prevent)</td>
+      </tr>
+      <tr>
+          <td>Documentation freshness</td>
+          <td>Manual checks</td>
+          <td>Automated sync</td>
+      </tr>
+      <tr>
+          <td>Convention compliance</td>
+          <td>Inconsistent</td>
+          <td>Enforced</td>
+      </tr>
+      <tr>
+          <td>Security+ study value</td>
+          <td>Separate research</td>
+          <td>Integrated into output</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="related-projects">Related Projects<a hidden class="anchor" aria-hidden="true" href="#related-projects">#</a></h2>
+<ul>
+<li><a href="/projects/container-resource-management">Container Resource Management</a> - Memory limit implementation</li>
+<li><a href="/projects/security-review">Security Review</a> - Manual hardening process</li>
+<li><a href="/projects/obsidian-vault-restructure">Obsidian Vault Restructure</a> - Documentation system</li>
+</ul>
+<hr>
+<h2 id="conclusion">Conclusion<a hidden class="anchor" aria-hidden="true" href="#conclusion">#</a></h2>
+<p>Building custom AI agents transformed homelab infrastructure management from reactive (fix issues after they occur) to proactive (prevent issues before deployment).</p>
+<p><strong>Key Takeaway</strong>: AI agents are most valuable when they:</p>
+<ol>
+<li>Have structured context (not just documentation)</li>
+<li>Provide actionable fixes (not just reports)</li>
+<li>Run in parallel (fast feedback loops)</li>
+<li>Integrate with existing workflows (pre-commit, pre-deploy)</li>
+</ol>
+<p>The agent system has become part of my standard deployment workflow - every new service is validated by 3+ agents before going live.</p>
+<hr>
+<p><strong>Source Code</strong>: <a href="https://github.com/jhathcock-sys/ai-assistant-config">GitHub - ai-assistant-config/agents</a></p>
+<p><strong>Documentation</strong>: <a href="https://github.com/jhathcock-sys/homelab-docs">Obsidian Vault - Claude Code Agents</a></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://jhathcock-sys.github.io/me/tags/ai/">AI</a></li>
+      <li><a href="https://jhathcock-sys.github.io/me/tags/automation/">Automation</a></li>
+      <li><a href="https://jhathcock-sys.github.io/me/tags/devops/">DevOps</a></li>
+      <li><a href="https://jhathcock-sys.github.io/me/tags/security/">Security</a></li>
+      <li><a href="https://jhathcock-sys.github.io/me/tags/infrastructure/">Infrastructure</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://jhathcock-sys.github.io/me/projects/container-resource-management/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Container Resource Management &amp; Monitoring</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://jhathcock-sys.github.io/me/">James Hathcock</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>
