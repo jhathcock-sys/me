@@ -1,3 +1,3 @@
 User-agent: *
-Disallow: /
-Sitemap: http://localhost:43835/me/sitemap.xml
+Disallow:
+Sitemap: https://jhathcock-sys.github.io/me/sitemap.xml

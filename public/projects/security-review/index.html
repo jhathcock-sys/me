@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Docker Security Review | James Hathcock</title>
+<meta name="keywords" content="">
+<meta name="description" content="Docker Security Audit &amp; Hardening
+Repository: github.com/jhathcock-sys/Dockers
+Commit: d403912 - Security hardening fixes
+Project Overview
+A comprehensive security audit of my homelab Docker infrastructure, identifying critical vulnerabilities and applying hardening measures. This project directly supports my Security&#43; certification preparation by applying real-world container security concepts.
+The audit reviewed 11 Docker Compose files across two servers (ProxMoxBox and Pi5), examining configurations for common security misconfigurations that could lead to container escape, privilege escalation, or data exposure.">
+<meta name="author" content="James Hathcock">
+<link rel="canonical" href="https://jhathcock-sys.github.io/me/projects/security-review/">
+<link crossorigin="anonymous" href="/me/assets/css/stylesheet.343cc480b9ffc8f04ccbe5e968ad674880cab773ec19905e93033065c1e7a804.css" integrity="sha256-NDzEgLn/yPBMy&#43;XpaK1nSIDKt3PsGZBekwMwZcHnqAQ=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://jhathcock-sys.github.io/me/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://jhathcock-sys.github.io/me/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jhathcock-sys.github.io/me/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://jhathcock-sys.github.io/me/apple-touch-icon.png">
+<link rel="mask-icon" href="https://jhathcock-sys.github.io/me/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://jhathcock-sys.github.io/me/projects/security-review/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://jhathcock-sys.github.io/me/projects/security-review/">
+  <meta property="og:site_name" content="James Hathcock">
+  <meta property="og:title" content="Docker Security Review">
+  <meta property="og:description" content="Docker Security Audit &amp; Hardening Repository: github.com/jhathcock-sys/Dockers Commit: d403912 - Security hardening fixes
+Project Overview A comprehensive security audit of my homelab Docker infrastructure, identifying critical vulnerabilities and applying hardening measures. This project directly supports my Security&#43; certification preparation by applying real-world container security concepts.
+The audit reviewed 11 Docker Compose files across two servers (ProxMoxBox and Pi5), examining configurations for common security misconfigurations that could lead to container escape, privilege escalation, or data exposure.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="projects">
+    <meta property="article:published_time" content="2026-02-03T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-02-03T00:00:00+00:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Docker Security Review">
+<meta name="twitter:description" content="Docker Security Audit &amp; Hardening
+Repository: github.com/jhathcock-sys/Dockers
+Commit: d403912 - Security hardening fixes
+Project Overview
+A comprehensive security audit of my homelab Docker infrastructure, identifying critical vulnerabilities and applying hardening measures. This project directly supports my Security&#43; certification preparation by applying real-world container security concepts.
+The audit reviewed 11 Docker Compose files across two servers (ProxMoxBox and Pi5), examining configurations for common security misconfigurations that could lead to container escape, privilege escalation, or data exposure.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Projects",
+      "item": "https://jhathcock-sys.github.io/me/projects/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Docker Security Review",
+      "item": "https://jhathcock-sys.github.io/me/projects/security-review/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Docker Security Review",
+  "name": "Docker Security Review",
+  "description": "Docker Security Audit \u0026amp; Hardening Repository: github.com/jhathcock-sys/Dockers Commit: d403912 - Security hardening fixes\nProject Overview A comprehensive security audit of my homelab Docker infrastructure, identifying critical vulnerabilities and applying hardening measures. This project directly supports my Security+ certification preparation by applying real-world container security concepts.\nThe audit reviewed 11 Docker Compose files across two servers (ProxMoxBox and Pi5), examining configurations for common security misconfigurations that could lead to container escape, privilege escalation, or data exposure.\n",
+  "keywords": [
+    
+  ],
+  "articleBody": "Docker Security Audit \u0026 Hardening Repository: github.com/jhathcock-sys/Dockers Commit: d403912 - Security hardening fixes\nProject Overview A comprehensive security audit of my homelab Docker infrastructure, identifying critical vulnerabilities and applying hardening measures. This project directly supports my Security+ certification preparation by applying real-world container security concepts.\nThe audit reviewed 11 Docker Compose files across two servers (ProxMoxBox and Pi5), examining configurations for common security misconfigurations that could lead to container escape, privilege escalation, or data exposure.\nAudit Methodology The security review followed a structured approach based on Docker security best practices and CIS Docker Benchmark guidelines:\nCategory What We Checked Privileged Containers Containers with privileged: true or excessive capabilities Docker Socket Exposure Mounts of /var/run/docker.sock without read-only flag Secrets Management Hardcoded passwords, API keys, or insecure defaults Volume Mounts Dangerous mounts (/, /etc, docker.sock) without :ro Image Versioning Use of :latest tags vs pinned versions Resource Limits Missing memory/CPU constraints Network Exposure Unnecessary port bindings, lack of network isolation User Permissions Containers running as root unnecessarily Critical Findings 1. cAdvisor Running in Privileged Mode Severity: HIGH File: proxmox/monitoring/docker-compose.yaml\nIssue:\ncadvisor: privileged: true # Full host access! devices: - /dev/kmsg volumes: - /:/rootfs:ro - /var/run:/var/run:ro Risk: privileged: true disables all container isolation. The container has:\nFull access to all host devices All Linux capabilities enabled Ability to load kernel modules Complete container escape vector Fix Applied:\ncadvisor: cap_add: - SYS_PTRACE # Only what's needed for process metrics security_opt: - no-new-privileges:true # Prevent privilege escalation devices: - /dev/kmsg Why SYS_PTRACE? cAdvisor needs to inspect process information for container metrics. This single capability is sufficient without granting full privileged access.\n2. Docker Socket Exposure Without Read-Only Severity: HIGH Files: proxmox/uptime-kuma/docker-compose.yaml, proxmox/dockhand/docker-compose.yaml\nIssue:\nvolumes: - /var/run/docker.sock:/var/run/docker.sock # Read-write access! Risk: The Docker socket is equivalent to root access on the host. A container with write access can:\nSpawn new privileged containers Access secrets from any container Mount any host path Execute commands on the host via container creation Fix Applied:\nvolumes: - /var/run/docker.sock:/var/run/docker.sock:ro # Read-only Trade-off: Dockhand may lose some container management features with read-only access. If critical functionality breaks, this specific service can be reverted while maintaining the fix for Uptime Kuma.\n3. Default Password Fallback in Grafana Severity: MEDIUM File: proxmox/monitoring/docker-compose.yaml\nIssue:\nenvironment: - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin} Risk: If the .env file is missing or GRAFANA_PASSWORD is unset, the container starts with admin as the password. This creates a security hole that might go unnoticed.\nFix Applied:\nenvironment: - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD} Behavior Change: Container will now fail to start if GRAFANA_PASSWORD is not set, making misconfigurations obvious rather than silent.\nAdditional Findings (Lower Priority) Image Version Pinning Severity: MEDIUM Affected: 14 of 15 containers using :latest\n# Current (risky) image: grafana/grafana:latest # Recommended image: grafana/grafana:10.2.3 Risk: Automatic updates can introduce breaking changes or, in worst case, supply chain attacks. Pinned versions provide:\nReproducible deployments Controlled update process Audit trail of version changes Missing Resource Limits Severity: MEDIUM Affected: Most services lack memory/CPU constraints\n# Add to services deploy: resources: limits: memory: 512M cpus: '1.0' Risk: A single container can consume all host resources, causing denial-of-service to other services.\nNetwork Isolation Severity: LOW Status: All containers on default bridge network\nRecommendation: Create isolated networks for different service tiers:\nmonitoring network for Prometheus stack apps network for user-facing services management network for Dockhand, Portainer Security Concepts Applied This audit reinforced several Security+ exam objectives:\nDomain Concept Application 3.0 Architecture Least privilege Replacing privileged: true with specific capabilities 3.0 Architecture Defense in depth Multiple layers: read-only mounts, no-new-privileges, resource limits 4.0 Operations Hardening Removing default credentials, pinning versions 4.0 Operations Change management Git-tracked infrastructure changes 5.0 Governance Security policies Documented conventions in CLAUDE.md Changes Summary Service Before After cAdvisor privileged: true cap_add: SYS_PTRACE + no-new-privileges Uptime Kuma docker.sock (rw) docker.sock:ro Dockhand docker.sock (rw) docker.sock:ro Grafana Password fallback :-admin No fallback (fail if unset) Documentation Updates The security hardening was documented in multiple locations:\nhomelab-ops/CLAUDE.md - Added section with:\nNew security conventions Detailed fix documentation Remaining recommendations Obsidian Homelab Log - Added Security Hardening section explaining:\nWhy each vulnerability matters Docker socket risks Privileged mode dangers Remaining Recommendations Priority Task Status HIGH Pin all container images to specific versions Planned MEDIUM Add memory/CPU limits to all services Planned MEDIUM Add health checks to critical services Planned LOW Add no-new-privileges to all containers Planned LOW Create isolated Docker networks Planned Lessons Learned Privileged mode is rarely necessary. Most containers requesting it can function with specific capabilities instead.\nDocker socket is a root-equivalent. Any container with socket access should be treated as having full host control.\nDefault credentials are silent failures. Configurations should fail explicitly rather than fall back to insecure defaults.\nSecurity is iterative. This audit identified immediate fixes and created a backlog of improvements to implement over time.\nRelated Projects HomeLab Infrastructure - Full homelab documentation GitOps Infrastructure - How Docker configs are managed via Git Claude Code Memory System - AI-assisted development workflow ",
+  "wordCount" : "815",
+  "inLanguage": "en",
+  "datePublished": "2026-02-03T00:00:00Z",
+  "dateModified": "2026-02-03T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "James Hathcock"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://jhathcock-sys.github.io/me/projects/security-review/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "James Hathcock",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://jhathcock-sys.github.io/me/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://jhathcock-sys.github.io/me/" accesskey="h" title="James Hathcock (Alt + H)">James Hathcock</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://jhathcock-sys.github.io/me/resume/" title="Resume">
+                    <span>Resume</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://jhathcock-sys.github.io/me/projects/" title="Projects">
+                    <span>Projects</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://jhathcock-sys.github.io/me/">Home</a>&nbsp;»&nbsp;<a href="https://jhathcock-sys.github.io/me/projects/">Projects</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Docker Security Review
+    </h1>
+    <div class="post-meta"><span title='2026-02-03 00:00:00 +0000 UTC'>February 3, 2026</span>&nbsp;·&nbsp;<span>4 min</span>&nbsp;·&nbsp;<span>James Hathcock</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="docker-security-audit--hardening">Docker Security Audit &amp; Hardening<a hidden class="anchor" aria-hidden="true" href="#docker-security-audit--hardening">#</a></h1>
+<p><strong>Repository:</strong> <a href="https://github.com/jhathcock-sys/Dockers">github.com/jhathcock-sys/Dockers</a>
+<strong>Commit:</strong> <code>d403912</code> - Security hardening fixes</p>
+<h2 id="project-overview">Project Overview<a hidden class="anchor" aria-hidden="true" href="#project-overview">#</a></h2>
+<p>A comprehensive security audit of my homelab Docker infrastructure, identifying critical vulnerabilities and applying hardening measures. This project directly supports my Security+ certification preparation by applying real-world container security concepts.</p>
+<p>The audit reviewed 11 Docker Compose files across two servers (ProxMoxBox and Pi5), examining configurations for common security misconfigurations that could lead to container escape, privilege escalation, or data exposure.</p>
+<hr>
+<h2 id="audit-methodology">Audit Methodology<a hidden class="anchor" aria-hidden="true" href="#audit-methodology">#</a></h2>
+<p>The security review followed a structured approach based on Docker security best practices and CIS Docker Benchmark guidelines:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Category</th>
+          <th>What We Checked</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Privileged Containers</strong></td>
+          <td>Containers with <code>privileged: true</code> or excessive capabilities</td>
+      </tr>
+      <tr>
+          <td><strong>Docker Socket Exposure</strong></td>
+          <td>Mounts of <code>/var/run/docker.sock</code> without read-only flag</td>
+      </tr>
+      <tr>
+          <td><strong>Secrets Management</strong></td>
+          <td>Hardcoded passwords, API keys, or insecure defaults</td>
+      </tr>
+      <tr>
+          <td><strong>Volume Mounts</strong></td>
+          <td>Dangerous mounts (/, /etc, docker.sock) without <code>:ro</code></td>
+      </tr>
+      <tr>
+          <td><strong>Image Versioning</strong></td>
+          <td>Use of <code>:latest</code> tags vs pinned versions</td>
+      </tr>
+      <tr>
+          <td><strong>Resource Limits</strong></td>
+          <td>Missing memory/CPU constraints</td>
+      </tr>
+      <tr>
+          <td><strong>Network Exposure</strong></td>
+          <td>Unnecessary port bindings, lack of network isolation</td>
+      </tr>
+      <tr>
+          <td><strong>User Permissions</strong></td>
+          <td>Containers running as root unnecessarily</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="critical-findings">Critical Findings<a hidden class="anchor" aria-hidden="true" href="#critical-findings">#</a></h2>
+<h3 id="1-cadvisor-running-in-privileged-mode">1. cAdvisor Running in Privileged Mode<a hidden class="anchor" aria-hidden="true" href="#1-cadvisor-running-in-privileged-mode">#</a></h3>
+<p><strong>Severity:</strong> HIGH
+<strong>File:</strong> <code>proxmox/monitoring/docker-compose.yaml</code></p>
+<p><strong>Issue:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">cadvisor</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">privileged</span>: <span style="color:#66d9ef">true</span>    <span style="color:#75715e"># Full host access!</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">devices</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#ae81ff">/dev/kmsg</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">volumes</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#ae81ff">/:/rootfs:ro</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#ae81ff">/var/run:/var/run:ro</span>
+</span></span></code></pre></div><p><strong>Risk:</strong> <code>privileged: true</code> disables all container isolation. The container has:</p>
+<ul>
+<li>Full access to all host devices</li>
+<li>All Linux capabilities enabled</li>
+<li>Ability to load kernel modules</li>
+<li>Complete container escape vector</li>
+</ul>
+<p><strong>Fix Applied:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">cadvisor</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">cap_add</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#ae81ff">SYS_PTRACE             </span> <span style="color:#75715e"># Only what&#39;s needed for process metrics</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">security_opt</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#66d9ef">no</span>-<span style="color:#ae81ff">new-privileges:true </span> <span style="color:#75715e"># Prevent privilege escalation</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">devices</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#ae81ff">/dev/kmsg</span>
+</span></span></code></pre></div><p><strong>Why SYS_PTRACE?</strong> cAdvisor needs to inspect process information for container metrics. This single capability is sufficient without granting full privileged access.</p>
+<hr>
+<h3 id="2-docker-socket-exposure-without-read-only">2. Docker Socket Exposure Without Read-Only<a hidden class="anchor" aria-hidden="true" href="#2-docker-socket-exposure-without-read-only">#</a></h3>
+<p><strong>Severity:</strong> HIGH
+<strong>Files:</strong> <code>proxmox/uptime-kuma/docker-compose.yaml</code>, <code>proxmox/dockhand/docker-compose.yaml</code></p>
+<p><strong>Issue:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">volumes</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">/var/run/docker.sock:/var/run/docker.sock </span> <span style="color:#75715e"># Read-write access!</span>
+</span></span></code></pre></div><p><strong>Risk:</strong> The Docker socket is equivalent to root access on the host. A container with write access can:</p>
+<ul>
+<li>Spawn new privileged containers</li>
+<li>Access secrets from any container</li>
+<li>Mount any host path</li>
+<li>Execute commands on the host via container creation</li>
+</ul>
+<p><strong>Fix Applied:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">volumes</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">/var/run/docker.sock:/var/run/docker.sock:ro </span> <span style="color:#75715e"># Read-only</span>
+</span></span></code></pre></div><p><strong>Trade-off:</strong> Dockhand may lose some container management features with read-only access. If critical functionality breaks, this specific service can be reverted while maintaining the fix for Uptime Kuma.</p>
+<hr>
+<h3 id="3-default-password-fallback-in-grafana">3. Default Password Fallback in Grafana<a hidden class="anchor" aria-hidden="true" href="#3-default-password-fallback-in-grafana">#</a></h3>
+<p><strong>Severity:</strong> MEDIUM
+<strong>File:</strong> <code>proxmox/monitoring/docker-compose.yaml</code></p>
+<p><strong>Issue:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">environment</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}</span>
+</span></span></code></pre></div><p><strong>Risk:</strong> If the <code>.env</code> file is missing or <code>GRAFANA_PASSWORD</code> is unset, the container starts with <code>admin</code> as the password. This creates a security hole that might go unnoticed.</p>
+<p><strong>Fix Applied:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">environment</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}</span>
+</span></span></code></pre></div><p><strong>Behavior Change:</strong> Container will now fail to start if <code>GRAFANA_PASSWORD</code> is not set, making misconfigurations obvious rather than silent.</p>
+<hr>
+<h2 id="additional-findings-lower-priority">Additional Findings (Lower Priority)<a hidden class="anchor" aria-hidden="true" href="#additional-findings-lower-priority">#</a></h2>
+<h3 id="image-version-pinning">Image Version Pinning<a hidden class="anchor" aria-hidden="true" href="#image-version-pinning">#</a></h3>
+<p><strong>Severity:</strong> MEDIUM
+<strong>Affected:</strong> 14 of 15 containers using <code>:latest</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># Current (risky)</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">image</span>: <span style="color:#ae81ff">grafana/grafana:latest</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Recommended</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">image</span>: <span style="color:#ae81ff">grafana/grafana:10.2.3</span>
+</span></span></code></pre></div><p><strong>Risk:</strong> Automatic updates can introduce breaking changes or, in worst case, supply chain attacks. Pinned versions provide:</p>
+<ul>
+<li>Reproducible deployments</li>
+<li>Controlled update process</li>
+<li>Audit trail of version changes</li>
+</ul>
+<hr>
+<h3 id="missing-resource-limits">Missing Resource Limits<a hidden class="anchor" aria-hidden="true" href="#missing-resource-limits">#</a></h3>
+<p><strong>Severity:</strong> MEDIUM
+<strong>Affected:</strong> Most services lack memory/CPU constraints</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># Add to services</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">deploy</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">resources</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">limits</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">memory</span>: <span style="color:#ae81ff">512M</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">cpus</span>: <span style="color:#e6db74">&#39;1.0&#39;</span>
+</span></span></code></pre></div><p><strong>Risk:</strong> A single container can consume all host resources, causing denial-of-service to other services.</p>
+<hr>
+<h3 id="network-isolation">Network Isolation<a hidden class="anchor" aria-hidden="true" href="#network-isolation">#</a></h3>
+<p><strong>Severity:</strong> LOW
+<strong>Status:</strong> All containers on default bridge network</p>
+<p><strong>Recommendation:</strong> Create isolated networks for different service tiers:</p>
+<ul>
+<li><code>monitoring</code> network for Prometheus stack</li>
+<li><code>apps</code> network for user-facing services</li>
+<li><code>management</code> network for Dockhand, Portainer</li>
+</ul>
+<hr>
+<h2 id="security-concepts-applied">Security Concepts Applied<a hidden class="anchor" aria-hidden="true" href="#security-concepts-applied">#</a></h2>
+<p>This audit reinforced several Security+ exam objectives:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Domain</th>
+          <th>Concept</th>
+          <th>Application</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>3.0 Architecture</strong></td>
+          <td>Least privilege</td>
+          <td>Replacing <code>privileged: true</code> with specific capabilities</td>
+      </tr>
+      <tr>
+          <td><strong>3.0 Architecture</strong></td>
+          <td>Defense in depth</td>
+          <td>Multiple layers: read-only mounts, no-new-privileges, resource limits</td>
+      </tr>
+      <tr>
+          <td><strong>4.0 Operations</strong></td>
+          <td>Hardening</td>
+          <td>Removing default credentials, pinning versions</td>
+      </tr>
+      <tr>
+          <td><strong>4.0 Operations</strong></td>
+          <td>Change management</td>
+          <td>Git-tracked infrastructure changes</td>
+      </tr>
+      <tr>
+          <td><strong>5.0 Governance</strong></td>
+          <td>Security policies</td>
+          <td>Documented conventions in CLAUDE.md</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="changes-summary">Changes Summary<a hidden class="anchor" aria-hidden="true" href="#changes-summary">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>Service</th>
+          <th>Before</th>
+          <th>After</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>cAdvisor</strong></td>
+          <td><code>privileged: true</code></td>
+          <td><code>cap_add: SYS_PTRACE</code> + <code>no-new-privileges</code></td>
+      </tr>
+      <tr>
+          <td><strong>Uptime Kuma</strong></td>
+          <td><code>docker.sock</code> (rw)</td>
+          <td><code>docker.sock:ro</code></td>
+      </tr>
+      <tr>
+          <td><strong>Dockhand</strong></td>
+          <td><code>docker.sock</code> (rw)</td>
+          <td><code>docker.sock:ro</code></td>
+      </tr>
+      <tr>
+          <td><strong>Grafana</strong></td>
+          <td>Password fallback <code>:-admin</code></td>
+          <td>No fallback (fail if unset)</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="documentation-updates">Documentation Updates<a hidden class="anchor" aria-hidden="true" href="#documentation-updates">#</a></h2>
+<p>The security hardening was documented in multiple locations:</p>
+<ol>
+<li>
+<p><strong>homelab-ops/CLAUDE.md</strong> - Added <code>&lt;security_hardening&gt;</code> section with:</p>
+<ul>
+<li>New security conventions</li>
+<li>Detailed fix documentation</li>
+<li>Remaining recommendations</li>
+</ul>
+</li>
+<li>
+<p><strong>Obsidian Homelab Log</strong> - Added Security Hardening section explaining:</p>
+<ul>
+<li>Why each vulnerability matters</li>
+<li>Docker socket risks</li>
+<li>Privileged mode dangers</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="remaining-recommendations">Remaining Recommendations<a hidden class="anchor" aria-hidden="true" href="#remaining-recommendations">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>Priority</th>
+          <th>Task</th>
+          <th>Status</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>HIGH</strong></td>
+          <td>Pin all container images to specific versions</td>
+          <td>Planned</td>
+      </tr>
+      <tr>
+          <td><strong>MEDIUM</strong></td>
+          <td>Add memory/CPU limits to all services</td>
+          <td>Planned</td>
+      </tr>
+      <tr>
+          <td><strong>MEDIUM</strong></td>
+          <td>Add health checks to critical services</td>
+          <td>Planned</td>
+      </tr>
+      <tr>
+          <td><strong>LOW</strong></td>
+          <td>Add <code>no-new-privileges</code> to all containers</td>
+          <td>Planned</td>
+      </tr>
+      <tr>
+          <td><strong>LOW</strong></td>
+          <td>Create isolated Docker networks</td>
+          <td>Planned</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="lessons-learned">Lessons Learned<a hidden class="anchor" aria-hidden="true" href="#lessons-learned">#</a></h2>
+<ol>
+<li>
+<p><strong>Privileged mode is rarely necessary.</strong> Most containers requesting it can function with specific capabilities instead.</p>
+</li>
+<li>
+<p><strong>Docker socket is a root-equivalent.</strong> Any container with socket access should be treated as having full host control.</p>
+</li>
+<li>
+<p><strong>Default credentials are silent failures.</strong> Configurations should fail explicitly rather than fall back to insecure defaults.</p>
+</li>
+<li>
+<p><strong>Security is iterative.</strong> This audit identified immediate fixes and created a backlog of improvements to implement over time.</p>
+</li>
+</ol>
+<hr>
+<h2 id="related-projects">Related Projects<a hidden class="anchor" aria-hidden="true" href="#related-projects">#</a></h2>
+<ul>
+<li><a href="../home-lab/">HomeLab Infrastructure</a> - Full homelab documentation</li>
+<li><a href="../gitops/">GitOps Infrastructure</a> - How Docker configs are managed via Git</li>
+<li><a href="../claude-memory/">Claude Code Memory System</a> - AI-assisted development workflow</li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://jhathcock-sys.github.io/me/projects/container-resource-management/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Container Resource Management &amp; Monitoring</span>
+  </a>
+  <a class="next" href="https://jhathcock-sys.github.io/me/projects/claude-memory/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Claude Code Memory System</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://jhathcock-sys.github.io/me/">James Hathcock</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

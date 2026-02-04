@@ -146,12 +146,34 @@ See my [Docker Security Review](../security-review/) for the full audit report, 
 
 ---
 
+## 🚀 Recent Projects
+
+### Podcast Studio (2026-02-03)
+Self-hosted video podcast recording platform with 4K multi-track support. Built for D&D sessions with up to 6 participants.
+
+**Stack:** LiveKit (WebRTC), React + TypeScript, Node.js/Express, MinIO (S3 storage), FFmpeg (post-processing), Coturn (TURN server)
+
+**Features:**
+- Hybrid LiveKit + double-ended recording for true 4K quality
+- Client-side MediaRecorder with resumable uploads (Uppy.js)
+- Live streaming to YouTube/Twitch via RTMP
+- Automated audio normalization and multi-track sync with FFmpeg
+- Scene switching with custom layouts
+
+**Storage:** ~70GB per 1-hour 6-person 4K session
+
+**Repository:** [podcast-studio](https://github.com/jhathcock-sys/podcast-studio)
+
+---
+
 ## 📋 Future Plans
 
+- [ ] **Podcast Studio Deployment** - Deploy and test on 192.168.1.8
 - [ ] **OPNsense + Managed Switch** - Enterprise networking with VLANs and IDS/IPS
 - [ ] Add media stack (Jellyfin/Plex, Sonarr, Radarr)
 - [ ] Implement Home Assistant for home automation
 - [ ] Migrate to Kubernetes for orchestration
 - [ ] Set up offsite backups to cloud storage
+- [x] ~~Container resource management~~ (Completed - memory limits on all 20 containers)
 - [x] ~~Add alerting via Grafana/Prometheus~~ (Completed - Discord notifications active)
 - [x] ~~Wazuh SIEM~~ (Completed - agents on ProxMoxBox and Pi5, ready for Suricata integration)

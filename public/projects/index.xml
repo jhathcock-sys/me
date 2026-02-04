@@ -2,17 +2,36 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Projects on James Hathcock</title>
-    <link>http://localhost:43835/me/projects/</link>
+    <link>https://jhathcock-sys.github.io/me/projects/</link>
     <description>Recent content in Projects on James Hathcock</description>
     <generator>Hugo -- 0.154.3</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 02 Feb 2026 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:43835/me/projects/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 04 Feb 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://jhathcock-sys.github.io/me/projects/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Container Resource Management &amp; Monitoring</title>
+      <link>https://jhathcock-sys.github.io/me/projects/container-resource-management/</link>
+      <pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate>
+      <guid>https://jhathcock-sys.github.io/me/projects/container-resource-management/</guid>
+      <description>Implemented comprehensive memory limits and fixed Prometheus alerting across 20 Docker containers in a production homelab environment.</description>
+    </item>
+    <item>
+      <title>Docker Security Review</title>
+      <link>https://jhathcock-sys.github.io/me/projects/security-review/</link>
+      <pubDate>Tue, 03 Feb 2026 00:00:00 +0000</pubDate>
+      <guid>https://jhathcock-sys.github.io/me/projects/security-review/</guid>
+      <description>&lt;h1 id=&#34;docker-security-audit--hardening&#34;&gt;Docker Security Audit &amp;amp; Hardening&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;Repository:&lt;/strong&gt; &lt;a href=&#34;https://github.com/jhathcock-sys/Dockers&#34;&gt;github.com/jhathcock-sys/Dockers&lt;/a&gt;
+&lt;strong&gt;Commit:&lt;/strong&gt; &lt;code&gt;d403912&lt;/code&gt; - Security hardening fixes&lt;/p&gt;
+&lt;h2 id=&#34;project-overview&#34;&gt;Project Overview&lt;/h2&gt;
+&lt;p&gt;A comprehensive security audit of my homelab Docker infrastructure, identifying critical vulnerabilities and applying hardening measures. This project directly supports my Security+ certification preparation by applying real-world container security concepts.&lt;/p&gt;
+&lt;p&gt;The audit reviewed 11 Docker Compose files across two servers (ProxMoxBox and Pi5), examining configurations for common security misconfigurations that could lead to container escape, privilege escalation, or data exposure.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Claude Code Memory System</title>
-      <link>http://localhost:43835/me/projects/claude-memory/</link>
+      <link>https://jhathcock-sys.github.io/me/projects/claude-memory/</link>
       <pubDate>Mon, 02 Feb 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:43835/me/projects/claude-memory/</guid>
+      <guid>https://jhathcock-sys.github.io/me/projects/claude-memory/</guid>
       <description>&lt;h1 id=&#34;-claude-code-memory-system&#34;&gt;🧠 Claude Code Memory System&lt;/h1&gt;
 &lt;p&gt;Building a structured context system for AI-assisted infrastructure development.&lt;/p&gt;
 &lt;h2 id=&#34;project-overview&#34;&gt;Project Overview&lt;/h2&gt;
@@ -21,9 +40,9 @@
     </item>
     <item>
       <title>GitOps Infrastructure</title>
-      <link>http://localhost:43835/me/projects/gitops/</link>
+      <link>https://jhathcock-sys.github.io/me/projects/gitops/</link>
       <pubDate>Mon, 26 Jan 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:43835/me/projects/gitops/</guid>
+      <guid>https://jhathcock-sys.github.io/me/projects/gitops/</guid>
       <description>&lt;h1 id=&#34;-gitops-infrastructure&#34;&gt;🔄 GitOps Infrastructure&lt;/h1&gt;
 &lt;p&gt;&lt;strong&gt;Repository:&lt;/strong&gt; &lt;a href=&#34;https://github.com/jhathcock-sys/Dockers&#34;&gt;github.com/jhathcock-sys/Dockers&lt;/a&gt;&lt;/p&gt;
 &lt;h2 id=&#34;project-overview&#34;&gt;Project Overview&lt;/h2&gt;
@@ -70,9 +89,9 @@
     </item>
     <item>
       <title>Home Lab</title>
-      <link>http://localhost:43835/me/projects/home-lab/</link>
+      <link>https://jhathcock-sys.github.io/me/projects/home-lab/</link>
       <pubDate>Thu, 08 Jan 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:43835/me/projects/home-lab/</guid>
+      <guid>https://jhathcock-sys.github.io/me/projects/home-lab/</guid>
       <description>&lt;h1 id=&#34;-my-homelab-setup&#34;&gt;🏠 My Homelab Setup&lt;/h1&gt;
 &lt;p&gt;Welcome to my homelab documentation. This project tracks the infrastructure, services, and networking configuration of my self-hosted environment. The goal is to create a resilient, automated, and organized system for home services, monitoring, and development.&lt;/p&gt;
 &lt;h2 id=&#34;-hardware-infrastructure&#34;&gt;🛠 Hardware Infrastructure&lt;/h2&gt;

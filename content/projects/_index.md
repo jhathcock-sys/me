@@ -32,6 +32,13 @@ Comprehensive security audit of homelab Docker infrastructure. Identified critic
 
 ---
 
+### [Container Resource Management](../container-resource-management/)
+Implemented comprehensive memory limits and fixed Prometheus alerting across 20 Docker containers. Fixed broken alerts showing +Inf%, applied resource limits based on usage analysis, and improved monitoring accuracy.
+
+**Technologies:** Docker, Prometheus, Grafana, PromQL, GitOps
+
+---
+
 ### [Claude Code Memory System](../claude-memory/)
 Structured context system for AI-assisted infrastructure development. Converts markdown-based memory files to XML format for better hierarchy and queryability across development sessions.
 

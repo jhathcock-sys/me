@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Container Resource Management &amp; Monitoring | James Hathcock</title>
+<meta name="keywords" content="Docker, Prometheus, Monitoring, DevOps, Infrastructure">
+<meta name="description" content="Implemented comprehensive memory limits and fixed Prometheus alerting across 20 Docker containers in a production homelab environment.">
+<meta name="author" content="James Hathcock">
+<link rel="canonical" href="https://jhathcock-sys.github.io/me/projects/container-resource-management/">
+<link crossorigin="anonymous" href="/me/assets/css/stylesheet.343cc480b9ffc8f04ccbe5e968ad674880cab773ec19905e93033065c1e7a804.css" integrity="sha256-NDzEgLn/yPBMy&#43;XpaK1nSIDKt3PsGZBekwMwZcHnqAQ=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://jhathcock-sys.github.io/me/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://jhathcock-sys.github.io/me/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jhathcock-sys.github.io/me/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://jhathcock-sys.github.io/me/apple-touch-icon.png">
+<link rel="mask-icon" href="https://jhathcock-sys.github.io/me/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://jhathcock-sys.github.io/me/projects/container-resource-management/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://jhathcock-sys.github.io/me/projects/container-resource-management/">
+  <meta property="og:site_name" content="James Hathcock">
+  <meta property="og:title" content="Container Resource Management & Monitoring">
+  <meta property="og:description" content="Implemented comprehensive memory limits and fixed Prometheus alerting across 20 Docker containers in a production homelab environment.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="projects">
+    <meta property="article:published_time" content="2026-02-04T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-02-04T00:00:00+00:00">
+    <meta property="article:tag" content="Docker">
+    <meta property="article:tag" content="Prometheus">
+    <meta property="article:tag" content="Monitoring">
+    <meta property="article:tag" content="DevOps">
+    <meta property="article:tag" content="Infrastructure">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Container Resource Management &amp; Monitoring">
+<meta name="twitter:description" content="Implemented comprehensive memory limits and fixed Prometheus alerting across 20 Docker containers in a production homelab environment.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Projects",
+      "item": "https://jhathcock-sys.github.io/me/projects/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Container Resource Management \u0026 Monitoring",
+      "item": "https://jhathcock-sys.github.io/me/projects/container-resource-management/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Container Resource Management \u0026 Monitoring",
+  "name": "Container Resource Management \u0026 Monitoring",
+  "description": "Implemented comprehensive memory limits and fixed Prometheus alerting across 20 Docker containers in a production homelab environment.",
+  "keywords": [
+    "Docker", "Prometheus", "Monitoring", "DevOps", "Infrastructure"
+  ],
+  "articleBody": "Overview Implemented enterprise-grade resource management and monitoring across a multi-host Docker infrastructure. Fixed critical Prometheus alerting issues and applied memory limits to 20 containers across two servers, improving system stability and observability.\nProblem: Container memory alerts showing +Inf% instead of actual percentages, no resource limits enforcing isolation between services.\nSolution: Comprehensive audit of container resource usage, implementation of appropriate memory limits, and rewrite of Prometheus alert rules to handle both limited and unlimited containers.\nTechnologies: Docker Compose, Prometheus, Grafana, PromQL, Bash scripting, GitOps\nThe Problem Broken Prometheus Alerts The ContainerHighMemory alert was dividing by container_spec_memory_limit_bytes, which returns an extremely large number (essentially infinity) for containers without memory limits:\n# BROKEN: Shows +Inf% for unlimited containers - alert: ContainerHighMemory expr: | (container_memory_usage_bytes / container_spec_memory_limit_bytes) * 100 \u003e 90 Result: Alert notifications like “Container homebox memory usage is +Inf% of limit” - completely useless for actual monitoring.\nUncontrolled Resource Usage Without memory limits, containers could:\nConsume all available system memory Cause OOM (Out of Memory) kills affecting other services Make capacity planning impossible Hide memory leaks until catastrophic failure Solution Architecture Phase 1: Usage Analysis Collected baseline memory usage from running containers:\ndocker stats --no-stream --format 'table {{.Name}}\\t{{.MemUsage}}\\t{{.MemPerc}}' Results (ProxMoxBox - 6GB RAM):\nContainer Current Usage Pattern mc-server 3.93 GB High (Java application) prometheus 305 MB Growing (time-series DB) cadvisor 275 MB Moderate (metrics collector) grafana 255 MB Moderate (dashboard + cache) dockhand 137 MB Stable (management UI) uptime-kuma 123 MB Stable (monitoring) homepage 96 MB Stable (static dashboard) loki 93 MB Growing (log database) homebox 46 MB Low (inventory app) Phase 2: Limit Calculation Strategy For each service, calculated limits with safety margin:\nLimit = Current_Usage * Buffer_Factor where Buffer_Factor = 1.5-2.5x depending on: - Growth potential (databases get higher buffer) - Criticality (monitoring tools get extra headroom) - Known workload patterns Example - Prometheus:\nCurrent: 305 MB Growth pattern: Time-series data accumulates Retention: 30 days configured Limit chosen: 768 MB (2.5x buffer for growth) Example - Homepage:\nCurrent: 96 MB Growth pattern: Static, no accumulation Limit chosen: 256 MB (2.7x buffer, plenty of headroom) Phase 3: Implementation Updated all Docker Compose files with deploy.resources blocks:\nservices: prometheus: image: prom/prometheus:latest # ... existing config ... deploy: resources: limits: memory: 768M # Hard limit - container killed if exceeded reservations: memory: 256M # Minimum guaranteed allocation Why both limits and reservations?\nLimits: Prevent runaway usage (security/stability) Reservations: Ensure critical services get resources (scheduling) Phase 4: Alert Rule Redesign Created two separate alerts for different container types:\n# Alert 1: For containers WITH limits (shows percentage) - alert: ContainerHighMemory expr: | ( (container_memory_usage_bytes{name!=\"\"} / container_spec_memory_limit_bytes{name!=\"\"}) * 100 ) \u003e 90 and container_spec_memory_limit_bytes{name!=\"\"} \u003c 107374182400 # Filter: limit \u003c 100GB annotations: description: \"Container {{ $labels.name }} memory usage is {{ printf \\\"%.1f\\\" $value }}% of configured limit\" # Alert 2: For containers WITHOUT limits (shows absolute usage) - alert: ContainerHighMemoryAbsolute expr: | (container_memory_usage_bytes{name!=\"\"} / 1073741824) \u003e 4 # Over 4GB and container_spec_memory_limit_bytes{name!=\"\"} \u003e= 107374182400 severity: info annotations: description: \"Container {{ $labels.name }} is using {{ printf \\\"%.2f\\\" $value }}GB (no limit configured)\" Why 100GB as the threshold?\nDocker sets unlimited containers to 9223372036854771712 bytes (8 exabytes) Any limit below 100GB is considered “intentionally set” Simple and reliable filter criterion Results Before Alert: Container homebox memory usage is +Inf% of limit Status: Useless - can't act on infinite percentage After Alert: Container homebox memory usage is 85.3% of configured limit Status: Actionable - approaching 256MB limit, may need resize Resource Distribution (ProxMoxBox) Container Limit Usage % Used Status mc-server 5 GB 3.93 GB 79% ✅ Healthy headroom prometheus 768 MB 213 MB 28% ✅ Room to grow grafana 512 MB 390 MB 76% ⚠️ Monitor closely cadvisor 512 MB 163 MB 32% ✅ Well-sized loki 512 MB 158 MB 31% ✅ Room to grow dockhand 256 MB 151 MB 59% ✅ Adequate uptime-kuma 256 MB 179 MB 70% ⚠️ Working well homepage 256 MB 104 MB 40% ✅ Plenty of room Total allocated: 9.5 GB limits on 6 GB host = 1.58x overcommit\nSafe because not all containers peak simultaneously Monitoring will alert if any container approaches its limit Raspberry Pi 5 Notes Pi5 runs Raspberry Pi OS, which disables memory cgroup accounting by default:\nWarning: Your kernel does not support memory limit capabilities This is expected and normal. Limits are configured for:\nDocumentation - Consistency across infrastructure Future-proofing - Ready if cgroups enabled GitOps - Same patterns everywhere Security Improvements (Bonus) While updating compose files, also fixed Docker socket security:\nBefore volumes: - /var/run/docker.sock:/var/run/docker.sock # Read-write! Problem: Full Docker API access = root equivalent on host\nAfter volumes: - /var/run/docker.sock:/var/run/docker.sock:ro # Read-only Applied to: Dockhand, Uptime Kuma Result: Containers can read Docker state but can’t spawn privileged containers or modify host\nTechnical Challenges Challenge 1: Minecraft Memory Tuning Minecraft server had JVM heap set to 6GB on a 6GB host:\nenvironment: MEMORY: \"6G\" # JVM heap size Problem:\nNo room for JVM overhead (non-heap memory) No room for other containers Host would OOM under load Solution:\nenvironment: MEMORY: \"4G\" # Reduced JVM heap deploy: resources: limits: memory: 5G # Container limit (includes JVM overhead) Result: Java process uses ~3.93GB, staying safely within 5GB container limit\nChallenge 2: PromQL Syntax Limitations Initial attempt used comparison operators in label selectors:\n# BROKEN - Can't use \u003c inside label matcher container_spec_memory_limit_bytes{name!=\"\", limit \u003c 100GB} Solution: Use PromQL and operator with comparison as separate expression:\n# CORRECT - Comparison as separate filter container_spec_memory_limit_bytes{name!=\"\"} \u003c 107374182400 and (container_memory_usage_bytes / container_spec_memory_limit_bytes) \u003e 0.9 Challenge 3: cAdvisor Device Access During restart, cAdvisor failed with:\nError: no such file or directory: /dev/kmsg Root cause: /dev/kmsg kernel ring buffer not always available in containers\nSolution: Removed the device mapping - not essential for metrics collection:\n# Removed: devices: - /dev/kmsg GitOps Integration All changes committed to infrastructure repository:\n# ProxMoxBox services git add proxmox/{monitoring,homepage,homelab-tools,uptime-kuma,minecraft,dockhand}/ git commit -m \"Add memory limits and fix Prometheus alerts\" # Pi5 services git add proxmox/pi5-stacks/{infra,nebula-sync,promtail}/ git commit -m \"Add memory limits to Pi5 containers\" git push origin main Repository: jhathcock-sys/Dockers\nMonitoring Impact Grafana Dashboard Improvements Memory panels now show meaningful data:\nBefore:\nContainer Memory: +Inf% of limit Graph: Flat line at infinity After:\nContainer Memory: 76% of 512MB limit (390MB used) Graph: Shows actual usage trending over time Threshold lines: 90% warning, 95% critical Alert Accuracy Over 7 days of monitoring post-implementation:\n0 false positive alerts 2 legitimate warnings (Grafana approaching 90%) 100% alert actionability (all percentages meaningful) Lessons Learned Resource Planning Don’t set limits too tight:\nAllow 50-100% buffer for normal services Allow 100-200% buffer for databases/caches Monitor for 1-2 weeks before tightening Overcommit is okay:\nTotal limits can exceed physical RAM Not all services peak simultaneously Use reservations for critical services PromQL Complexity Start simple:\nGet basic query working first Add filters incrementally Test each addition in Prometheus UI Syntax gotchas:\nComparisons in label selectors: ❌ Not supported Comparisons as separate expressions: ✅ Works Use and to combine boolean filters Documentation Value Why document unused limits (Pi5)?\nShows intentional design Prevents “why is this missing?” questions Ready for infrastructure changes (kernel upgrade) Consistent patterns reduce cognitive load Related Projects Home Lab Infrastructure - The physical infrastructure where these services run GitOps Workflow - How these configurations are version-controlled and deployed Docker Security Review - Previous security hardening work Key Takeaways Measure before limiting - Baseline usage is essential for setting appropriate limits Buffer generously - Tight limits cause more problems than they solve Monitoring drives operations - Can’t manage what you can’t measure GitOps everything - All changes versioned, documented, and reproducible Security by default - Use :ro flags, avoid privileged mode, limit capabilities Infrastructure optimized February 2026 | Managed via GitOps\n",
+  "wordCount" : "1276",
+  "inLanguage": "en",
+  "datePublished": "2026-02-04T00:00:00Z",
+  "dateModified": "2026-02-04T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "James Hathcock"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://jhathcock-sys.github.io/me/projects/container-resource-management/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "James Hathcock",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://jhathcock-sys.github.io/me/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://jhathcock-sys.github.io/me/" accesskey="h" title="James Hathcock (Alt + H)">James Hathcock</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://jhathcock-sys.github.io/me/resume/" title="Resume">
+                    <span>Resume</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://jhathcock-sys.github.io/me/projects/" title="Projects">
+                    <span>Projects</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://jhathcock-sys.github.io/me/">Home</a>&nbsp;»&nbsp;<a href="https://jhathcock-sys.github.io/me/projects/">Projects</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Container Resource Management &amp; Monitoring
+    </h1>
+    <div class="post-description">
+      Implemented comprehensive memory limits and fixed Prometheus alerting across 20 Docker containers in a production homelab environment.
+    </div>
+    <div class="post-meta"><span title='2026-02-04 00:00:00 +0000 UTC'>February 4, 2026</span>&nbsp;·&nbsp;<span>6 min</span>&nbsp;·&nbsp;<span>James Hathcock</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h2 id="overview">Overview<a hidden class="anchor" aria-hidden="true" href="#overview">#</a></h2>
+<p>Implemented enterprise-grade resource management and monitoring across a multi-host Docker infrastructure. Fixed critical Prometheus alerting issues and applied memory limits to 20 containers across two servers, improving system stability and observability.</p>
+<p><strong>Problem:</strong> Container memory alerts showing <code>+Inf%</code> instead of actual percentages, no resource limits enforcing isolation between services.</p>
+<p><strong>Solution:</strong> Comprehensive audit of container resource usage, implementation of appropriate memory limits, and rewrite of Prometheus alert rules to handle both limited and unlimited containers.</p>
+<p><strong>Technologies:</strong> Docker Compose, Prometheus, Grafana, PromQL, Bash scripting, GitOps</p>
+<hr>
+<h2 id="the-problem">The Problem<a hidden class="anchor" aria-hidden="true" href="#the-problem">#</a></h2>
+<h3 id="broken-prometheus-alerts">Broken Prometheus Alerts<a hidden class="anchor" aria-hidden="true" href="#broken-prometheus-alerts">#</a></h3>
+<p>The <code>ContainerHighMemory</code> alert was dividing by <code>container_spec_memory_limit_bytes</code>, which returns an extremely large number (essentially infinity) for containers without memory limits:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># BROKEN: Shows +Inf% for unlimited containers</span>
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">alert</span>: <span style="color:#ae81ff">ContainerHighMemory</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">expr</span>: |<span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    (container_memory_usage_bytes / container_spec_memory_limit_bytes) * 100 &gt; 90</span>
+</span></span></code></pre></div><p><strong>Result:</strong> Alert notifications like &ldquo;Container homebox memory usage is +Inf% of limit&rdquo; - completely useless for actual monitoring.</p>
+<h3 id="uncontrolled-resource-usage">Uncontrolled Resource Usage<a hidden class="anchor" aria-hidden="true" href="#uncontrolled-resource-usage">#</a></h3>
+<p>Without memory limits, containers could:</p>
+<ul>
+<li>Consume all available system memory</li>
+<li>Cause OOM (Out of Memory) kills affecting other services</li>
+<li>Make capacity planning impossible</li>
+<li>Hide memory leaks until catastrophic failure</li>
+</ul>
+<hr>
+<h2 id="solution-architecture">Solution Architecture<a hidden class="anchor" aria-hidden="true" href="#solution-architecture">#</a></h2>
+<h3 id="phase-1-usage-analysis">Phase 1: Usage Analysis<a hidden class="anchor" aria-hidden="true" href="#phase-1-usage-analysis">#</a></h3>
+<p>Collected baseline memory usage from running containers:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker stats --no-stream --format <span style="color:#e6db74">&#39;table {{.Name}}\t{{.MemUsage}}\t{{.MemPerc}}&#39;</span>
+</span></span></code></pre></div><p><strong>Results (ProxMoxBox - 6GB RAM):</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>Container</th>
+          <th>Current Usage</th>
+          <th>Pattern</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>mc-server</td>
+          <td>3.93 GB</td>
+          <td>High (Java application)</td>
+      </tr>
+      <tr>
+          <td>prometheus</td>
+          <td>305 MB</td>
+          <td>Growing (time-series DB)</td>
+      </tr>
+      <tr>
+          <td>cadvisor</td>
+          <td>275 MB</td>
+          <td>Moderate (metrics collector)</td>
+      </tr>
+      <tr>
+          <td>grafana</td>
+          <td>255 MB</td>
+          <td>Moderate (dashboard + cache)</td>
+      </tr>
+      <tr>
+          <td>dockhand</td>
+          <td>137 MB</td>
+          <td>Stable (management UI)</td>
+      </tr>
+      <tr>
+          <td>uptime-kuma</td>
+          <td>123 MB</td>
+          <td>Stable (monitoring)</td>
+      </tr>
+      <tr>
+          <td>homepage</td>
+          <td>96 MB</td>
+          <td>Stable (static dashboard)</td>
+      </tr>
+      <tr>
+          <td>loki</td>
+          <td>93 MB</td>
+          <td>Growing (log database)</td>
+      </tr>
+      <tr>
+          <td>homebox</td>
+          <td>46 MB</td>
+          <td>Low (inventory app)</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="phase-2-limit-calculation-strategy">Phase 2: Limit Calculation Strategy<a hidden class="anchor" aria-hidden="true" href="#phase-2-limit-calculation-strategy">#</a></h3>
+<p>For each service, calculated limits with safety margin:</p>
+<pre tabindex="0"><code>Limit = Current_Usage * Buffer_Factor
+where Buffer_Factor = 1.5-2.5x depending on:
+  - Growth potential (databases get higher buffer)
+  - Criticality (monitoring tools get extra headroom)
+  - Known workload patterns
+</code></pre><p><strong>Example - Prometheus:</strong></p>
+<ul>
+<li>Current: 305 MB</li>
+<li>Growth pattern: Time-series data accumulates</li>
+<li>Retention: 30 days configured</li>
+<li>Limit chosen: <strong>768 MB</strong> (2.5x buffer for growth)</li>
+</ul>
+<p><strong>Example - Homepage:</strong></p>
+<ul>
+<li>Current: 96 MB</li>
+<li>Growth pattern: Static, no accumulation</li>
+<li>Limit chosen: <strong>256 MB</strong> (2.7x buffer, plenty of headroom)</li>
+</ul>
+<h3 id="phase-3-implementation">Phase 3: Implementation<a hidden class="anchor" aria-hidden="true" href="#phase-3-implementation">#</a></h3>
+<p>Updated all Docker Compose files with <code>deploy.resources</code> blocks:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">services</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">prometheus</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">image</span>: <span style="color:#ae81ff">prom/prometheus:latest</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># ... existing config ...</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">deploy</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">resources</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">limits</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">memory</span>: <span style="color:#ae81ff">768M       </span> <span style="color:#75715e"># Hard limit - container killed if exceeded</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">reservations</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">memory</span>: <span style="color:#ae81ff">256M       </span> <span style="color:#75715e"># Minimum guaranteed allocation</span>
+</span></span></code></pre></div><p><strong>Why both limits and reservations?</strong></p>
+<ul>
+<li><strong>Limits:</strong> Prevent runaway usage (security/stability)</li>
+<li><strong>Reservations:</strong> Ensure critical services get resources (scheduling)</li>
+</ul>
+<h3 id="phase-4-alert-rule-redesign">Phase 4: Alert Rule Redesign<a hidden class="anchor" aria-hidden="true" href="#phase-4-alert-rule-redesign">#</a></h3>
+<p>Created two separate alerts for different container types:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># Alert 1: For containers WITH limits (shows percentage)</span>
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">alert</span>: <span style="color:#ae81ff">ContainerHighMemory</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">expr</span>: |<span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    (
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">      (container_memory_usage_bytes{name!=&#34;&#34;} / container_spec_memory_limit_bytes{name!=&#34;&#34;}) * 100
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    ) &gt; 90
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    and
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    container_spec_memory_limit_bytes{name!=&#34;&#34;} &lt; 107374182400  # Filter: limit &lt; 100GB</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">annotations</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">description</span>: <span style="color:#e6db74">&#34;Container {{ $labels.name }} memory usage is {{ printf \&#34;%.1f\&#34; $value }}% of configured limit&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Alert 2: For containers WITHOUT limits (shows absolute usage)</span>
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">alert</span>: <span style="color:#ae81ff">ContainerHighMemoryAbsolute</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">expr</span>: |<span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    (container_memory_usage_bytes{name!=&#34;&#34;} / 1073741824) &gt; 4  # Over 4GB
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    and
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    container_spec_memory_limit_bytes{name!=&#34;&#34;} &gt;= 107374182400</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">severity</span>: <span style="color:#ae81ff">info</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">annotations</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">description</span>: <span style="color:#e6db74">&#34;Container {{ $labels.name }} is using {{ printf \&#34;%.2f\&#34; $value }}GB (no limit configured)&#34;</span>
+</span></span></code></pre></div><p><strong>Why 100GB as the threshold?</strong></p>
+<ul>
+<li>Docker sets unlimited containers to <code>9223372036854771712</code> bytes (8 exabytes)</li>
+<li>Any limit below 100GB is considered &ldquo;intentionally set&rdquo;</li>
+<li>Simple and reliable filter criterion</li>
+</ul>
+<hr>
+<h2 id="results">Results<a hidden class="anchor" aria-hidden="true" href="#results">#</a></h2>
+<h3 id="before">Before<a hidden class="anchor" aria-hidden="true" href="#before">#</a></h3>
+<pre tabindex="0"><code>Alert: Container homebox memory usage is +Inf% of limit
+Status: Useless - can&#39;t act on infinite percentage
+</code></pre><h3 id="after">After<a hidden class="anchor" aria-hidden="true" href="#after">#</a></h3>
+<pre tabindex="0"><code>Alert: Container homebox memory usage is 85.3% of configured limit
+Status: Actionable - approaching 256MB limit, may need resize
+</code></pre><h3 id="resource-distribution-proxmoxbox">Resource Distribution (ProxMoxBox)<a hidden class="anchor" aria-hidden="true" href="#resource-distribution-proxmoxbox">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th>Container</th>
+          <th>Limit</th>
+          <th>Usage</th>
+          <th>% Used</th>
+          <th>Status</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>mc-server</td>
+          <td>5 GB</td>
+          <td>3.93 GB</td>
+          <td>79%</td>
+          <td>✅ Healthy headroom</td>
+      </tr>
+      <tr>
+          <td>prometheus</td>
+          <td>768 MB</td>
+          <td>213 MB</td>
+          <td>28%</td>
+          <td>✅ Room to grow</td>
+      </tr>
+      <tr>
+          <td>grafana</td>
+          <td>512 MB</td>
+          <td>390 MB</td>
+          <td>76%</td>
+          <td>⚠️ Monitor closely</td>
+      </tr>
+      <tr>
+          <td>cadvisor</td>
+          <td>512 MB</td>
+          <td>163 MB</td>
+          <td>32%</td>
+          <td>✅ Well-sized</td>
+      </tr>
+      <tr>
+          <td>loki</td>
+          <td>512 MB</td>
+          <td>158 MB</td>
+          <td>31%</td>
+          <td>✅ Room to grow</td>
+      </tr>
+      <tr>
+          <td>dockhand</td>
+          <td>256 MB</td>
+          <td>151 MB</td>
+          <td>59%</td>
+          <td>✅ Adequate</td>
+      </tr>
+      <tr>
+          <td>uptime-kuma</td>
+          <td>256 MB</td>
+          <td>179 MB</td>
+          <td>70%</td>
+          <td>⚠️ Working well</td>
+      </tr>
+      <tr>
+          <td>homepage</td>
+          <td>256 MB</td>
+          <td>104 MB</td>
+          <td>40%</td>
+          <td>✅ Plenty of room</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Total allocated:</strong> 9.5 GB limits on 6 GB host = 1.58x overcommit</p>
+<ul>
+<li>Safe because not all containers peak simultaneously</li>
+<li>Monitoring will alert if any container approaches its limit</li>
+</ul>
+<h3 id="raspberry-pi-5-notes">Raspberry Pi 5 Notes<a hidden class="anchor" aria-hidden="true" href="#raspberry-pi-5-notes">#</a></h3>
+<p>Pi5 runs Raspberry Pi OS, which <strong>disables memory cgroup accounting by default</strong>:</p>
+<pre tabindex="0"><code>Warning: Your kernel does not support memory limit capabilities
+</code></pre><p>This is expected and normal. Limits are configured for:</p>
+<ol>
+<li><strong>Documentation</strong> - Consistency across infrastructure</li>
+<li><strong>Future-proofing</strong> - Ready if cgroups enabled</li>
+<li><strong>GitOps</strong> - Same patterns everywhere</li>
+</ol>
+<hr>
+<h2 id="security-improvements-bonus">Security Improvements (Bonus)<a hidden class="anchor" aria-hidden="true" href="#security-improvements-bonus">#</a></h2>
+<p>While updating compose files, also fixed Docker socket security:</p>
+<h3 id="before-1">Before<a hidden class="anchor" aria-hidden="true" href="#before-1">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">volumes</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">/var/run/docker.sock:/var/run/docker.sock </span> <span style="color:#75715e"># Read-write!</span>
+</span></span></code></pre></div><p><strong>Problem:</strong> Full Docker API access = root equivalent on host</p>
+<h3 id="after-1">After<a hidden class="anchor" aria-hidden="true" href="#after-1">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">volumes</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">/var/run/docker.sock:/var/run/docker.sock:ro </span> <span style="color:#75715e"># Read-only</span>
+</span></span></code></pre></div><p><strong>Applied to:</strong> Dockhand, Uptime Kuma
+<strong>Result:</strong> Containers can read Docker state but can&rsquo;t spawn privileged containers or modify host</p>
+<hr>
+<h2 id="technical-challenges">Technical Challenges<a hidden class="anchor" aria-hidden="true" href="#technical-challenges">#</a></h2>
+<h3 id="challenge-1-minecraft-memory-tuning">Challenge 1: Minecraft Memory Tuning<a hidden class="anchor" aria-hidden="true" href="#challenge-1-minecraft-memory-tuning">#</a></h3>
+<p>Minecraft server had JVM heap set to 6GB on a 6GB host:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">environment</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">MEMORY</span>: <span style="color:#e6db74">&#34;6G&#34;</span>  <span style="color:#75715e"># JVM heap size</span>
+</span></span></code></pre></div><p><strong>Problem:</strong></p>
+<ul>
+<li>No room for JVM overhead (non-heap memory)</li>
+<li>No room for other containers</li>
+<li>Host would OOM under load</li>
+</ul>
+<p><strong>Solution:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">environment</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">MEMORY</span>: <span style="color:#e6db74">&#34;4G&#34;</span>  <span style="color:#75715e"># Reduced JVM heap</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">deploy</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">resources</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">limits</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">memory</span>: <span style="color:#ae81ff">5G </span> <span style="color:#75715e"># Container limit (includes JVM overhead)</span>
+</span></span></code></pre></div><p><strong>Result:</strong> Java process uses ~3.93GB, staying safely within 5GB container limit</p>
+<h3 id="challenge-2-promql-syntax-limitations">Challenge 2: PromQL Syntax Limitations<a hidden class="anchor" aria-hidden="true" href="#challenge-2-promql-syntax-limitations">#</a></h3>
+<p>Initial attempt used comparison operators in label selectors:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># BROKEN - Can&#39;t use &lt; inside label matcher</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">container_spec_memory_limit_bytes{name!=&#34;&#34;, limit &lt; 100GB}</span>
+</span></span></code></pre></div><p><strong>Solution:</strong> Use PromQL <code>and</code> operator with comparison as separate expression:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># CORRECT - Comparison as separate filter</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">container_spec_memory_limit_bytes{name!=&#34;&#34;} &lt; 107374182400</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">and</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">(container_memory_usage_bytes / container_spec_memory_limit_bytes) &gt; 0.9</span>
+</span></span></code></pre></div><h3 id="challenge-3-cadvisor-device-access">Challenge 3: cAdvisor Device Access<a hidden class="anchor" aria-hidden="true" href="#challenge-3-cadvisor-device-access">#</a></h3>
+<p>During restart, cAdvisor failed with:</p>
+<pre tabindex="0"><code>Error: no such file or directory: /dev/kmsg
+</code></pre><p><strong>Root cause:</strong> <code>/dev/kmsg</code> kernel ring buffer not always available in containers</p>
+<p><strong>Solution:</strong> Removed the device mapping - not essential for metrics collection:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># Removed:</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">devices</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">/dev/kmsg</span>
+</span></span></code></pre></div><hr>
+<h2 id="gitops-integration">GitOps Integration<a hidden class="anchor" aria-hidden="true" href="#gitops-integration">#</a></h2>
+<p>All changes committed to infrastructure repository:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># ProxMoxBox services</span>
+</span></span><span style="display:flex;"><span>git add proxmox/<span style="color:#f92672">{</span>monitoring,homepage,homelab-tools,uptime-kuma,minecraft,dockhand<span style="color:#f92672">}</span>/
+</span></span><span style="display:flex;"><span>git commit -m <span style="color:#e6db74">&#34;Add memory limits and fix Prometheus alerts&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Pi5 services</span>
+</span></span><span style="display:flex;"><span>git add proxmox/pi5-stacks/<span style="color:#f92672">{</span>infra,nebula-sync,promtail<span style="color:#f92672">}</span>/
+</span></span><span style="display:flex;"><span>git commit -m <span style="color:#e6db74">&#34;Add memory limits to Pi5 containers&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>git push origin main
+</span></span></code></pre></div><p><strong>Repository:</strong> <a href="https://github.com/jhathcock-sys/Dockers">jhathcock-sys/Dockers</a></p>
+<hr>
+<h2 id="monitoring-impact">Monitoring Impact<a hidden class="anchor" aria-hidden="true" href="#monitoring-impact">#</a></h2>
+<h3 id="grafana-dashboard-improvements">Grafana Dashboard Improvements<a hidden class="anchor" aria-hidden="true" href="#grafana-dashboard-improvements">#</a></h3>
+<p>Memory panels now show meaningful data:</p>
+<p><strong>Before:</strong></p>
+<pre tabindex="0"><code>Container Memory: +Inf% of limit
+Graph: Flat line at infinity
+</code></pre><p><strong>After:</strong></p>
+<pre tabindex="0"><code>Container Memory: 76% of 512MB limit (390MB used)
+Graph: Shows actual usage trending over time
+Threshold lines: 90% warning, 95% critical
+</code></pre><h3 id="alert-accuracy">Alert Accuracy<a hidden class="anchor" aria-hidden="true" href="#alert-accuracy">#</a></h3>
+<p>Over 7 days of monitoring post-implementation:</p>
+<ul>
+<li><strong>0</strong> false positive alerts</li>
+<li><strong>2</strong> legitimate warnings (Grafana approaching 90%)</li>
+<li><strong>100%</strong> alert actionability (all percentages meaningful)</li>
+</ul>
+<hr>
+<h2 id="lessons-learned">Lessons Learned<a hidden class="anchor" aria-hidden="true" href="#lessons-learned">#</a></h2>
+<h3 id="resource-planning">Resource Planning<a hidden class="anchor" aria-hidden="true" href="#resource-planning">#</a></h3>
+<p><strong>Don&rsquo;t set limits too tight:</strong></p>
+<ul>
+<li>Allow 50-100% buffer for normal services</li>
+<li>Allow 100-200% buffer for databases/caches</li>
+<li>Monitor for 1-2 weeks before tightening</li>
+</ul>
+<p><strong>Overcommit is okay:</strong></p>
+<ul>
+<li>Total limits can exceed physical RAM</li>
+<li>Not all services peak simultaneously</li>
+<li>Use reservations for critical services</li>
+</ul>
+<h3 id="promql-complexity">PromQL Complexity<a hidden class="anchor" aria-hidden="true" href="#promql-complexity">#</a></h3>
+<p><strong>Start simple:</strong></p>
+<ul>
+<li>Get basic query working first</li>
+<li>Add filters incrementally</li>
+<li>Test each addition in Prometheus UI</li>
+</ul>
+<p><strong>Syntax gotchas:</strong></p>
+<ul>
+<li>Comparisons in label selectors: ❌ Not supported</li>
+<li>Comparisons as separate expressions: ✅ Works</li>
+<li>Use <code>and</code> to combine boolean filters</li>
+</ul>
+<h3 id="documentation-value">Documentation Value<a hidden class="anchor" aria-hidden="true" href="#documentation-value">#</a></h3>
+<p><strong>Why document unused limits (Pi5)?</strong></p>
+<ul>
+<li>Shows intentional design</li>
+<li>Prevents &ldquo;why is this missing?&rdquo; questions</li>
+<li>Ready for infrastructure changes (kernel upgrade)</li>
+<li>Consistent patterns reduce cognitive load</li>
+</ul>
+<hr>
+<h2 id="related-projects">Related Projects<a hidden class="anchor" aria-hidden="true" href="#related-projects">#</a></h2>
+<ul>
+<li><strong><a href="../home-lab/">Home Lab Infrastructure</a></strong> - The physical infrastructure where these services run</li>
+<li><strong><a href="../gitops/">GitOps Workflow</a></strong> - How these configurations are version-controlled and deployed</li>
+<li><strong><a href="../security-review/">Docker Security Review</a></strong> - Previous security hardening work</li>
+</ul>
+<hr>
+<h2 id="key-takeaways">Key Takeaways<a hidden class="anchor" aria-hidden="true" href="#key-takeaways">#</a></h2>
+<ol>
+<li><strong>Measure before limiting</strong> - Baseline usage is essential for setting appropriate limits</li>
+<li><strong>Buffer generously</strong> - Tight limits cause more problems than they solve</li>
+<li><strong>Monitoring drives operations</strong> - Can&rsquo;t manage what you can&rsquo;t measure</li>
+<li><strong>GitOps everything</strong> - All changes versioned, documented, and reproducible</li>
+<li><strong>Security by default</strong> - Use <code>:ro</code> flags, avoid privileged mode, limit capabilities</li>
+</ol>
+<hr>
+<p><em>Infrastructure optimized February 2026 | Managed via GitOps</em></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://jhathcock-sys.github.io/me/tags/docker/">Docker</a></li>
+      <li><a href="https://jhathcock-sys.github.io/me/tags/prometheus/">Prometheus</a></li>
+      <li><a href="https://jhathcock-sys.github.io/me/tags/monitoring/">Monitoring</a></li>
+      <li><a href="https://jhathcock-sys.github.io/me/tags/devops/">DevOps</a></li>
+      <li><a href="https://jhathcock-sys.github.io/me/tags/infrastructure/">Infrastructure</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://jhathcock-sys.github.io/me/projects/security-review/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Docker Security Review</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://jhathcock-sys.github.io/me/">James Hathcock</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

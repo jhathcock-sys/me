@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" dir="auto" data-theme="auto">
 
-<head><script src="/me/livereload.js?mindelay=10&amp;v=2&amp;port=43835&amp;path=me/livereload" data-no-instant defer></script><meta charset="utf-8">
+<head><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="index, follow">
 <title>GitOps Infrastructure | James Hathcock</title>
 <meta name="keywords" content="">
 <meta name="description" content="🔄 GitOps Infrastructure
@@ -51,16 +51,16 @@ docker compose up -d
 Remote Stacks (Pi5 via Hawser)
 Pi5 stacks are managed remotely through Dockhand&rsquo;s Hawser agent:">
 <meta name="author" content="James Hathcock">
-<link rel="canonical" href="http://localhost:43835/me/projects/gitops/">
+<link rel="canonical" href="https://jhathcock-sys.github.io/me/projects/gitops/">
 <link crossorigin="anonymous" href="/me/assets/css/stylesheet.343cc480b9ffc8f04ccbe5e968ad674880cab773ec19905e93033065c1e7a804.css" integrity="sha256-NDzEgLn/yPBMy&#43;XpaK1nSIDKt3PsGZBekwMwZcHnqAQ=" rel="preload stylesheet" as="style">
-<link rel="icon" href="http://localhost:43835/me/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:43835/me/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:43835/me/favicon-32x32.png">
-<link rel="apple-touch-icon" href="http://localhost:43835/me/apple-touch-icon.png">
-<link rel="mask-icon" href="http://localhost:43835/me/safari-pinned-tab.svg">
+<link rel="icon" href="https://jhathcock-sys.github.io/me/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://jhathcock-sys.github.io/me/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jhathcock-sys.github.io/me/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://jhathcock-sys.github.io/me/apple-touch-icon.png">
+<link rel="mask-icon" href="https://jhathcock-sys.github.io/me/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="http://localhost:43835/me/projects/gitops/">
+<link rel="alternate" hreflang="en" href="https://jhathcock-sys.github.io/me/projects/gitops/">
 <noscript>
     <style>
         #theme-toggle,
@@ -112,13 +112,124 @@ Pi5 stacks are managed remotely through Dockhand&rsquo;s Hawser agent:">
         document.querySelector("html").dataset.theme = 'light';
     }
 
+</script><meta property="og:url" content="https://jhathcock-sys.github.io/me/projects/gitops/">
+  <meta property="og:site_name" content="James Hathcock">
+  <meta property="og:title" content="GitOps Infrastructure">
+  <meta property="og:description" content="🔄 GitOps Infrastructure Repository: github.com/jhathcock-sys/Dockers
+Project Overview Infrastructure as Code for my homelab environment. All Docker Compose configurations are version-controlled in Git, enabling reproducible deployments, change tracking, and easy rollbacks.
+This is a stepping stone toward full Kubernetes orchestration, building GitOps practices while working with Docker Compose.
+📁 Repository Structure homelab-ops/ ├── proxmox/ # ProxMoxBox (192.168.1.4) stacks │ ├── dockhand/ # Docker management UI │ ├── homepage/ # Dashboard &#43; config files │ │ └── config/ # services.yaml, widgets.yaml, etc. │ ├── homelab-tools/ # Homebox asset inventory │ ├── minecraft/ # PaperMC &#43; Geyser/Floodgate │ ├── monitoring/ # Full observability stack │ │ ├── alertmanager/ # Alert routing config (Discord) │ │ ├── prometheus/ # Scrape configs &#43; alert rules │ │ ├── loki/ # Log aggregation config │ │ ├── promtail/ # Log collector config │ │ └── grafana/ # Dashboard provisioning │ ├── nginx-proxy-manager/ # Reverse proxy │ └── uptime-kuma/ # Service health monitoring │ └── pi5/ # Raspberry Pi 5 stacks (via Hawser) ├── infra/ # Pi-hole &#43; Tailscale ├── mealie/ # Recipe management └── nebula-sync/ # Pi-hole sync 🚀 Deployment Workflow Local Stacks (ProxMoxBox) # 1. Edit compose files locally vim proxmox/homepage/docker-compose.yaml # 2. Commit and push git add . &amp;&amp; git commit -m &#34;Update homepage config&#34; git push # 3. On server: pull and deploy cd /opt/homepage git pull docker compose up -d Remote Stacks (Pi5 via Hawser) Pi5 stacks are managed remotely through Dockhand’s Hawser agent:">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="projects">
+    <meta property="article:published_time" content="2026-01-26T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-01-26T00:00:00+00:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GitOps Infrastructure">
+<meta name="twitter:description" content="🔄 GitOps Infrastructure
+Repository: github.com/jhathcock-sys/Dockers
+Project Overview
+Infrastructure as Code for my homelab environment. All Docker Compose configurations are version-controlled in Git, enabling reproducible deployments, change tracking, and easy rollbacks.
+This is a stepping stone toward full Kubernetes orchestration, building GitOps practices while working with Docker Compose.
+
+📁 Repository Structure
+homelab-ops/
+├── proxmox/                    # ProxMoxBox (192.168.1.4) stacks
+│   ├── dockhand/               # Docker management UI
+│   ├── homepage/               # Dashboard &#43; config files
+│   │   └── config/             # services.yaml, widgets.yaml, etc.
+│   ├── homelab-tools/          # Homebox asset inventory
+│   ├── minecraft/              # PaperMC &#43; Geyser/Floodgate
+│   ├── monitoring/             # Full observability stack
+│   │   ├── alertmanager/       # Alert routing config (Discord)
+│   │   ├── prometheus/         # Scrape configs &#43; alert rules
+│   │   ├── loki/               # Log aggregation config
+│   │   ├── promtail/           # Log collector config
+│   │   └── grafana/            # Dashboard provisioning
+│   ├── nginx-proxy-manager/    # Reverse proxy
+│   └── uptime-kuma/            # Service health monitoring
+│
+└── pi5/                        # Raspberry Pi 5 stacks (via Hawser)
+    ├── infra/                  # Pi-hole &#43; Tailscale
+    ├── mealie/                 # Recipe management
+    └── nebula-sync/            # Pi-hole sync
+
+🚀 Deployment Workflow
+Local Stacks (ProxMoxBox)
+# 1. Edit compose files locally
+vim proxmox/homepage/docker-compose.yaml
+
+# 2. Commit and push
+git add . &amp;&amp; git commit -m &#34;Update homepage config&#34;
+git push
+
+# 3. On server: pull and deploy
+cd /opt/homepage
+git pull
+docker compose up -d
+Remote Stacks (Pi5 via Hawser)
+Pi5 stacks are managed remotely through Dockhand&rsquo;s Hawser agent:">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Projects",
+      "item": "https://jhathcock-sys.github.io/me/projects/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "GitOps Infrastructure",
+      "item": "https://jhathcock-sys.github.io/me/projects/gitops/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "GitOps Infrastructure",
+  "name": "GitOps Infrastructure",
+  "description": "🔄 GitOps Infrastructure Repository: github.com/jhathcock-sys/Dockers\nProject Overview Infrastructure as Code for my homelab environment. All Docker Compose configurations are version-controlled in Git, enabling reproducible deployments, change tracking, and easy rollbacks.\nThis is a stepping stone toward full Kubernetes orchestration, building GitOps practices while working with Docker Compose.\n📁 Repository Structure homelab-ops/ ├── proxmox/ # ProxMoxBox (192.168.1.4) stacks │ ├── dockhand/ # Docker management UI │ ├── homepage/ # Dashboard + config files │ │ └── config/ # services.yaml, widgets.yaml, etc. │ ├── homelab-tools/ # Homebox asset inventory │ ├── minecraft/ # PaperMC + Geyser/Floodgate │ ├── monitoring/ # Full observability stack │ │ ├── alertmanager/ # Alert routing config (Discord) │ │ ├── prometheus/ # Scrape configs + alert rules │ │ ├── loki/ # Log aggregation config │ │ ├── promtail/ # Log collector config │ │ └── grafana/ # Dashboard provisioning │ ├── nginx-proxy-manager/ # Reverse proxy │ └── uptime-kuma/ # Service health monitoring │ └── pi5/ # Raspberry Pi 5 stacks (via Hawser) ├── infra/ # Pi-hole + Tailscale ├── mealie/ # Recipe management └── nebula-sync/ # Pi-hole sync 🚀 Deployment Workflow Local Stacks (ProxMoxBox) # 1. Edit compose files locally vim proxmox/homepage/docker-compose.yaml # 2. Commit and push git add . \u0026amp;\u0026amp; git commit -m \u0026#34;Update homepage config\u0026#34; git push # 3. On server: pull and deploy cd /opt/homepage git pull docker compose up -d Remote Stacks (Pi5 via Hawser) Pi5 stacks are managed remotely through Dockhand\u0026rsquo;s Hawser agent:\n",
+  "keywords": [
+    
+  ],
+  "articleBody": "🔄 GitOps Infrastructure Repository: github.com/jhathcock-sys/Dockers\nProject Overview Infrastructure as Code for my homelab environment. All Docker Compose configurations are version-controlled in Git, enabling reproducible deployments, change tracking, and easy rollbacks.\nThis is a stepping stone toward full Kubernetes orchestration, building GitOps practices while working with Docker Compose.\n📁 Repository Structure homelab-ops/ ├── proxmox/ # ProxMoxBox (192.168.1.4) stacks │ ├── dockhand/ # Docker management UI │ ├── homepage/ # Dashboard + config files │ │ └── config/ # services.yaml, widgets.yaml, etc. │ ├── homelab-tools/ # Homebox asset inventory │ ├── minecraft/ # PaperMC + Geyser/Floodgate │ ├── monitoring/ # Full observability stack │ │ ├── alertmanager/ # Alert routing config (Discord) │ │ ├── prometheus/ # Scrape configs + alert rules │ │ ├── loki/ # Log aggregation config │ │ ├── promtail/ # Log collector config │ │ └── grafana/ # Dashboard provisioning │ ├── nginx-proxy-manager/ # Reverse proxy │ └── uptime-kuma/ # Service health monitoring │ └── pi5/ # Raspberry Pi 5 stacks (via Hawser) ├── infra/ # Pi-hole + Tailscale ├── mealie/ # Recipe management └── nebula-sync/ # Pi-hole sync 🚀 Deployment Workflow Local Stacks (ProxMoxBox) # 1. Edit compose files locally vim proxmox/homepage/docker-compose.yaml # 2. Commit and push git add . \u0026\u0026 git commit -m \"Update homepage config\" git push # 3. On server: pull and deploy cd /opt/homepage git pull docker compose up -d Remote Stacks (Pi5 via Hawser) Pi5 stacks are managed remotely through Dockhand’s Hawser agent:\nCompose files live on ProxMoxBox at /opt/pi5-stacks/ Hawser executes commands on the Pi5 Docker daemon No SSH required for routine deployments 🗺️ Path Mapping Git Path Deploy Path Server proxmox// /opt// ProxMoxBox pi5// /opt/pi5-stacks// ProxMoxBox (Hawser → Pi5) 🔧 Stack Management with Dockhand Dockhand provides a web UI for Docker management:\nStack Import: Adopt existing containers by pointing to compose files Remote Management: Hawser agent enables control of remote Docker hosts Compose Editing: Edit and redeploy stacks from the UI Key Configuration services: dockhand: image: fnsys/dockhand:latest environment: - HOST_DATA_DIR=/opt # Path resolution for stacks volumes: - /var/run/docker.sock:/var/run/docker.sock - /opt:/opt # Access to all compose files 🔐 Secrets Management Sensitive values are kept out of Git using .env files:\n# Template provided in repo cp .env.example .env # Generate encryption keys openssl rand -hex 32 Pattern:\n.env.example → Committed (templates with placeholders) .env → Gitignored (actual secrets) 📊 Current Stacks ProxMoxBox Services Stack Ports Purpose dockhand 3000 Docker management homepage 4000 Dashboard homelab-tools 3100 Homebox inventory minecraft 25565, 19132/udp Game server monitoring 3030, 9090, 9093, 9100, 8081, 3101 Grafana, Prometheus, Alertmanager, Loki, exporters nginx-proxy-manager 80, 443, 81 Reverse proxy uptime-kuma 3001 Health monitoring Pi5 Services (via Hawser) Stack Services Purpose infra Pi-hole, Tailscale DNS + VPN mealie Mealie Recipe management nebula-sync Nebula-sync Pi-hole replication promtail Promtail Log collection to Loki 🖥️ Non-Docker Services Some infrastructure runs on dedicated VMs outside the GitOps workflow:\nService IP Notes Wazuh SIEM 192.168.1.7 Security monitoring - standalone Debian VM These are managed separately but integrate with the Docker-based services (e.g., Wazuh agents on Docker hosts report to the SIEM).\n📋 Future Plans Implement CI/CD pipeline for automated deployments Add pre-commit hooks for YAML linting Migrate to Kubernetes with ArgoCD Set up Renovate for automated image updates ",
+  "wordCount" : "533",
+  "inLanguage": "en",
+  "datePublished": "2026-01-26T00:00:00Z",
+  "dateModified": "2026-01-26T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "James Hathcock"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://jhathcock-sys.github.io/me/projects/gitops/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "James Hathcock",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://jhathcock-sys.github.io/me/favicon.ico"
+    }
+  }
+}
 </script>
 </head>
 <body id="top">
     <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="http://localhost:43835/me/" accesskey="h" title="James Hathcock (Alt + H)">James Hathcock</a>
+            <a href="https://jhathcock-sys.github.io/me/" accesskey="h" title="James Hathcock (Alt + H)">James Hathcock</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
                     <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
@@ -144,12 +255,12 @@ Pi5 stacks are managed remotely through Dockhand&rsquo;s Hawser agent:">
         </div>
         <ul id="menu">
             <li>
-                <a href="http://localhost:43835/me/resume/" title="Resume">
+                <a href="https://jhathcock-sys.github.io/me/resume/" title="Resume">
                     <span>Resume</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:43835/me/projects/" title="Projects">
+                <a href="https://jhathcock-sys.github.io/me/projects/" title="Projects">
                     <span>Projects</span>
                 </a>
             </li>
@@ -160,7 +271,7 @@ Pi5 stacks are managed remotely through Dockhand&rsquo;s Hawser agent:">
 
 <article class="post-single">
   <header class="post-header">
-    <div class="breadcrumbs"><a href="http://localhost:43835/me/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:43835/me/projects/">Projects</a></div>
+    <div class="breadcrumbs"><a href="https://jhathcock-sys.github.io/me/">Home</a>&nbsp;»&nbsp;<a href="https://jhathcock-sys.github.io/me/projects/">Projects</a></div>
     <h1 class="post-title entry-hint-parent">
       GitOps Infrastructure
     </h1>
@@ -387,12 +498,12 @@ Pi5 stacks are managed remotely through Dockhand&rsquo;s Hawser agent:">
     <ul class="post-tags">
     </ul>
 <nav class="paginav">
-  <a class="prev" href="http://localhost:43835/me/projects/claude-memory/">
+  <a class="prev" href="https://jhathcock-sys.github.io/me/projects/claude-memory/">
     <span class="title">« Prev</span>
     <br>
     <span>Claude Code Memory System</span>
   </a>
-  <a class="next" href="http://localhost:43835/me/projects/home-lab/">
+  <a class="next" href="https://jhathcock-sys.github.io/me/projects/home-lab/">
     <span class="title">Next »</span>
     <br>
     <span>Home Lab</span>
@@ -404,7 +515,7 @@ Pi5 stacks are managed remotely through Dockhand&rsquo;s Hawser agent:">
     </main>
     
 <footer class="footer">
-        <span>&copy; 2026 <a href="http://localhost:43835/me/">James Hathcock</a></span> · 
+        <span>&copy; 2026 <a href="https://jhathcock-sys.github.io/me/">James Hathcock</a></span> · 
 
     <span>
         Powered by
