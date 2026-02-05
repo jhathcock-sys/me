@@ -55,7 +55,6 @@ The Proxmox host runs **LXC Containers** to separate concerns:
      * **Homebox:** Asset inventory and tracking
      * **Uptime Kuma:** Service health monitoring
      * **Minecraft Server:** PaperMC with Geyser/Floodgate (Java + Bedrock)
-     * **Syncthing:** File synchronization across devices
 
 4. **Monitoring & Alerting Stack** 📊
    * **Grafana:** Dashboards and visualization (custom Homelab Overview + Docker Containers dashboards)
