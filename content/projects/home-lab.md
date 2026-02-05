@@ -211,6 +211,54 @@ Integrated Synology DS220j (7.2TB) with homelab infrastructure for centralized s
 
 ---
 
+## 📝 Obsidian Vault Sync (2026-02-04)
+
+Self-hosted real-time synchronization for homelab documentation vault using CouchDB.
+
+**Deployment:** Pi5 (192.168.1.234:5984)
+
+**Technology Stack:**
+- **CouchDB:** NoSQL database for document storage
+- **Self-hosted LiveSync:** Obsidian community plugin for real-time sync
+- **End-to-End Encryption:** Optional passphrase-based encryption
+- **Docker:** Containerized deployment with health checks
+
+**Features:**
+- Real-time vault synchronization across all devices (desktop, mobile, laptop)
+- Sub-second sync latency on local network
+- Automatic conflict detection and resolution
+- Works alongside Git for hybrid workflow (sync + version control)
+- Remote access via Tailscale VPN
+
+**Architecture Decision:**
+- Deployed to Pi5 instead of ProxMoxBox due to better resource availability
+- Pi5 had 6.9GB free memory vs ProxMoxBox's 3.7GB
+- CPU nearly idle (1.24% vs 60%+ on ProxMoxBox)
+- Fits Pi5's role as always-on secondary services node
+
+**Resource Usage:**
+- CouchDB container: ~500MB-1GB RAM, <2% CPU
+- Memory limit: 1GB max, 512MB reserved
+- Database size: ~100-500MB for text-heavy vault
+
+**Integration:**
+- Complements existing Git workflow (homelab-docs repository)
+- LiveSync handles real-time editing, Git handles version control
+- Public wiki publishing pipeline unchanged (homelab-wiki)
+
+**Monitoring:**
+- System metrics via Node Exporter (CPU, memory, disk)
+- Docker health checks every 30 seconds
+- Basic monitoring sufficient; detailed CouchDB metrics optional
+
+**Security:**
+- Private network deployment (192.168.1.0/24)
+- Strong generated credentials
+- Optional E2E encryption in Obsidian plugin
+- Tailscale VPN for secure remote access
+
+---
+
 ## 📋 Future Plans
 
 - [ ] **Podcast Studio Deployment** - Deploy and test on 192.168.1.8
@@ -224,3 +272,4 @@ Integrated Synology DS220j (7.2TB) with homelab infrastructure for centralized s
 - [x] ~~Container resource management~~ (Completed - memory limits on all 20 containers)
 - [x] ~~Add alerting via Grafana/Prometheus~~ (Completed - Discord notifications active)
 - [x] ~~Wazuh SIEM~~ (Completed - agents on ProxMoxBox and Pi5, ready for Suricata integration)
+- [x] ~~Obsidian vault sync~~ (Completed - CouchDB LiveSync on Pi5, real-time sync across devices)
