@@ -722,11 +722,220 @@ After adding a directive, test it:
 
 ---
 
+## 🔄 Evolution: Memory System 2.0 (February 2026)
+
+After several months of using the original memory system, I identified technical debt and scaling issues that led to a complete architectural refactoring.
+
+### The Problems
+
+**1. Duplicate Directories**
+```
+ai-assistant-config/
+├── homelab-ops/CLAUDE.md      # Root-level backup
+├── projects/homelab-ops/       # DUPLICATE backup
+└── my-portfolio/               # Another duplicate
+```
+The backup repository had grown organically, creating multiple copies of the same project files.
+
+**2. Manual Sync Workflow**
+```bash
+# Had to remember these commands:
+cp ~/.claude/CLAUDE.md ~/ai-assistant-config/claude-code/CLAUDE.md
+cp ~/.claude/projects/-home-cib--claude/memory/MEMORY.md ~/ai-assistant-config/memory/
+cd ~/ai-assistant-config && git add -A && git commit && git push
+```
+Error-prone, easy to forget, no single source of truth.
+
+**3. Content Overlap**
+- Workstation details duplicated in global and session memory
+- Project paths listed in multiple files
+- IP topology scattered across files
+- Unclear which file should contain what information
+
+**4. Security Risk**
+Some project CLAUDE.md files had credentials in examples, and there was no `.gitignore` to prevent accidentally committing `.local.md` files with sensitive data.
+
+### The Solution: Symlink-Based Architecture
+
+I completely restructured the memory system around three principles:
+1. **Single Source of Truth:** Backup repo is the only location for memory files
+2. **Zero Manual Sync:** Symlinks make edits immediately available
+3. **Clear Separation of Concerns:** Distinct layers for global, session, and project context
+
+**New Structure:**
+```
+ai-assistant-config/
+├── global/
+│   └── CLAUDE.md              # User profile, persona, directives (~3KB)
+├── session/
+│   └── MEMORY.md              # Operational knowledge, active services (~8KB)
+├── projects/                  # ONE location per project
+│   ├── homelab-ops/CLAUDE.md
+│   ├── homelab-docs/CLAUDE.md
+│   ├── homelab-wiki/CLAUDE.md
+│   ├── podcast-studio/CLAUDE.md
+│   └── my-portfolio/CLAUDE.md
+├── scripts/
+│   ├── install-symlinks.sh    # One-time setup
+│   └── sync.sh                # Commit and push changes
+└── .gitignore                 # Protect credentials
+```
+
+**Symlink Mapping:**
+```bash
+~/.claude/CLAUDE.md → ~/ai-assistant-config/global/CLAUDE.md
+~/.claude/projects/-home-cib--claude/memory/MEMORY.md → ~/ai-assistant-config/session/MEMORY.md
+```
+
+### Implementation: Helper Scripts
+
+**`install-symlinks.sh`** - One-time setup:
+```bash
+#!/bin/bash
+# Backs up existing files and creates symlinks
+# Makes the backup repo the source of truth
+
+# Backup existing files
+mv ~/.claude/CLAUDE.md ~/.claude/CLAUDE.md.bak
+
+# Create symlinks
+ln -sf ~/ai-assistant-config/global/CLAUDE.md ~/.claude/CLAUDE.md
+ln -sf ~/ai-assistant-config/session/MEMORY.md \
+       ~/.claude/projects/-home-cib--claude/memory/MEMORY.md
+```
+
+**`sync.sh`** - Commit and push changes:
+```bash
+#!/bin/bash
+# Since files are symlinked, they're already in the repo
+# Just need to commit and push
+
+cd ~/ai-assistant-config
+git add -A
+git commit -m "Memory sync $(date +%Y-%m-%d)"
+git push
+```
+
+### Content Reorganization
+
+**global/CLAUDE.md (slimmed down to ~3KB):**
+- ✅ User profile and metadata
+- ✅ Persona definition
+- ✅ Core directives
+- ✅ Interaction rules
+- ✅ Learning path and goals
+- ❌ Removed: Workstation details (moved to session)
+- ❌ Removed: Project paths (moved to session)
+- ❌ Removed: Documentation pointers (moved to session)
+
+**session/MEMORY.md (expanded to ~8KB):**
+- ✅ Project quick-reference table
+- ✅ Workstation configuration details
+- ✅ Workflow reminders (critical patterns like Quartz wiki requirements)
+- ✅ Infrastructure notes (server resources, GitOps workflow)
+- ✅ Common mistakes avoided
+- ✅ Active services with URLs
+- ✅ Recent changes log
+
+**Why this separation works:**
+- **Global** contains things that rarely change (who I am, how I think)
+- **Session** contains operational knowledge that updates frequently
+- **Project** files stay focused on repository-specific context
+
+### Security Improvements
+
+**Added `.gitignore`:**
+```gitignore
+# Sensitive files - credentials and tokens
+*.local.md
+**/CLAUDE.local.md
+secrets/
+credentials/
+```
+
+**Pattern for sensitive data:**
+```xml
+<web_interface name="Grafana" url="http://192.168.1.4:3030" />
+<note>Credentials stored in CLAUDE.local.md (gitignored)</note>
+```
+
+Instead of:
+```xml
+<web_interface name="Grafana" url="http://192.168.1.4:3030"
+               creds="admin / my-password-here" />  <!-- BAD! -->
+```
+
+### Benefits Realized
+
+| Metric | Before | After |
+|--------|--------|-------|
+| **Sync workflow** | 3 manual commands | `./scripts/sync.sh` |
+| **Duplicate files** | 3+ copies per project | 1 canonical location |
+| **Edit-to-commit time** | ~2 minutes | ~10 seconds |
+| **Credential exposure risk** | Medium (no gitignore) | Low (.gitignore + patterns) |
+| **File size (global)** | ~6KB | ~3KB |
+| **File size (session)** | ~4KB | ~8KB |
+| **Clarity of structure** | Confusing | Clear 3-layer hierarchy |
+
+### The New Workflow
+
+**Editing memory:**
+```bash
+# Edit directly in repo (or through symlinks - same thing!)
+vim ~/ai-assistant-config/session/MEMORY.md
+```
+
+**Syncing to Git:**
+```bash
+cd ~/ai-assistant-config
+./scripts/sync.sh "Updated infrastructure notes"
+# ✅ Committed and pushed in one command
+```
+
+**Adding new project context:**
+```bash
+# Just create the file - it's already in the right place
+vim ~/ai-assistant-config/projects/new-project/CLAUDE.md
+./scripts/sync.sh "Add new-project context"
+```
+
+### Lessons from the Refactor
+
+**1. Premature Organization is Real**
+
+The original structure made sense when I had 2 projects. By project 5, it was technical debt. Don't over-engineer from day one, but be willing to refactor when pain points emerge.
+
+**2. Symlinks are Underutilized**
+
+The symlink approach eliminates an entire class of sync problems. Why copy when you can link?
+
+**3. Separation of Concerns Applies to Context Too**
+
+Just like code, memory benefits from clear layers:
+- Global = Interface (public persona, directives)
+- Session = Business logic (how things work right now)
+- Project = Data layer (specific implementation details)
+
+**4. Automation Compounds**
+
+`install-symlinks.sh` is a 30-second investment that saves 2 minutes every sync. Over a year, that's hours saved and countless forgotten syncs prevented.
+
+**5. Git is the Perfect Memory Backend**
+
+- Version history for memory evolution
+- Rollback capability (`git checkout <commit>`)
+- Conflict resolution if editing on multiple machines
+- Free backup via GitHub
+
+---
+
 ## 📋 Future Enhancements
 
+- [x] ~~Create project-specific CLAUDE.md files for each stack~~ ✅ Completed (Feb 2026)
+- [x] ~~Add backup/sync automation~~ ✅ Completed with `sync.sh` (Feb 2026)
+- [x] ~~Implement credential security patterns~~ ✅ Completed with `.gitignore` (Feb 2026)
 - [ ] Add `<runbooks>` section for common procedures (backup restore, certificate renewal)
 - [ ] Include `<troubleshooting>` patterns for known issues
-- [ ] Create project-specific CLAUDE.md files for each stack
 - [ ] Document MCP (Model Context Protocol) server integrations for tool access
 - [ ] Add `<maintenance_windows>` to inform AI about acceptable change times
 - [ ] Include `<dependencies>` mapping between services for impact analysis
