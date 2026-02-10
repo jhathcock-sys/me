@@ -929,13 +929,21 @@ Just like code, memory benefits from clear layers:
 
 ---
 
+## 📖 Continue Reading
+
+The memory system continues to evolve. Read about the next major evolution:
+
+**[→ Semantic Memory: Claude Memory System 3.0](../semantic-memory-or-claude-memory-3/)** - Moving from file-based context to vector database semantic search with ChromaDB and MCP integration (February 2026)
+
+---
+
 ## 📋 Future Enhancements
 
 - [x] ~~Create project-specific CLAUDE.md files for each stack~~ ✅ Completed (Feb 2026)
 - [x] ~~Add backup/sync automation~~ ✅ Completed with `sync.sh` (Feb 2026)
 - [x] ~~Implement credential security patterns~~ ✅ Completed with `.gitignore` (Feb 2026)
+- [x] ~~Document MCP (Model Context Protocol) server integrations for tool access~~ ✅ Completed - see [Memory System 3.0](../semantic-memory-or-claude-memory-3/)
 - [ ] Add `<runbooks>` section for common procedures (backup restore, certificate renewal)
 - [ ] Include `<troubleshooting>` patterns for known issues
-- [ ] Document MCP (Model Context Protocol) server integrations for tool access
 - [ ] Add `<maintenance_windows>` to inform AI about acceptable change times
 - [ ] Include `<dependencies>` mapping between services for impact analysis
