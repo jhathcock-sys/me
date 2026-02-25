@@ -6,8 +6,15 @@
     <description>Recent content in Infrastructure on James Hathcock</description>
     <generator>Hugo -- 0.156.0</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 04 Feb 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 23 Feb 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://jhathcock-sys.github.io/me/tags/infrastructure/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Self-Hosted AI Inference Stack &amp; Agent Team</title>
+      <link>https://jhathcock-sys.github.io/me/projects/ai-inference-stack/</link>
+      <pubDate>Mon, 23 Feb 2026 00:00:00 +0000</pubDate>
+      <guid>https://jhathcock-sys.github.io/me/projects/ai-inference-stack/</guid>
+      <description>A production-grade, self-hosted AI inference platform with local-first LLM routing, Redis caching, cloud fallback, and a team of specialized AI agents — all running on homelab hardware.</description>
+    </item>
     <item>
       <title>Claude Code Custom Agent System</title>
       <link>https://jhathcock-sys.github.io/me/projects/claude-code-agents/</link>

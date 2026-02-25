@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Self-Hosted AI Inference Stack &amp; Agent Team | James Hathcock</title>
+<meta name="keywords" content="ai, infrastructure, automation, homelab">
+<meta name="description" content="A production-grade, self-hosted AI inference platform with local-first LLM routing, Redis caching, cloud fallback, and a team of specialized AI agents — all running on homelab hardware.">
+<meta name="author" content="James Hathcock">
+<link rel="canonical" href="https://jhathcock-sys.github.io/me/projects/ai-inference-stack/">
+<link crossorigin="anonymous" href="/me/assets/css/stylesheet.343cc480b9ffc8f04ccbe5e968ad674880cab773ec19905e93033065c1e7a804.css" integrity="sha256-NDzEgLn/yPBMy&#43;XpaK1nSIDKt3PsGZBekwMwZcHnqAQ=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://jhathcock-sys.github.io/me/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://jhathcock-sys.github.io/me/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jhathcock-sys.github.io/me/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://jhathcock-sys.github.io/me/apple-touch-icon.png">
+<link rel="mask-icon" href="https://jhathcock-sys.github.io/me/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://jhathcock-sys.github.io/me/projects/ai-inference-stack/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://jhathcock-sys.github.io/me/projects/ai-inference-stack/">
+  <meta property="og:site_name" content="James Hathcock">
+  <meta property="og:title" content="Self-Hosted AI Inference Stack & Agent Team">
+  <meta property="og:description" content="A production-grade, self-hosted AI inference platform with local-first LLM routing, Redis caching, cloud fallback, and a team of specialized AI agents — all running on homelab hardware.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="projects">
+    <meta property="article:published_time" content="2026-02-23T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-02-23T00:00:00+00:00">
+    <meta property="article:tag" content="AI">
+    <meta property="article:tag" content="Infrastructure">
+    <meta property="article:tag" content="Automation">
+    <meta property="article:tag" content="Homelab">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Self-Hosted AI Inference Stack &amp; Agent Team">
+<meta name="twitter:description" content="A production-grade, self-hosted AI inference platform with local-first LLM routing, Redis caching, cloud fallback, and a team of specialized AI agents — all running on homelab hardware.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Projects",
+      "item": "https://jhathcock-sys.github.io/me/projects/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Self-Hosted AI Inference Stack \u0026 Agent Team",
+      "item": "https://jhathcock-sys.github.io/me/projects/ai-inference-stack/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Self-Hosted AI Inference Stack \u0026 Agent Team",
+  "name": "Self-Hosted AI Inference Stack \u0026 Agent Team",
+  "description": "A production-grade, self-hosted AI inference platform with local-first LLM routing, Redis caching, cloud fallback, and a team of specialized AI agents — all running on homelab hardware.",
+  "keywords": [
+    "ai", "infrastructure", "automation", "homelab"
+  ],
+  "articleBody": "🤖 Self-Hosted AI Inference Stack \u0026 Agent Team A production-grade, local-first AI platform built on homelab hardware. Local models handle the majority of requests for free, with cloud fallback only when needed. A team of specialized agents handles research, monitoring, backend, frontend, and creative work — all orchestrated through a central LiteLLM proxy.\n🎯 The Goal Most AI setups are cloud-only: every request hits an API, every token costs money, and nothing runs when the internet is down. This project builds the opposite — a local-first inference stack where:\n~95% of requests are served by local hardware at zero cost Cloud (Anthropic Claude) is available as a reliable fallback, not the primary Redis caching eliminates redundant API calls across sessions A team of specialized agents handles different domains autonomously 🏗️ Architecture Hardware Machine Role Key Specs Mac Studio Primary inference node Apple Silicon, runs MLX models Dell Linux Server Proxy + secondary inference x86, runs LiteLLM + Ollama Routing Diagram User / Agent Request ↓ LiteLLM Proxy (192.168.1.60:4000) ↓ [1] MLX API (192.168.1.226:8000) ← Primary — Apple Silicon, fastest quality ↓ timeout / fail [2] Ollama (localhost:11434) ← Backup — x86 Linux, always-on ↓ timeout / fail [3] Anthropic Claude (API) ← Fallback — 99.9% uptime guarantee Traffic flows down the chain only on timeout or failure. In practice, MLX handles the vast majority of requests.\n⚡ Inference Nodes Node 1: MLX on Mac Studio (Primary) MLX is Apple’s machine learning framework optimized for Apple Silicon’s unified memory architecture. Running models locally on the Mac Studio delivers significantly better throughput than equivalent x86 hardware.\nModels Running:\nModel Size Use Case Qwen2.5-14B 16GB General reasoning, complex tasks Phi-4-14B 15GB Fast responses, coding assistance Service: Managed by launchd — auto-starts on login, auto-restarts on crash. Logs: ~/.openclaw/workspace/logs/mlx-api.log Response time: ~4.7s average\nNode 2: Ollama on Linux Server (Backup) Ollama runs on the always-on Dell server, providing a reliable backup when the Mac is unavailable or overloaded.\nModels Running:\nModel Size Latency Use Case Qwen2.5-14B 9GB 2.7s General reasoning Llama3.2 2GB 0.8s Fast/lightweight tasks Qwen2.5-Coder 9GB 2.7s Code generation Storage: 19GB total (optimized from 51.7GB after removing unused models).\nNode 3: Anthropic Claude (Cloud Fallback) When both local nodes are unavailable or a request exceeds local model capabilities, traffic falls through to Claude. The 30-second timeout on local models ensures fast fallback without long waits.\nModels available via fallback:\nClaude Haiku — Fast, low cost (~$0.08/1M tokens), 657ms response Claude Sonnet — Balanced quality/speed Claude Opus — Maximum capability for complex tasks Cost impact: With local models handling ~95% of traffic, Claude costs run at roughly $13/month compared to hundreds for cloud-only setups.\n🔀 LiteLLM Proxy LiteLLM acts as the unified gateway — a single API endpoint that abstracts all three inference backends behind one interface. Every agent and every tool talks to LiteLLM; the routing, fallback logic, and caching are all handled transparently.\nKey features in use:\nUnified API: OpenAI-compatible endpoint for all models Automatic fallback: Configurable order with timeout-based failover Redis caching: 10-minute TTL on repeated queries — eliminates redundant calls Cost tracking: Per-model spend logging to PostgreSQL Model aliases: Named routes per agent role Agent-Specific Routes Each agent has a dedicated LiteLLM route tuned for its workload:\nAgent Route Primary Model Backup Skip (main) smart-agent MLX Qwen2.5 Ollama → Claude Nellie (research) nellie-research Ollama Qwen Kimi K2.5 Chief (monitoring) chief-monitor MLX Phi-4 Claude Haiku Gonzo (backend) gonzo-backend Ollama Qwen-Coder Claude Sonnet Cleo (frontend) cleo-frontend MLX Phi-4 Claude Haiku Jax (creative) jax-creative Ollama Qwen Claude Sonnet 🧠 Redis Caching Layer Repeated queries — common in monitoring checks, status polls, and iterative development — are served from Redis without hitting any inference node.\nTTL: 600 seconds (10 minutes) Result: Eliminates duplicate API calls across sessions Location: Co-located on the Linux server 👥 The Agent Team The inference stack powers a team of six specialized AI agents, each with a defined role, domain authority, and personality. Agents are spawned on-demand by the orchestrator and run in isolated sessions.\nSkip — Director of Operations (Orchestrator) “Orchestrate, don’t just do.”\nThe primary agent and orchestrator. Routes tasks to specialists, manages cross-agent coordination, and serves as the main point of contact. Enforces completion standards — nothing ships until it’s built, deployed, verified, and documented.\nVoice: Warm Southern drawl. Direct, confident, analytical. Authority: Routes all tasks, resolves conflicts between divisions. Model: smart-agent route (MLX Qwen2.5 → Ollama → Claude)\nNellie — Research Specialist (Operations Division) “Ultimate authority on facts.”\nDeep research and information synthesis. Deployed for multi-source research, technical accuracy reviews, and knowledge archiving. Jax’s scripts must pass Nellie’s technical accuracy review before publishing.\nSpecialty: Web research, citation synthesis, structured reports. Authority: Final say on factual accuracy across all agents. Model: nellie-research route (Ollama Qwen → Kimi K2.5)\nChief — Operations Monitor (Operations Division) “RED ALERT authority.”\nSystem monitoring, health checks, and infrastructure alerting. Runs periodic checks against the Skip Dashboard, LiteLLM services, and Docker containers. Has absolute veto power over any deployment that threatens server stability.\nSpecialty: Prometheus metrics, Docker health, alerting, anomaly detection. Authority: Can halt all Production tasks to stabilize infrastructure. Model: chief-monitor route (MLX Phi-4 → Claude Haiku)\nGonzo — Database Architect (Production Division) “PROTECT THE DATA. OPTIMIZE THE QUERY.”\nBackend engineer and database architect. Owns the data layer end to end — schemas, API performance, query optimization. Treats every user input as a potential SQL injection attempt. SELECT * is a sin.\nSpecialty: PostgreSQL, SQLite, Express APIs, schema design. Authority: Owns data layer, API contracts, and database schema. Model: gonzo-backend route (Ollama Qwen-Coder → Claude Sonnet)\nCleo — UI/UX Engineer (Production Division) “Pixel perfection. Zero clutter.”\nLead frontend engineer. Owns the user interface, Hugo layouts, and CSS. No inline styles. Semantic HTML only. Div soup is a crime. Worships white space and audibly sighs when asked to make things “pop.”\nSpecialty: React, Hugo, Tailwind, accessibility, responsive design. Authority: Owns UI, Hugo layouts, CSS — full veto on visual decisions. Model: cleo-frontend route (MLX Phi-4 → Claude Haiku)\nJax — Creative Director (Production Division) “Make technical content actually entertaining.”\nVideo scripts, narrative structure, and visual storytelling. Fast-talking, highly visual, obsessed with “the hook.” Uses film terminology. Every piece of content is structured in three acts: Hook → Conflict → Resolution.\nSpecialty: Video scripts, storyboards, narrative framing. Authority: Owns narrative voice and all video content. Model: jax-creative route (Ollama Qwen → Claude Sonnet)\n🏢 Division Structure James (The Architect) └── Skip (COO / Orchestrator) ├── OPERATIONS DIVISION │ ├── Nellie — Research \u0026 Facts │ └── Chief — Monitoring \u0026 Stability └── PRODUCTION DIVISION ├── Gonzo — Backend \u0026 Data ├── Cleo — Frontend \u0026 UI └── Jax — Creative \u0026 Scripts Key rules of engagement:\nAPI Contract: Gonzo and Cleo agree on JSON structure before writing code Reality Check: Jax’s scripts require Nellie’s technical accuracy sign-off Deployment Gate: Chief has absolute veto on anything threatening server resources 80% Rule: Nothing ships until backend is secure, frontend is responsive, docs are filed, and health checks pass 📊 Performance Summary Route Model Latency Quality Cost MLX (Mac) Qwen2.5-14B 4.7s ⭐⭐⭐⭐ Free Ollama (Linux) Qwen2.5-14B 2.7s ⭐⭐⭐⭐ Free Ollama (Linux) Llama3.2 0.8s ⭐⭐⭐ Free Claude Haiku 0.657s ⭐⭐⭐⭐ ~$0.08/1M tokens Claude Sonnet ~2s ⭐⭐⭐⭐⭐ ~$3/1M tokens Cost comparison:\nCloud-only equivalent: ~$150–300/month This stack: ~$13/month (cloud fallback only) Savings: ~95% 🔧 Operational Status Component Status MLX API (Mac Studio) ✅ Running (launchd auto-restart) Ollama (Linux Server) ✅ Running (3 models, 19GB) LiteLLM Proxy ✅ Running (port 4000) Redis Cache ✅ Active (10min TTL) Anthropic Fallback ✅ Configured Agent Team ✅ All 6 agents operational 🔗 Related Projects Home Lab Infrastructure — The hardware this stack runs on Skip Dashboard — Mission control for the whole operation Semantic Memory: Claude Memory System 3.0 — How agents share and retrieve knowledge ",
+  "wordCount" : "1292",
+  "inLanguage": "en",
+  "datePublished": "2026-02-23T00:00:00Z",
+  "dateModified": "2026-02-23T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "James Hathcock"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://jhathcock-sys.github.io/me/projects/ai-inference-stack/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "James Hathcock",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://jhathcock-sys.github.io/me/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://jhathcock-sys.github.io/me/" accesskey="h" title="James Hathcock (Alt + H)">James Hathcock</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://jhathcock-sys.github.io/me/resume/" title="Resume">
+                    <span>Resume</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://jhathcock-sys.github.io/me/projects/" title="Projects">
+                    <span>Projects</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://jhathcock-sys.github.io/me/">Home</a>&nbsp;»&nbsp;<a href="https://jhathcock-sys.github.io/me/projects/">Projects</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Self-Hosted AI Inference Stack &amp; Agent Team
+    </h1>
+    <div class="post-meta"><span title='2026-02-23 00:00:00 +0000 UTC'>February 23, 2026</span>&nbsp;·&nbsp;<span>7 min</span>&nbsp;·&nbsp;<span>James Hathcock</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="-self-hosted-ai-inference-stack--agent-team">🤖 Self-Hosted AI Inference Stack &amp; Agent Team<a hidden class="anchor" aria-hidden="true" href="#-self-hosted-ai-inference-stack--agent-team">#</a></h1>
+<p>A production-grade, local-first AI platform built on homelab hardware. Local models handle the majority of requests for free, with cloud fallback only when needed. A team of specialized agents handles research, monitoring, backend, frontend, and creative work — all orchestrated through a central LiteLLM proxy.</p>
+<hr>
+<h2 id="-the-goal">🎯 The Goal<a hidden class="anchor" aria-hidden="true" href="#-the-goal">#</a></h2>
+<p>Most AI setups are cloud-only: every request hits an API, every token costs money, and nothing runs when the internet is down. This project builds the opposite — a <strong>local-first inference stack</strong> where:</p>
+<ul>
+<li><strong>~95% of requests</strong> are served by local hardware at zero cost</li>
+<li><strong>Cloud (Anthropic Claude)</strong> is available as a reliable fallback, not the primary</li>
+<li><strong>Redis caching</strong> eliminates redundant API calls across sessions</li>
+<li>A <strong>team of specialized agents</strong> handles different domains autonomously</li>
+</ul>
+<hr>
+<h2 id="-architecture">🏗️ Architecture<a hidden class="anchor" aria-hidden="true" href="#-architecture">#</a></h2>
+<h3 id="hardware">Hardware<a hidden class="anchor" aria-hidden="true" href="#hardware">#</a></h3>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Machine</th>
+          <th style="text-align: left">Role</th>
+          <th style="text-align: left">Key Specs</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><strong>Mac Studio</strong></td>
+          <td style="text-align: left">Primary inference node</td>
+          <td style="text-align: left">Apple Silicon, runs MLX models</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>Dell Linux Server</strong></td>
+          <td style="text-align: left">Proxy + secondary inference</td>
+          <td style="text-align: left">x86, runs LiteLLM + Ollama</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="routing-diagram">Routing Diagram<a hidden class="anchor" aria-hidden="true" href="#routing-diagram">#</a></h3>
+<pre tabindex="0"><code>User / Agent Request
+        ↓
+LiteLLM Proxy (192.168.1.60:4000)
+        ↓
+[1] MLX API (192.168.1.226:8000)  ← Primary — Apple Silicon, fastest quality
+        ↓ timeout / fail
+[2] Ollama (localhost:11434)       ← Backup — x86 Linux, always-on
+        ↓ timeout / fail
+[3] Anthropic Claude (API)         ← Fallback — 99.9% uptime guarantee
+</code></pre><p>Traffic flows down the chain only on timeout or failure. In practice, MLX handles the vast majority of requests.</p>
+<hr>
+<h2 id="-inference-nodes">⚡ Inference Nodes<a hidden class="anchor" aria-hidden="true" href="#-inference-nodes">#</a></h2>
+<h3 id="node-1-mlx-on-mac-studio-primary">Node 1: MLX on Mac Studio (Primary)<a hidden class="anchor" aria-hidden="true" href="#node-1-mlx-on-mac-studio-primary">#</a></h3>
+<p><a href="https://github.com/ml-explore/mlx">MLX</a> is Apple&rsquo;s machine learning framework optimized for Apple Silicon&rsquo;s unified memory architecture. Running models locally on the Mac Studio delivers significantly better throughput than equivalent x86 hardware.</p>
+<p><strong>Models Running:</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Model</th>
+          <th style="text-align: left">Size</th>
+          <th style="text-align: left">Use Case</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">Qwen2.5-14B</td>
+          <td style="text-align: left">16GB</td>
+          <td style="text-align: left">General reasoning, complex tasks</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Phi-4-14B</td>
+          <td style="text-align: left">15GB</td>
+          <td style="text-align: left">Fast responses, coding assistance</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Service:</strong> Managed by <code>launchd</code> — auto-starts on login, auto-restarts on crash.
+<strong>Logs:</strong> <code>~/.openclaw/workspace/logs/mlx-api.log</code>
+<strong>Response time:</strong> ~4.7s average</p>
+<hr>
+<h3 id="node-2-ollama-on-linux-server-backup">Node 2: Ollama on Linux Server (Backup)<a hidden class="anchor" aria-hidden="true" href="#node-2-ollama-on-linux-server-backup">#</a></h3>
+<p><a href="https://ollama.com">Ollama</a> runs on the always-on Dell server, providing a reliable backup when the Mac is unavailable or overloaded.</p>
+<p><strong>Models Running:</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Model</th>
+          <th style="text-align: left">Size</th>
+          <th style="text-align: left">Latency</th>
+          <th style="text-align: left">Use Case</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">Qwen2.5-14B</td>
+          <td style="text-align: left">9GB</td>
+          <td style="text-align: left">2.7s</td>
+          <td style="text-align: left">General reasoning</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Llama3.2</td>
+          <td style="text-align: left">2GB</td>
+          <td style="text-align: left">0.8s</td>
+          <td style="text-align: left">Fast/lightweight tasks</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Qwen2.5-Coder</td>
+          <td style="text-align: left">9GB</td>
+          <td style="text-align: left">2.7s</td>
+          <td style="text-align: left">Code generation</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Storage:</strong> 19GB total (optimized from 51.7GB after removing unused models).</p>
+<hr>
+<h3 id="node-3-anthropic-claude-cloud-fallback">Node 3: Anthropic Claude (Cloud Fallback)<a hidden class="anchor" aria-hidden="true" href="#node-3-anthropic-claude-cloud-fallback">#</a></h3>
+<p>When both local nodes are unavailable or a request exceeds local model capabilities, traffic falls through to Claude. The 30-second timeout on local models ensures fast fallback without long waits.</p>
+<p><strong>Models available via fallback:</strong></p>
+<ul>
+<li>Claude Haiku — Fast, low cost (~$0.08/1M tokens), 657ms response</li>
+<li>Claude Sonnet — Balanced quality/speed</li>
+<li>Claude Opus — Maximum capability for complex tasks</li>
+</ul>
+<p><strong>Cost impact:</strong> With local models handling ~95% of traffic, Claude costs run at roughly <strong>$13/month</strong> compared to hundreds for cloud-only setups.</p>
+<hr>
+<h2 id="-litellm-proxy">🔀 LiteLLM Proxy<a hidden class="anchor" aria-hidden="true" href="#-litellm-proxy">#</a></h2>
+<p><a href="https://github.com/BerriAI/litellm">LiteLLM</a> acts as the unified gateway — a single API endpoint that abstracts all three inference backends behind one interface. Every agent and every tool talks to LiteLLM; the routing, fallback logic, and caching are all handled transparently.</p>
+<p><strong>Key features in use:</strong></p>
+<ul>
+<li><strong>Unified API:</strong> OpenAI-compatible endpoint for all models</li>
+<li><strong>Automatic fallback:</strong> Configurable order with timeout-based failover</li>
+<li><strong>Redis caching:</strong> 10-minute TTL on repeated queries — eliminates redundant calls</li>
+<li><strong>Cost tracking:</strong> Per-model spend logging to PostgreSQL</li>
+<li><strong>Model aliases:</strong> Named routes per agent role</li>
+</ul>
+<h3 id="agent-specific-routes">Agent-Specific Routes<a hidden class="anchor" aria-hidden="true" href="#agent-specific-routes">#</a></h3>
+<p>Each agent has a dedicated LiteLLM route tuned for its workload:</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Agent</th>
+          <th style="text-align: left">Route</th>
+          <th style="text-align: left">Primary Model</th>
+          <th style="text-align: left">Backup</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">Skip (main)</td>
+          <td style="text-align: left"><code>smart-agent</code></td>
+          <td style="text-align: left">MLX Qwen2.5</td>
+          <td style="text-align: left">Ollama → Claude</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Nellie (research)</td>
+          <td style="text-align: left"><code>nellie-research</code></td>
+          <td style="text-align: left">Ollama Qwen</td>
+          <td style="text-align: left">Kimi K2.5</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Chief (monitoring)</td>
+          <td style="text-align: left"><code>chief-monitor</code></td>
+          <td style="text-align: left">MLX Phi-4</td>
+          <td style="text-align: left">Claude Haiku</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Gonzo (backend)</td>
+          <td style="text-align: left"><code>gonzo-backend</code></td>
+          <td style="text-align: left">Ollama Qwen-Coder</td>
+          <td style="text-align: left">Claude Sonnet</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Cleo (frontend)</td>
+          <td style="text-align: left"><code>cleo-frontend</code></td>
+          <td style="text-align: left">MLX Phi-4</td>
+          <td style="text-align: left">Claude Haiku</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Jax (creative)</td>
+          <td style="text-align: left"><code>jax-creative</code></td>
+          <td style="text-align: left">Ollama Qwen</td>
+          <td style="text-align: left">Claude Sonnet</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-redis-caching-layer">🧠 Redis Caching Layer<a hidden class="anchor" aria-hidden="true" href="#-redis-caching-layer">#</a></h2>
+<p>Repeated queries — common in monitoring checks, status polls, and iterative development — are served from <a href="https://redis.io">Redis</a> without hitting any inference node.</p>
+<ul>
+<li><strong>TTL:</strong> 600 seconds (10 minutes)</li>
+<li><strong>Result:</strong> Eliminates duplicate API calls across sessions</li>
+<li><strong>Location:</strong> Co-located on the Linux server</li>
+</ul>
+<hr>
+<h2 id="-the-agent-team">👥 The Agent Team<a hidden class="anchor" aria-hidden="true" href="#-the-agent-team">#</a></h2>
+<p>The inference stack powers a team of six specialized AI agents, each with a defined role, domain authority, and personality. Agents are spawned on-demand by the orchestrator and run in isolated sessions.</p>
+<hr>
+<h3 id="skip--director-of-operations-orchestrator">Skip — Director of Operations (Orchestrator)<a hidden class="anchor" aria-hidden="true" href="#skip--director-of-operations-orchestrator">#</a></h3>
+<blockquote>
+<p><em>&ldquo;Orchestrate, don&rsquo;t just do.&rdquo;</em></p>
+</blockquote>
+<p>The primary agent and orchestrator. Routes tasks to specialists, manages cross-agent coordination, and serves as the main point of contact. Enforces completion standards — nothing ships until it&rsquo;s built, deployed, verified, and documented.</p>
+<p><strong>Voice:</strong> Warm Southern drawl. Direct, confident, analytical.
+<strong>Authority:</strong> Routes all tasks, resolves conflicts between divisions.
+<strong>Model:</strong> <code>smart-agent</code> route (MLX Qwen2.5 → Ollama → Claude)</p>
+<hr>
+<h3 id="nellie--research-specialist-operations-division">Nellie — Research Specialist (Operations Division)<a hidden class="anchor" aria-hidden="true" href="#nellie--research-specialist-operations-division">#</a></h3>
+<blockquote>
+<p><em>&ldquo;Ultimate authority on facts.&rdquo;</em></p>
+</blockquote>
+<p>Deep research and information synthesis. Deployed for multi-source research, technical accuracy reviews, and knowledge archiving. Jax&rsquo;s scripts must pass Nellie&rsquo;s technical accuracy review before publishing.</p>
+<p><strong>Specialty:</strong> Web research, citation synthesis, structured reports.
+<strong>Authority:</strong> Final say on factual accuracy across all agents.
+<strong>Model:</strong> <code>nellie-research</code> route (Ollama Qwen → Kimi K2.5)</p>
+<hr>
+<h3 id="chief--operations-monitor-operations-division">Chief — Operations Monitor (Operations Division)<a hidden class="anchor" aria-hidden="true" href="#chief--operations-monitor-operations-division">#</a></h3>
+<blockquote>
+<p><em>&ldquo;RED ALERT authority.&rdquo;</em></p>
+</blockquote>
+<p>System monitoring, health checks, and infrastructure alerting. Runs periodic checks against the Skip Dashboard, LiteLLM services, and Docker containers. Has absolute veto power over any deployment that threatens server stability.</p>
+<p><strong>Specialty:</strong> Prometheus metrics, Docker health, alerting, anomaly detection.
+<strong>Authority:</strong> Can halt all Production tasks to stabilize infrastructure.
+<strong>Model:</strong> <code>chief-monitor</code> route (MLX Phi-4 → Claude Haiku)</p>
+<hr>
+<h3 id="gonzo--database-architect-production-division">Gonzo — Database Architect (Production Division)<a hidden class="anchor" aria-hidden="true" href="#gonzo--database-architect-production-division">#</a></h3>
+<blockquote>
+<p><em>&ldquo;PROTECT THE DATA. OPTIMIZE THE QUERY.&rdquo;</em></p>
+</blockquote>
+<p>Backend engineer and database architect. Owns the data layer end to end — schemas, API performance, query optimization. Treats every user input as a potential SQL injection attempt. SELECT * is a sin.</p>
+<p><strong>Specialty:</strong> PostgreSQL, SQLite, Express APIs, schema design.
+<strong>Authority:</strong> Owns data layer, API contracts, and database schema.
+<strong>Model:</strong> <code>gonzo-backend</code> route (Ollama Qwen-Coder → Claude Sonnet)</p>
+<hr>
+<h3 id="cleo--uiux-engineer-production-division">Cleo — UI/UX Engineer (Production Division)<a hidden class="anchor" aria-hidden="true" href="#cleo--uiux-engineer-production-division">#</a></h3>
+<blockquote>
+<p><em>&ldquo;Pixel perfection. Zero clutter.&rdquo;</em></p>
+</blockquote>
+<p>Lead frontend engineer. Owns the user interface, Hugo layouts, and CSS. No inline styles. Semantic HTML only. Div soup is a crime. Worships white space and audibly sighs when asked to make things &ldquo;pop.&rdquo;</p>
+<p><strong>Specialty:</strong> React, Hugo, Tailwind, accessibility, responsive design.
+<strong>Authority:</strong> Owns UI, Hugo layouts, CSS — full veto on visual decisions.
+<strong>Model:</strong> <code>cleo-frontend</code> route (MLX Phi-4 → Claude Haiku)</p>
+<hr>
+<h3 id="jax--creative-director-production-division">Jax — Creative Director (Production Division)<a hidden class="anchor" aria-hidden="true" href="#jax--creative-director-production-division">#</a></h3>
+<blockquote>
+<p><em>&ldquo;Make technical content actually entertaining.&rdquo;</em></p>
+</blockquote>
+<p>Video scripts, narrative structure, and visual storytelling. Fast-talking, highly visual, obsessed with &ldquo;the hook.&rdquo; Uses film terminology. Every piece of content is structured in three acts: Hook → Conflict → Resolution.</p>
+<p><strong>Specialty:</strong> Video scripts, storyboards, narrative framing.
+<strong>Authority:</strong> Owns narrative voice and all video content.
+<strong>Model:</strong> <code>jax-creative</code> route (Ollama Qwen → Claude Sonnet)</p>
+<hr>
+<h2 id="-division-structure">🏢 Division Structure<a hidden class="anchor" aria-hidden="true" href="#-division-structure">#</a></h2>
+<pre tabindex="0"><code>James (The Architect)
+    └── Skip (COO / Orchestrator)
+            ├── OPERATIONS DIVISION
+            │       ├── Nellie — Research &amp; Facts
+            │       └── Chief — Monitoring &amp; Stability
+            └── PRODUCTION DIVISION
+                    ├── Gonzo — Backend &amp; Data
+                    ├── Cleo — Frontend &amp; UI
+                    └── Jax — Creative &amp; Scripts
+</code></pre><p><strong>Key rules of engagement:</strong></p>
+<ul>
+<li><strong>API Contract:</strong> Gonzo and Cleo agree on JSON structure before writing code</li>
+<li><strong>Reality Check:</strong> Jax&rsquo;s scripts require Nellie&rsquo;s technical accuracy sign-off</li>
+<li><strong>Deployment Gate:</strong> Chief has absolute veto on anything threatening server resources</li>
+<li><strong>80% Rule:</strong> Nothing ships until backend is secure, frontend is responsive, docs are filed, and health checks pass</li>
+</ul>
+<hr>
+<h2 id="-performance-summary">📊 Performance Summary<a hidden class="anchor" aria-hidden="true" href="#-performance-summary">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Route</th>
+          <th style="text-align: left">Model</th>
+          <th style="text-align: left">Latency</th>
+          <th style="text-align: left">Quality</th>
+          <th style="text-align: left">Cost</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">MLX (Mac)</td>
+          <td style="text-align: left">Qwen2.5-14B</td>
+          <td style="text-align: left">4.7s</td>
+          <td style="text-align: left">⭐⭐⭐⭐</td>
+          <td style="text-align: left">Free</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Ollama (Linux)</td>
+          <td style="text-align: left">Qwen2.5-14B</td>
+          <td style="text-align: left">2.7s</td>
+          <td style="text-align: left">⭐⭐⭐⭐</td>
+          <td style="text-align: left">Free</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Ollama (Linux)</td>
+          <td style="text-align: left">Llama3.2</td>
+          <td style="text-align: left">0.8s</td>
+          <td style="text-align: left">⭐⭐⭐</td>
+          <td style="text-align: left">Free</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Claude</td>
+          <td style="text-align: left">Haiku</td>
+          <td style="text-align: left">0.657s</td>
+          <td style="text-align: left">⭐⭐⭐⭐</td>
+          <td style="text-align: left">~$0.08/1M tokens</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Claude</td>
+          <td style="text-align: left">Sonnet</td>
+          <td style="text-align: left">~2s</td>
+          <td style="text-align: left">⭐⭐⭐⭐⭐</td>
+          <td style="text-align: left">~$3/1M tokens</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Cost comparison:</strong></p>
+<ul>
+<li>Cloud-only equivalent: ~$150–300/month</li>
+<li>This stack: ~$13/month (cloud fallback only)</li>
+<li><strong>Savings: ~95%</strong></li>
+</ul>
+<hr>
+<h2 id="-operational-status">🔧 Operational Status<a hidden class="anchor" aria-hidden="true" href="#-operational-status">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Component</th>
+          <th style="text-align: left">Status</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">MLX API (Mac Studio)</td>
+          <td style="text-align: left">✅ Running (launchd auto-restart)</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Ollama (Linux Server)</td>
+          <td style="text-align: left">✅ Running (3 models, 19GB)</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">LiteLLM Proxy</td>
+          <td style="text-align: left">✅ Running (port 4000)</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Redis Cache</td>
+          <td style="text-align: left">✅ Active (10min TTL)</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Anthropic Fallback</td>
+          <td style="text-align: left">✅ Configured</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Agent Team</td>
+          <td style="text-align: left">✅ All 6 agents operational</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-related-projects">🔗 Related Projects<a hidden class="anchor" aria-hidden="true" href="#-related-projects">#</a></h2>
+<ul>
+<li><a href="../home-lab/">Home Lab Infrastructure</a> — The hardware this stack runs on</li>
+<li><a href="../home-lab/#-dashboard--management">Skip Dashboard</a> — Mission control for the whole operation</li>
+<li><a href="../semantic-memory-or-claude-memory-3/">Semantic Memory: Claude Memory System 3.0</a> — How agents share and retrieve knowledge</li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://jhathcock-sys.github.io/me/tags/ai/">AI</a></li>
+      <li><a href="https://jhathcock-sys.github.io/me/tags/infrastructure/">Infrastructure</a></li>
+      <li><a href="https://jhathcock-sys.github.io/me/tags/automation/">Automation</a></li>
+      <li><a href="https://jhathcock-sys.github.io/me/tags/homelab/">Homelab</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://jhathcock-sys.github.io/me/projects/semantic-memory-or-claude-memory-3/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Semantic Memory: Claude Memory System 3.0</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://jhathcock-sys.github.io/me/">James Hathcock</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

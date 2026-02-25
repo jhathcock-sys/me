@@ -16,6 +16,13 @@
       <description>Senior Systems Engineer and IT leader with 20+ years of experience designing, securing, and optimizing enterprise infrastructure across on-premises and hybrid cloud environments.</description>
     </item>
     <item>
+      <title>Self-Hosted AI Inference Stack &amp; Agent Team</title>
+      <link>https://jhathcock-sys.github.io/me/projects/ai-inference-stack/</link>
+      <pubDate>Mon, 23 Feb 2026 00:00:00 +0000</pubDate>
+      <guid>https://jhathcock-sys.github.io/me/projects/ai-inference-stack/</guid>
+      <description>A production-grade, self-hosted AI inference platform with local-first LLM routing, Redis caching, cloud fallback, and a team of specialized AI agents — all running on homelab hardware.</description>
+    </item>
+    <item>
       <title>Semantic Memory: Claude Memory System 3.0</title>
       <link>https://jhathcock-sys.github.io/me/projects/semantic-memory-or-claude-memory-3/</link>
       <pubDate>Mon, 09 Feb 2026 00:00:00 +0000</pubDate>

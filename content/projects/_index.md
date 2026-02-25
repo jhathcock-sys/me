@@ -11,6 +11,13 @@ A collection of technical projects demonstrating hands-on experience with infras
 
 ## Featured Projects
 
+### [Self-Hosted AI Inference Stack & Agent Team](../ai-inference-stack/)
+Production-grade, local-first AI platform combining MLX on Apple Silicon, Ollama on Linux, and Claude as cloud fallback — all routed through LiteLLM with Redis caching. Powers a team of six specialized AI agents handling research, monitoring, backend, frontend, and creative work.
+
+**Technologies:** MLX, Ollama, LiteLLM, Redis, Anthropic Claude, OpenClaw, Apple Silicon
+
+---
+
 ### [Home Lab](../home-lab/)
 Self-hosted infrastructure running on Proxmox and Raspberry Pi. Includes monitoring, DNS, dashboards, and containerized services managed via Dockhand.
 
