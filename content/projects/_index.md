@@ -45,3 +45,10 @@ Structured context system for AI-assisted infrastructure development. Converts m
 **Technologies:** Claude Code, XML, Bash, Git
 
 ---
+
+### [Semantic Memory: Claude Memory System 3.0](../semantic-memory-or-claude-memory-3/)
+Evolution from file-based context to semantic vector search using ChromaDB. On-demand retrieval via MCP integration replaces pre-loaded context — AI memory that scales with your infrastructure.
+
+**Technologies:** ChromaDB, MCP, Python, Vector Embeddings, Claude Code
+
+---

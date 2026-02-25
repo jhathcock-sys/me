@@ -4,10 +4,34 @@
     <title>James Hathcock</title>
     <link>https://jhathcock-sys.github.io/me/</link>
     <description>Recent content on James Hathcock</description>
-    <generator>Hugo -- 0.154.3</generator>
+    <generator>Hugo -- 0.156.0</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 04 Feb 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 25 Feb 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://jhathcock-sys.github.io/me/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>James Hathcock</title>
+      <link>https://jhathcock-sys.github.io/me/resume/</link>
+      <pubDate>Wed, 25 Feb 2026 00:00:00 +0000</pubDate>
+      <guid>https://jhathcock-sys.github.io/me/resume/</guid>
+      <description>Senior Systems Engineer and IT leader with 20+ years of experience designing, securing, and optimizing enterprise infrastructure across on-premises and hybrid cloud environments.</description>
+    </item>
+    <item>
+      <title>Semantic Memory: Claude Memory System 3.0</title>
+      <link>https://jhathcock-sys.github.io/me/projects/semantic-memory-or-claude-memory-3/</link>
+      <pubDate>Mon, 09 Feb 2026 00:00:00 +0000</pubDate>
+      <guid>https://jhathcock-sys.github.io/me/projects/semantic-memory-or-claude-memory-3/</guid>
+      <description>&lt;h1 id=&#34;-semantic-memory-claude-memory-system-30&#34;&gt;🧠 Semantic Memory: Claude Memory System 3.0&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;Part 3 of the Claude Code Memory System series&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;This article documents the evolution from file-based context to semantic vector search. If you haven&amp;rsquo;t read the previous parts, start with:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;../claude-memory/&#34;&gt;Part 1: Claude Code Memory System&lt;/a&gt; - XML-based context and directives&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;../claude-memory/#evolution-memory-system-20-february-2026&#34;&gt;Part 2: Memory System 2.0&lt;/a&gt; - Symlink architecture and sync automation&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;-evolution-memory-system-30-february-2026&#34;&gt;🔄 Evolution: Memory System 3.0 (February 2026)&lt;/h2&gt;
+&lt;h3 id=&#34;the-limits-of-files&#34;&gt;The Limits of Files&lt;/h3&gt;
+&lt;p&gt;Memory Systems 1.0 and 2.0 solved real problems. XML-based CLAUDE.md files gave Claude structured context, and the symlink architecture kept everything in sync across projects. But as the homelab grew, cracks started to show.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Claude Code Custom Agent System</title>
       <link>https://jhathcock-sys.github.io/me/projects/claude-code-agents/</link>
@@ -87,7 +111,7 @@
 &lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
 &lt;h2 id=&#34;-deployment-workflow&#34;&gt;🚀 Deployment Workflow&lt;/h2&gt;
 &lt;h3 id=&#34;local-stacks-proxmoxbox&#34;&gt;Local Stacks (ProxMoxBox)&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 1. Edit compose files locally&lt;/span&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 1. Edit compose files locally&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;vim proxmox/homepage/docker-compose.yaml
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 2. Commit and push&lt;/span&gt;
@@ -120,13 +144,6 @@
 &lt;li&gt;Project changelogs and infrastructure evolution&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;The wiki is built with Quartz v4 and features full-text search, graph view, and WikiLinks for easy navigation.&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>James Hathcock</title>
-      <link>https://jhathcock-sys.github.io/me/resume/</link>
-      <pubDate>Thu, 08 Jan 2026 00:00:00 +0000</pubDate>
-      <guid>https://jhathcock-sys.github.io/me/resume/</guid>
-      <description>Senior Systems Engineer with 30 years of experience architecting, securing, and optimizing enterprise IT infrastructure.</description>
     </item>
   </channel>
 </rss>

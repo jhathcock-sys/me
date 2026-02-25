@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Semantic Memory: Claude Memory System 3.0 | James Hathcock</title>
+<meta name="keywords" content="">
+<meta name="description" content="🧠 Semantic Memory: Claude Memory System 3.0
+Part 3 of the Claude Code Memory System series
+This article documents the evolution from file-based context to semantic vector search. If you haven&rsquo;t read the previous parts, start with:
+
+Part 1: Claude Code Memory System - XML-based context and directives
+Part 2: Memory System 2.0 - Symlink architecture and sync automation
+
+
+🔄 Evolution: Memory System 3.0 (February 2026)
+The Limits of Files
+Memory Systems 1.0 and 2.0 solved real problems. XML-based CLAUDE.md files gave Claude structured context, and the symlink architecture kept everything in sync across projects. But as the homelab grew, cracks started to show.">
+<meta name="author" content="James Hathcock">
+<link rel="canonical" href="https://jhathcock-sys.github.io/me/projects/semantic-memory-or-claude-memory-3/">
+<link crossorigin="anonymous" href="/me/assets/css/stylesheet.343cc480b9ffc8f04ccbe5e968ad674880cab773ec19905e93033065c1e7a804.css" integrity="sha256-NDzEgLn/yPBMy&#43;XpaK1nSIDKt3PsGZBekwMwZcHnqAQ=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://jhathcock-sys.github.io/me/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://jhathcock-sys.github.io/me/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jhathcock-sys.github.io/me/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://jhathcock-sys.github.io/me/apple-touch-icon.png">
+<link rel="mask-icon" href="https://jhathcock-sys.github.io/me/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://jhathcock-sys.github.io/me/projects/semantic-memory-or-claude-memory-3/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://jhathcock-sys.github.io/me/projects/semantic-memory-or-claude-memory-3/">
+  <meta property="og:site_name" content="James Hathcock">
+  <meta property="og:title" content="Semantic Memory: Claude Memory System 3.0">
+  <meta property="og:description" content="🧠 Semantic Memory: Claude Memory System 3.0 Part 3 of the Claude Code Memory System series
+This article documents the evolution from file-based context to semantic vector search. If you haven’t read the previous parts, start with:
+Part 1: Claude Code Memory System - XML-based context and directives Part 2: Memory System 2.0 - Symlink architecture and sync automation 🔄 Evolution: Memory System 3.0 (February 2026) The Limits of Files Memory Systems 1.0 and 2.0 solved real problems. XML-based CLAUDE.md files gave Claude structured context, and the symlink architecture kept everything in sync across projects. But as the homelab grew, cracks started to show.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="projects">
+    <meta property="article:published_time" content="2026-02-09T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-02-09T00:00:00+00:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Semantic Memory: Claude Memory System 3.0">
+<meta name="twitter:description" content="🧠 Semantic Memory: Claude Memory System 3.0
+Part 3 of the Claude Code Memory System series
+This article documents the evolution from file-based context to semantic vector search. If you haven&rsquo;t read the previous parts, start with:
+
+Part 1: Claude Code Memory System - XML-based context and directives
+Part 2: Memory System 2.0 - Symlink architecture and sync automation
+
+
+🔄 Evolution: Memory System 3.0 (February 2026)
+The Limits of Files
+Memory Systems 1.0 and 2.0 solved real problems. XML-based CLAUDE.md files gave Claude structured context, and the symlink architecture kept everything in sync across projects. But as the homelab grew, cracks started to show.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Projects",
+      "item": "https://jhathcock-sys.github.io/me/projects/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Semantic Memory: Claude Memory System 3.0",
+      "item": "https://jhathcock-sys.github.io/me/projects/semantic-memory-or-claude-memory-3/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Semantic Memory: Claude Memory System 3.0",
+  "name": "Semantic Memory: Claude Memory System 3.0",
+  "description": "🧠 Semantic Memory: Claude Memory System 3.0 Part 3 of the Claude Code Memory System series\nThis article documents the evolution from file-based context to semantic vector search. If you haven\u0026rsquo;t read the previous parts, start with:\nPart 1: Claude Code Memory System - XML-based context and directives Part 2: Memory System 2.0 - Symlink architecture and sync automation 🔄 Evolution: Memory System 3.0 (February 2026) The Limits of Files Memory Systems 1.0 and 2.0 solved real problems. XML-based CLAUDE.md files gave Claude structured context, and the symlink architecture kept everything in sync across projects. But as the homelab grew, cracks started to show.\n",
+  "keywords": [
+    
+  ],
+  "articleBody": "🧠 Semantic Memory: Claude Memory System 3.0 Part 3 of the Claude Code Memory System series\nThis article documents the evolution from file-based context to semantic vector search. If you haven’t read the previous parts, start with:\nPart 1: Claude Code Memory System - XML-based context and directives Part 2: Memory System 2.0 - Symlink architecture and sync automation 🔄 Evolution: Memory System 3.0 (February 2026) The Limits of Files Memory Systems 1.0 and 2.0 solved real problems. XML-based CLAUDE.md files gave Claude structured context, and the symlink architecture kept everything in sync across projects. But as the homelab grew, cracks started to show.\nThe fundamental issue was retrieval. Every conversation started with Claude loading whatever CLAUDE.md and MEMORY.md files were in scope, parsing the XML, and working from there. This worked fine when the homelab was a handful of services. But with dozens of containers, multiple network segments, architecture decisions scattered across months of work, and runbooks for everything from Wazuh tuning to Jellyfin transcoding – the file-based approach started hitting walls:\nContext window limits are real. You can only stuff so much XML into a conversation before you are burning tokens on context that may not be relevant to the current question. Keyword matching is brittle. If I documented a service under “SIEM stack” but later asked about “security monitoring,” the XML structure had no way to bridge that semantic gap. Manual maintenance does not scale. Every new service meant updating XML files by hand. Every architecture decision needed to be slotted into the right node. The overhead was starting to feel like the problem I was trying to solve. The question became: what if Claude could search for what it needs, the same way a human would search documentation, rather than having everything pre-loaded and hoping the right context is there?\nThe Solution: Vector Database + Semantic Search The answer turned out to be a technology I had been reading about in the context of RAG (Retrieval-Augmented Generation) applications: vector databases. The core idea is straightforward, even if the math underneath is not.\nInstead of storing documents as plain text to be keyword-matched, a vector database converts each document into an embedding – a high-dimensional numerical representation that captures the meaning of the text, not just the words. When you query the database, your question gets converted into the same vector space, and the database finds documents that are semantically close to your query.\nIn practice, this means asking “What IP is my SIEM on?” can find a document that says “Wazuh is deployed at 192.168.1.7” – even though the query never mentions “Wazuh” or the specific IP. The vectors for “SIEM” and “Wazuh” are close in embedding space because they are semantically related.\nThe specific tool: ChromaDB, a lightweight, open-source vector database that runs locally and has a clean Python API. No cloud dependencies, no API keys for the database itself, and it is simple enough to get running in an afternoon.\nArchitecture: Three Collections Rather than dumping everything into a single bucket, the ChromaDB instance is organized into three purpose-built collections:\nCollection Purpose Example Documents infrastructure Network topology, IP assignments, services, stack locations “Wazuh SIEM is deployed at 192.168.1.7 on the Docker host” documentation How-to guides, runbooks, troubleshooting notes “To restart the monitoring stack, run docker compose up -d from /opt/monitoring/” decisions Architecture decisions, rationale, lessons learned “Chose Wazuh over ELK because of built-in HIDS and lower resource usage” This separation matters. When Claude needs to answer “What IP is Wazuh on?” it can target the infrastructure collection. When the question is “Why did we pick Wazuh?” it hits decisions. The collection structure acts as a coarse filter before the semantic search even begins, improving both speed and relevance.\nEach document is stored with metadata – source file, date added, tags – so results can be filtered further when needed.\nMCP Integration: Making Memory Transparent The piece that ties this all together is the Model Context Protocol (MCP). MCP is a standard that lets AI assistants access external tools and data sources through a consistent interface. In this case, an MCP server wraps the ChromaDB instance and exposes it as a set of tools that Claude can call directly during a conversation.\nThe MCP server provides operations like:\nchroma_query_documents -- semantic search across a collection chroma_add_documents -- store new knowledge chroma_get_documents -- retrieve specific documents chroma_list_collections -- see what collections exist From Claude’s perspective, querying the memory database is no different from calling any other tool. There is no special prompt engineering, no manual “please check the database” instructions. The tools are simply available, and Claude uses them when they are relevant.\nHere is what the MCP server configuration looks like in practice:\n{ \"mcpServers\": { \"homelab-memory\": { \"command\": \"uvx\", \"args\": [\"chroma-mcp\", \"--chroma-db-path\", \"/home/cib/.chroma-db\"] } } } That is the entire integration. A locally running MCP server pointing at a ChromaDB directory on disk. No cloud services, no complex infrastructure – just a Python process and a database directory.\nReal-World Example Here is what this looks like in practice. I ask a simple question during a conversation:\n“What IP is Wazuh on?”\nBehind the scenes, Claude calls the chroma_query_documents tool against the infrastructure collection with the query text “Wazuh IP address.” ChromaDB converts that query into a vector, searches for the nearest documents, and returns something like:\n{ \"ids\": [[\"infra-wazuh-001\"]], \"documents\": [[\"Wazuh SIEM stack is deployed on the Docker host at 192.168.1.7. The stack includes wazuh-manager, wazuh-indexer, and wazuh-dashboard. Dashboard is accessible on port 443.\"]], \"metadatas\": [[{\"source\": \"infrastructure-inventory\", \"updated\": \"2026-01-15\"}]], \"distances\": [[0.23]] } Claude gets the document, sees the IP, and responds naturally: “Wazuh is at 192.168.1.7, with the dashboard on port 443.”\nThe critical thing is what did not happen. I did not need to remember which file that information was in. I did not need to tell Claude to check a specific MEMORY.md. I did not need to use the exact keyword that was in the document. The semantic search bridged the gap between my question and the stored knowledge automatically.\nBenefits Over Previous Systems The evolution across all three systems tells a clear story about scaling knowledge management:\nSystem 1.0 System 2.0 System 3.0 Storage Single CLAUDE.md per project Synced files via symlinks ChromaDB vector database Retrieval Loaded at conversation start Loaded at conversation start Queried on demand Search Manual / keyword Manual / keyword Semantic similarity Scaling Limited by context window Limited by context window Grows independently of context Maintenance Manual XML editing Manual with sync Add documents programmatically Cross-project Copy/paste or symlinks Symlinks Single database, all projects The most significant shift is from pre-loaded context to on-demand retrieval. Systems 1.0 and 2.0 relied on front-loading everything Claude might need. System 3.0 lets Claude pull exactly what is relevant, when it is relevant. That is a fundamentally different approach to AI memory.\nMigration: Complementary, Not Replacement An important design decision: System 3.0 does not replace Systems 1.0 and 2.0. It complements them.\nThe CLAUDE.md files still serve their purpose. They hold stable, structural information – persona directives, interaction preferences, network ranges, project-level configuration. This is context that is relevant to every conversation and benefits from being loaded upfront.\nChromaDB handles the long tail: the growing body of documentation, decisions, and infrastructure details that are individually relevant to specific questions but collectively too large to load every time.\nThe migration has been gradual. As I work on projects and generate new documentation, it gets added to the appropriate ChromaDB collection. The existing XML files remain in place. Both systems coexist, and Claude draws from whichever is appropriate for the current question.\nLessons Learned Vector databases are not just for enterprise RAG. The tutorials and blog posts about vector databases tend to focus on massive document corpora and production AI applications. But the same technology works remarkably well for personal knowledge management. A homelab with thirty services and six months of architecture decisions is exactly the kind of growing, loosely-structured knowledge base that benefits from semantic search.\nMCP changes the integration model. Before MCP, giving an AI access to external data meant carefully crafting prompts, pasting content, or building custom tooling. MCP makes external tools feel native. Claude does not treat the ChromaDB query as something special – it is just another tool, like reading a file or running a command. That transparency is what makes the system practical rather than gimmicky.\nSemantic search changes how you document. With keyword-based retrieval, you had to be disciplined about structure, naming, and tagging. With semantic search, you can write naturally and trust that the meaning will be captured. A casually written note about “switching from Elastic to Wazuh because of memory usage” will still surface when someone asks about SIEM architecture decisions months later. The pressure to maintain rigid structure drops significantly.\nDifferent knowledge types still want different storage. XML is excellent for stable, hierarchical configuration. Vector databases are excellent for growing, queryable documentation. Trying to force everything into one system is a mistake. The best architecture uses each tool where it fits.\nWhat’s Next System 3.0 is functional but early. The roadmap includes:\nBroader document ingestion. Changelog entries, git commit summaries, and project notes are all candidates for collection storage. The more knowledge in the database, the more useful semantic search becomes. Embedding model experimentation. The default embedding model works well, but different models have different strengths. Testing alternatives for homelab-specific technical content could improve retrieval quality. Automated collection updates. Right now, documents are added manually or during conversations. The next step is building lightweight automation – a script that watches for new documentation files and indexes them into the appropriate collection automatically. Multi-modal memory. Network diagrams, architecture sketches, dashboard screenshots. Vector databases can handle image embeddings alongside text. Being able to ask “Show me the network topology” and get back an actual diagram is a compelling future state. The bigger picture is this: AI memory is not a solved problem. Each iteration of this system has taught me something about how humans and AI assistants can share context effectively. The shift from “load everything upfront” to “search for what you need” feels like the right architectural direction. The question now is how far that paradigm can scale – and what new capabilities emerge when an AI assistant has genuine, searchable memory of every decision, every configuration, and every lesson learned across an entire infrastructure.\n🔗 Series Navigation ← Part 1: Claude Code Memory System - The foundation with XML context ← Part 2: Memory System 2.0 - Symlink architecture 🔗 Related Projects HomeLab Infrastructure - The infrastructure this memory system documents GitOps Workflow - Docker Compose management with version control ",
+  "wordCount" : "1777",
+  "inLanguage": "en",
+  "datePublished": "2026-02-09T00:00:00Z",
+  "dateModified": "2026-02-09T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "James Hathcock"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://jhathcock-sys.github.io/me/projects/semantic-memory-or-claude-memory-3/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "James Hathcock",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://jhathcock-sys.github.io/me/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://jhathcock-sys.github.io/me/" accesskey="h" title="James Hathcock (Alt + H)">James Hathcock</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://jhathcock-sys.github.io/me/resume/" title="Resume">
+                    <span>Resume</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://jhathcock-sys.github.io/me/projects/" title="Projects">
+                    <span>Projects</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://jhathcock-sys.github.io/me/">Home</a>&nbsp;»&nbsp;<a href="https://jhathcock-sys.github.io/me/projects/">Projects</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Semantic Memory: Claude Memory System 3.0
+    </h1>
+    <div class="post-meta"><span title='2026-02-09 00:00:00 +0000 UTC'>February 9, 2026</span>&nbsp;·&nbsp;<span>9 min</span>&nbsp;·&nbsp;<span>James Hathcock</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="-semantic-memory-claude-memory-system-30">🧠 Semantic Memory: Claude Memory System 3.0<a hidden class="anchor" aria-hidden="true" href="#-semantic-memory-claude-memory-system-30">#</a></h1>
+<p><strong>Part 3 of the Claude Code Memory System series</strong></p>
+<p>This article documents the evolution from file-based context to semantic vector search. If you haven&rsquo;t read the previous parts, start with:</p>
+<ul>
+<li><a href="../claude-memory/">Part 1: Claude Code Memory System</a> - XML-based context and directives</li>
+<li><a href="../claude-memory/#evolution-memory-system-20-february-2026">Part 2: Memory System 2.0</a> - Symlink architecture and sync automation</li>
+</ul>
+<hr>
+<h2 id="-evolution-memory-system-30-february-2026">🔄 Evolution: Memory System 3.0 (February 2026)<a hidden class="anchor" aria-hidden="true" href="#-evolution-memory-system-30-february-2026">#</a></h2>
+<h3 id="the-limits-of-files">The Limits of Files<a hidden class="anchor" aria-hidden="true" href="#the-limits-of-files">#</a></h3>
+<p>Memory Systems 1.0 and 2.0 solved real problems. XML-based CLAUDE.md files gave Claude structured context, and the symlink architecture kept everything in sync across projects. But as the homelab grew, cracks started to show.</p>
+<p>The fundamental issue was <strong>retrieval</strong>. Every conversation started with Claude loading whatever CLAUDE.md and MEMORY.md files were in scope, parsing the XML, and working from there. This worked fine when the homelab was a handful of services. But with dozens of containers, multiple network segments, architecture decisions scattered across months of work, and runbooks for everything from Wazuh tuning to Jellyfin transcoding &ndash; the file-based approach started hitting walls:</p>
+<ul>
+<li><strong>Context window limits are real.</strong> You can only stuff so much XML into a conversation before you are burning tokens on context that may not be relevant to the current question.</li>
+<li><strong>Keyword matching is brittle.</strong> If I documented a service under &ldquo;SIEM stack&rdquo; but later asked about &ldquo;security monitoring,&rdquo; the XML structure had no way to bridge that semantic gap.</li>
+<li><strong>Manual maintenance does not scale.</strong> Every new service meant updating XML files by hand. Every architecture decision needed to be slotted into the right node. The overhead was starting to feel like the problem I was trying to solve.</li>
+</ul>
+<p>The question became: what if Claude could <em>search</em> for what it needs, the same way a human would search documentation, rather than having everything pre-loaded and hoping the right context is there?</p>
+<h3 id="the-solution-vector-database--semantic-search">The Solution: Vector Database + Semantic Search<a hidden class="anchor" aria-hidden="true" href="#the-solution-vector-database--semantic-search">#</a></h3>
+<p>The answer turned out to be a technology I had been reading about in the context of RAG (Retrieval-Augmented Generation) applications: <strong>vector databases</strong>. The core idea is straightforward, even if the math underneath is not.</p>
+<p>Instead of storing documents as plain text to be keyword-matched, a vector database converts each document into an <strong>embedding</strong> &ndash; a high-dimensional numerical representation that captures the <em>meaning</em> of the text, not just the words. When you query the database, your question gets converted into the same vector space, and the database finds documents that are semantically close to your query.</p>
+<p>In practice, this means asking &ldquo;What IP is my SIEM on?&rdquo; can find a document that says &ldquo;Wazuh is deployed at 192.168.1.7&rdquo; &ndash; even though the query never mentions &ldquo;Wazuh&rdquo; or the specific IP. The vectors for &ldquo;SIEM&rdquo; and &ldquo;Wazuh&rdquo; are close in embedding space because they are semantically related.</p>
+<p>The specific tool: <strong>ChromaDB</strong>, a lightweight, open-source vector database that runs locally and has a clean Python API. No cloud dependencies, no API keys for the database itself, and it is simple enough to get running in an afternoon.</p>
+<h3 id="architecture-three-collections">Architecture: Three Collections<a hidden class="anchor" aria-hidden="true" href="#architecture-three-collections">#</a></h3>
+<p>Rather than dumping everything into a single bucket, the ChromaDB instance is organized into three purpose-built collections:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Collection</th>
+          <th>Purpose</th>
+          <th>Example Documents</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>infrastructure</code></td>
+          <td>Network topology, IP assignments, services, stack locations</td>
+          <td>&ldquo;Wazuh SIEM is deployed at 192.168.1.7 on the Docker host&rdquo;</td>
+      </tr>
+      <tr>
+          <td><code>documentation</code></td>
+          <td>How-to guides, runbooks, troubleshooting notes</td>
+          <td>&ldquo;To restart the monitoring stack, run docker compose up -d from /opt/monitoring/&rdquo;</td>
+      </tr>
+      <tr>
+          <td><code>decisions</code></td>
+          <td>Architecture decisions, rationale, lessons learned</td>
+          <td>&ldquo;Chose Wazuh over ELK because of built-in HIDS and lower resource usage&rdquo;</td>
+      </tr>
+  </tbody>
+</table>
+<p>This separation matters. When Claude needs to answer &ldquo;What IP is Wazuh on?&rdquo; it can target the <code>infrastructure</code> collection. When the question is &ldquo;Why did we pick Wazuh?&rdquo; it hits <code>decisions</code>. The collection structure acts as a coarse filter before the semantic search even begins, improving both speed and relevance.</p>
+<p>Each document is stored with metadata &ndash; source file, date added, tags &ndash; so results can be filtered further when needed.</p>
+<h3 id="mcp-integration-making-memory-transparent">MCP Integration: Making Memory Transparent<a hidden class="anchor" aria-hidden="true" href="#mcp-integration-making-memory-transparent">#</a></h3>
+<p>The piece that ties this all together is the <strong>Model Context Protocol (MCP)</strong>. MCP is a standard that lets AI assistants access external tools and data sources through a consistent interface. In this case, an MCP server wraps the ChromaDB instance and exposes it as a set of tools that Claude can call directly during a conversation.</p>
+<p>The MCP server provides operations like:</p>
+<pre tabindex="0"><code>chroma_query_documents   -- semantic search across a collection
+chroma_add_documents     -- store new knowledge
+chroma_get_documents     -- retrieve specific documents
+chroma_list_collections  -- see what collections exist
+</code></pre><p>From Claude&rsquo;s perspective, querying the memory database is no different from calling any other tool. There is no special prompt engineering, no manual &ldquo;please check the database&rdquo; instructions. The tools are simply available, and Claude uses them when they are relevant.</p>
+<p>Here is what the MCP server configuration looks like in practice:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;mcpServers&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;homelab-memory&#34;</span>: {
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;command&#34;</span>: <span style="color:#e6db74">&#34;uvx&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;args&#34;</span>: [<span style="color:#e6db74">&#34;chroma-mcp&#34;</span>, <span style="color:#e6db74">&#34;--chroma-db-path&#34;</span>, <span style="color:#e6db74">&#34;/home/cib/.chroma-db&#34;</span>]
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>That is the entire integration. A locally running MCP server pointing at a ChromaDB directory on disk. No cloud services, no complex infrastructure &ndash; just a Python process and a database directory.</p>
+<h3 id="real-world-example">Real-World Example<a hidden class="anchor" aria-hidden="true" href="#real-world-example">#</a></h3>
+<p>Here is what this looks like in practice. I ask a simple question during a conversation:</p>
+<blockquote>
+<p>&ldquo;What IP is Wazuh on?&rdquo;</p>
+</blockquote>
+<p>Behind the scenes, Claude calls the <code>chroma_query_documents</code> tool against the <code>infrastructure</code> collection with the query text &ldquo;Wazuh IP address.&rdquo; ChromaDB converts that query into a vector, searches for the nearest documents, and returns something like:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;ids&#34;</span>: [[<span style="color:#e6db74">&#34;infra-wazuh-001&#34;</span>]],
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;documents&#34;</span>: [[<span style="color:#e6db74">&#34;Wazuh SIEM stack is deployed on the Docker host at 192.168.1.7.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">                  The stack includes wazuh-manager, wazuh-indexer, and wazuh-dashboard.
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">                  Dashboard is accessible on port 443.&#34;</span>]],
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;metadatas&#34;</span>: [[{<span style="color:#f92672">&#34;source&#34;</span>: <span style="color:#e6db74">&#34;infrastructure-inventory&#34;</span>, <span style="color:#f92672">&#34;updated&#34;</span>: <span style="color:#e6db74">&#34;2026-01-15&#34;</span>}]],
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;distances&#34;</span>: [[<span style="color:#ae81ff">0.23</span>]]
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Claude gets the document, sees the IP, and responds naturally: &ldquo;Wazuh is at 192.168.1.7, with the dashboard on port 443.&rdquo;</p>
+<p>The critical thing is what did <em>not</em> happen. I did not need to remember which file that information was in. I did not need to tell Claude to check a specific MEMORY.md. I did not need to use the exact keyword that was in the document. The semantic search bridged the gap between my question and the stored knowledge automatically.</p>
+<h3 id="benefits-over-previous-systems">Benefits Over Previous Systems<a hidden class="anchor" aria-hidden="true" href="#benefits-over-previous-systems">#</a></h3>
+<p>The evolution across all three systems tells a clear story about scaling knowledge management:</p>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th>System 1.0</th>
+          <th>System 2.0</th>
+          <th>System 3.0</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Storage</strong></td>
+          <td>Single CLAUDE.md per project</td>
+          <td>Synced files via symlinks</td>
+          <td>ChromaDB vector database</td>
+      </tr>
+      <tr>
+          <td><strong>Retrieval</strong></td>
+          <td>Loaded at conversation start</td>
+          <td>Loaded at conversation start</td>
+          <td>Queried on demand</td>
+      </tr>
+      <tr>
+          <td><strong>Search</strong></td>
+          <td>Manual / keyword</td>
+          <td>Manual / keyword</td>
+          <td>Semantic similarity</td>
+      </tr>
+      <tr>
+          <td><strong>Scaling</strong></td>
+          <td>Limited by context window</td>
+          <td>Limited by context window</td>
+          <td>Grows independently of context</td>
+      </tr>
+      <tr>
+          <td><strong>Maintenance</strong></td>
+          <td>Manual XML editing</td>
+          <td>Manual with sync</td>
+          <td>Add documents programmatically</td>
+      </tr>
+      <tr>
+          <td><strong>Cross-project</strong></td>
+          <td>Copy/paste or symlinks</td>
+          <td>Symlinks</td>
+          <td>Single database, all projects</td>
+      </tr>
+  </tbody>
+</table>
+<p>The most significant shift is from <strong>pre-loaded context</strong> to <strong>on-demand retrieval</strong>. Systems 1.0 and 2.0 relied on front-loading everything Claude might need. System 3.0 lets Claude pull exactly what is relevant, when it is relevant. That is a fundamentally different approach to AI memory.</p>
+<h3 id="migration-complementary-not-replacement">Migration: Complementary, Not Replacement<a hidden class="anchor" aria-hidden="true" href="#migration-complementary-not-replacement">#</a></h3>
+<p>An important design decision: System 3.0 does not replace Systems 1.0 and 2.0. It complements them.</p>
+<p>The CLAUDE.md files still serve their purpose. They hold stable, structural information &ndash; persona directives, interaction preferences, network ranges, project-level configuration. This is context that is relevant to <em>every</em> conversation and benefits from being loaded upfront.</p>
+<p>ChromaDB handles the long tail: the growing body of documentation, decisions, and infrastructure details that are individually relevant to specific questions but collectively too large to load every time.</p>
+<p>The migration has been gradual. As I work on projects and generate new documentation, it gets added to the appropriate ChromaDB collection. The existing XML files remain in place. Both systems coexist, and Claude draws from whichever is appropriate for the current question.</p>
+<h3 id="lessons-learned">Lessons Learned<a hidden class="anchor" aria-hidden="true" href="#lessons-learned">#</a></h3>
+<p><strong>Vector databases are not just for enterprise RAG.</strong> The tutorials and blog posts about vector databases tend to focus on massive document corpora and production AI applications. But the same technology works remarkably well for personal knowledge management. A homelab with thirty services and six months of architecture decisions is exactly the kind of growing, loosely-structured knowledge base that benefits from semantic search.</p>
+<p><strong>MCP changes the integration model.</strong> Before MCP, giving an AI access to external data meant carefully crafting prompts, pasting content, or building custom tooling. MCP makes external tools feel native. Claude does not treat the ChromaDB query as something special &ndash; it is just another tool, like reading a file or running a command. That transparency is what makes the system practical rather than gimmicky.</p>
+<p><strong>Semantic search changes how you document.</strong> With keyword-based retrieval, you had to be disciplined about structure, naming, and tagging. With semantic search, you can write naturally and trust that the meaning will be captured. A casually written note about &ldquo;switching from Elastic to Wazuh because of memory usage&rdquo; will still surface when someone asks about SIEM architecture decisions months later. The pressure to maintain rigid structure drops significantly.</p>
+<p><strong>Different knowledge types still want different storage.</strong> XML is excellent for stable, hierarchical configuration. Vector databases are excellent for growing, queryable documentation. Trying to force everything into one system is a mistake. The best architecture uses each tool where it fits.</p>
+<h3 id="whats-next">What&rsquo;s Next<a hidden class="anchor" aria-hidden="true" href="#whats-next">#</a></h3>
+<p>System 3.0 is functional but early. The roadmap includes:</p>
+<ul>
+<li><strong>Broader document ingestion.</strong> Changelog entries, git commit summaries, and project notes are all candidates for collection storage. The more knowledge in the database, the more useful semantic search becomes.</li>
+<li><strong>Embedding model experimentation.</strong> The default embedding model works well, but different models have different strengths. Testing alternatives for homelab-specific technical content could improve retrieval quality.</li>
+<li><strong>Automated collection updates.</strong> Right now, documents are added manually or during conversations. The next step is building lightweight automation &ndash; a script that watches for new documentation files and indexes them into the appropriate collection automatically.</li>
+<li><strong>Multi-modal memory.</strong> Network diagrams, architecture sketches, dashboard screenshots. Vector databases can handle image embeddings alongside text. Being able to ask &ldquo;Show me the network topology&rdquo; and get back an actual diagram is a compelling future state.</li>
+</ul>
+<p>The bigger picture is this: AI memory is not a solved problem. Each iteration of this system has taught me something about how humans and AI assistants can share context effectively. The shift from &ldquo;load everything upfront&rdquo; to &ldquo;search for what you need&rdquo; feels like the right architectural direction. The question now is how far that paradigm can scale &ndash; and what new capabilities emerge when an AI assistant has genuine, searchable memory of every decision, every configuration, and every lesson learned across an entire infrastructure.</p>
+<hr>
+<h2 id="-series-navigation">🔗 Series Navigation<a hidden class="anchor" aria-hidden="true" href="#-series-navigation">#</a></h2>
+<ul>
+<li><a href="../claude-memory/">← Part 1: Claude Code Memory System</a> - The foundation with XML context</li>
+<li><a href="../claude-memory/#evolution-memory-system-20-february-2026">← Part 2: Memory System 2.0</a> - Symlink architecture</li>
+</ul>
+<hr>
+<h2 id="-related-projects">🔗 Related Projects<a hidden class="anchor" aria-hidden="true" href="#-related-projects">#</a></h2>
+<ul>
+<li><a href="../home-lab/">HomeLab Infrastructure</a> - The infrastructure this memory system documents</li>
+<li><a href="../gitops/">GitOps Workflow</a> - Docker Compose management with version control</li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://jhathcock-sys.github.io/me/projects/claude-code-agents/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Claude Code Custom Agent System</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://jhathcock-sys.github.io/me/">James Hathcock</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

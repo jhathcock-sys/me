@@ -163,7 +163,7 @@ Basic profile information that personalizes interactions:
     <user_name>James</user_name>
     <location>Delaware, EST (UTC-5)</location>
     <status>Job Hunting (Target: SysAdmin, IT Director, Network/Sec)</status>
-    <years_experience>30+</years_experience>
+    <years_experience>20+</years_experience>
     <key_strengths>Networking, Windows, Project Management</key_strengths>
 </meta_data>
 ```

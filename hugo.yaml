@@ -21,7 +21,7 @@ menu:
 
 params:
   # SEO and Open Graph
-  description: "Senior Systems Engineer with 30+ years experience in cloud infrastructure, Azure, and enterprise IT."
+  description: "Senior Systems Engineer with 20+ years experience in cloud infrastructure, Azure, and enterprise IT."
   author: "James Hathcock"
   keywords: ["Systems Engineer", "Azure", "DevOps", "Infrastructure", "IT Director"]
 
@@ -36,7 +36,7 @@ params:
   profileMode:
     enabled: true
     title: "James Hathcock"
-    subtitle: "Senior Systems Engineer | IT Director | 30+ Years Exp"
+    subtitle: "Senior Systems Engineer | IT Director | 20+ Years Exp"
     buttons:
       - name: View Resume
         url: "/me/resume/"
